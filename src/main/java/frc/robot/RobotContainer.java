@@ -5,10 +5,19 @@
 package frc.robot;
 
 import frc.robot.Constants.OperatorConstants;
-import frc.robot.commands.Autos;
-import frc.robot.commands.ExampleCommand;
-import frc.robot.subsystems.ExampleSubsystem;
+import frc.robot.Constants.SwerveConstants;
+import lib.frc706.cyberlib.commands.XboxDriveCommand;
+import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
+import swervelib.telemetry.SwerveDriveTelemetry;
+import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.commands.*;
+import java.io.File;
+
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -19,18 +28,49 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
-  private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
-  // Replace with CommandPS4Controller or CommandJoystick if needed
-  private final CommandXboxController m_driverController =
-      new CommandXboxController(OperatorConstants.kDriverControllerPort);
+  File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
+  public final SwerveSubsystem swerveSubsystem;
+
+  private Command teleopCommand;
+  
+  
+  private final CommandXboxController driverController;
+  private final CommandXboxController manipulatorController;
+  private AutoCommandManager autoManager;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
-    // Configure the trigger bindings
+    if (DriverStation.isJoystickConnected(OperatorConstants.kDriverControllerPortBT)) {
+      driverController = new CommandXboxController(OperatorConstants.kDriverControllerPortBT);
+    } else {
+      driverController = new CommandXboxController(OperatorConstants.kDriverControllerPortUSB);
+    }
+    if (DriverStation.isJoystickConnected(OperatorConstants.kManipulatorControllerPortBT)) {
+      manipulatorController = new CommandXboxController(OperatorConstants.kManipulatorControllerPortBT);
+    } else {
+      manipulatorController = new CommandXboxController(OperatorConstants.kManipulatorControllerPortUSB);
+    }
+    File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
+    
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, OperatorConstants.kMaxVelTele,
+        SwerveConstants.pathFollowerConfig);
+    swerveSubsystem.swerveDrive.getGyro().setInverted(true);
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+    autoManager = new AutoCommandManager(swerveSubsystem);
+
+    teleopCommand = new XboxDriveCommand(driverController,
+        swerveSubsystem,
+        () -> true,
+        OperatorConstants.kDriverControllerDeadband,
+        OperatorConstants.kMaxVelTele,
+        OperatorConstants.kMaxAccelTele,
+        OperatorConstants.kMaxAngularVelTele,
+        OperatorConstants.kMaxAngularAccelTele).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        swerveSubsystem.setDefaultCommand(getTeleopCommand());
+
     configureBindings();
-  }
+  }   
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
@@ -42,22 +82,50 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
-    // Schedule `ExampleCommand` when `exampleCondition` changes to `true`
-    new Trigger(m_exampleSubsystem::exampleCondition)
-        .onTrue(new ExampleCommand(m_exampleSubsystem));
+    driverController.a()
+        .onTrue(swerveSubsystem.runOnce(() -> {
+          swerveSubsystem.zeroHeading();
+          swerveSubsystem.swerveDrive.synchronizeModuleEncoders();
+          System.out.println("zeroing");
+        })) // reset gyro to 0 degrees when A is pressed
+        .debounce(2) // check if A is pressed for 2 seconds
+        .onTrue(swerveSubsystem.runOnce(() -> {
+          swerveSubsystem.recenter();
+          System.out.println("resetting robot pose");
+        })); // zero heading and reset position to (0,0) if A is pressed for 2 seconds
 
-    // Schedule `exampleMethodCommand` when the Xbox controller's B button is pressed,
-    // cancelling on release.
-    m_driverController.b().whileTrue(m_exampleSubsystem.exampleMethodCommand());
+    driverController.b().whileTrue(new ToSpeakerCommand(swerveSubsystem)
+      );
+    driverController.rightBumper().whileTrue(new TrackSpeakerCommand(swerveSubsystem, 
+      () -> -driverController.getLeftX(),
+      () -> -driverController.getLeftY(), () -> driverController.getRightTriggerAxis() 
+    ));
+  } 
+
+  public Command getTeleopCommand() {
+    swerveSubsystem.swerveDrive.setHeadingCorrection(false);
+    return teleopCommand;
   }
 
-  /**
-   * Use this to pass the autonomous command to the main {@link Robot} class.
-   *
-   * @return the command to run in autonomous
-   */
-  public Command getAutonomousCommand() {
-    // An example command will be run in autonomous
-    return Autos.exampleAuto(m_exampleSubsystem);
-  }
+    /*public Command getAutonomousCommand() {
+    // This method loads the auto when it is called, however, it is recommended
+    // to first load your paths/autos when code starts, then return the
+    // pre-loaded auto/path
+    SmartDashboard.putString("Auto Selected", "Test Auto");
+    return new PathPlannerAuto("Test Auto");
+  }*/
+
+    public Command getAutonomousCommand() {
+      Command autoCommand = autoManager.getAutoManagerSelected();
+      /*if(autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@66af20") || autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@12a209c") || autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@93b025") || autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@505305")){ //MStage4, MStage3, MAmp3, M2
+        swerveSubsystem.setPose(new Rotation2d(), new Pose2d(new Translation2d(1.37, 5.56), new Rotation2d())); 
+      } else if(autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@7ddf94")){ //Amp2
+        swerveSubsystem.setPose(new Rotation2d(), new Pose2d(new Translation2d(0.76, 6.78), new Rotation2d())); 
+      } */
+
+      SmartDashboard.putString("Auto Selected", autoManager.getAutoManagerSelected().toString());
+      return autoCommand;
+    } 
+  
+
 }
