@@ -16,7 +16,7 @@ public class ToReefCommand extends Command {
 
     @Override
     public void initialize() {
-        LimelightHelpers.setPipelineIndex("limelight", 0);
+        LimelightHelpers.setPipelineIndex("limelight-threeg", 0);
     }
 
     @Override
@@ -27,14 +27,14 @@ public class ToReefCommand extends Command {
         double turningSpeed;
         double kPturning = 1;
         double KpDistance = 2;
-        double distance =  LimelightHelpers.getTargetPose3d_RobotSpace("limelight").getZ();
+        double distance =  LimelightHelpers.getTargetPose3d_RobotSpace("limelight-threeg").getZ();
         double desiredDistance = 0.5;
         double distance_error = distance-desiredDistance;
         ySpeed = 0;
 
         //Set turning speed and y speed based off of apriltag
-        turningSpeed = kPturning*LimelightHelpers.getTargetPose3d_RobotSpace("limelight").getX();
-        xSpeed = LimelightHelpers.getTV("limelight") ? MathUtil.clamp(KpDistance*distance_error, -3, 3) : 0;
+        turningSpeed = kPturning*LimelightHelpers.getTargetPose3d_RobotSpace("limelight-threeg").getX();
+        xSpeed = LimelightHelpers.getTV("limelight-threeg") ? MathUtil.clamp(KpDistance*distance_error, -3, 3) : 0;
         
         //Output each module states to wheels
         swerveSubsystem.driveRobotOriented(swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(xSpeed, ySpeed, turningSpeed));

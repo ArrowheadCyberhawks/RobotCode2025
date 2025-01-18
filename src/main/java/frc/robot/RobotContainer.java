@@ -6,6 +6,7 @@ package frc.robot;
 
 import static frc.robot.Constants.*;
 import lib.frc706.cyberlib.commands.XboxDriveCommand;
+import lib.frc706.cyberlib.subsystems.LimelightSubsystem;
 import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -33,6 +34,7 @@ public class RobotContainer {
 
   File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
   public final SwerveSubsystem swerveSubsystem;
+  private final LimelightSubsystem limelightSubsystem;
 
   private Command teleopCommand;
   
@@ -56,7 +58,8 @@ public class RobotContainer {
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     
     swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.kDefaultPIDConstants);
-    swerveSubsystem.swerveDrive.getGyro().setInverted(true);
+    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, "limelight-threeg");
+    // swerveSubsystem.swerveDrive.getGyro().setInverted(true);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     autoManager = new AutoCommandManager(swerveSubsystem);
 
