@@ -45,8 +45,7 @@ public class TrackReefCommand extends Command {
         Pose2d targetPose = field.getTagPose(1).orElse(new Pose3d()).toPose2d();
         Pose2d robotPose = swerveSubsystem.swerveDrive.swerveDrivePoseEstimator.getEstimatedPosition();
         Transform2d targetPose_RobotSpace = new Transform2d(targetPose, robotPose);
-        Rotation2d targetAngle = targetPose.minus(robotPose).getTranslation().getAngle()//targetPose_RobotSpace.getRotation();
-        ;
+        Rotation2d targetAngle = targetPose.minus(robotPose).getTranslation().getAngle();//targetPose_RobotSpace.getRotation();
         double xSpeed = ySpdFunction.get();
         double ySpeed = xSpdFunction.get();
         double turningSpeed;
