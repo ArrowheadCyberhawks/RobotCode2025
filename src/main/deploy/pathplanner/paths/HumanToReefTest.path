@@ -3,38 +3,43 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 16.0,
+        "y": 1.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 14.577049180327867,
+        "y": 2.1369364754098363
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "RHPB"
     },
     {
       "anchor": {
-        "x": 4.11627361716262,
-        "y": 7.0
+        "x": 14.0,
+        "y": 2.5
       },
       "prevControl": {
-        "x": 3.11627361716262,
-        "y": 7.0
+        "x": 14.361270491803277,
+        "y": 2.172899590163934
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "RRS1"
     }
   ],
-  "rotationTargets": [],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 1,
+      "rotationDegrees": 0.0
+    }
+  ],
   "constraintZones": [],
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.5,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 90.0
+    "rotation": -55.71
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -56.8
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

@@ -16,6 +16,9 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.*;
 import java.io.File;
 
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -57,9 +60,9 @@ public class RobotContainer {
     }
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.kDefaultPIDConstants);
-    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, "limelight-threeg");
-    // swerveSubsystem.swerveDrive.getGyro().setInverted(true);
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.kTranslationPIDConstants, PID.kThetaPIDConstants);
+    // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, "limelight-threeg","limelight-three");
+    limelightSubsystem = new LimelightSubsystem(swerveSubsystem);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     autoManager = new AutoCommandManager(swerveSubsystem);
 
@@ -94,7 +97,7 @@ public class RobotContainer {
         })) // reset gyro to 0 degrees when A is pressed
         .debounce(2) // check if A is pressed for 2 seconds
         .onTrue(swerveSubsystem.runOnce(() -> {
-          swerveSubsystem.recenter();
+          swerveSubsystem.resetOdometry(new Pose2d());;
           System.out.println("resetting robot pose");
         })); // zero heading and reset position to (0,0) if A is pressed for 2 seconds
     

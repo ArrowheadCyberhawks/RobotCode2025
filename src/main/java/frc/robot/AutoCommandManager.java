@@ -1,6 +1,6 @@
 package frc.robot;
 
-import com.pathplanner.lib.commands.PathPlannerAuto;
+import com.pathplanner.lib.auto.AutoBuilder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -9,17 +9,12 @@ import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
 
 public class AutoCommandManager {
 
-    SendableChooser<Command> autoChooser = new SendableChooser<>();
+    SendableChooser<Command> autoChooser;
 
     public AutoCommandManager(SwerveSubsystem swerveSubsystem) {
         configureNamedCommands(swerveSubsystem);
         //all pathplanner autos
-        PathPlannerAuto test = new PathPlannerAuto("Test Auto");
-
-        autoChooser.setDefaultOption("None", null);
-        //Different autos
-        autoChooser.addOption("Test Auto", test);
-
+        autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("SelectAuto", autoChooser);
     }
 

@@ -33,7 +33,7 @@ public final class Constants {
     public static final double driveBaseRadius = Math.sqrt(wheelBase * wheelBase * 2) / 2;
 
      public static final double kMaxVelTele = Units.feetToMeters(15);
-    public static final double kMaxAccelTele = kMaxVelTele * 3; //idk what this should be
+    public static final double kMaxAccelTele = kMaxVelTele * 1; //idk what this should be
     public static final double kMaxAngularVelTele = 2 * 2 * Math.PI; //idk 2 radians per second whatever
     public static final double kMaxAngularAccelTele = kMaxAngularVelTele * 3;
     
@@ -51,9 +51,15 @@ public final class Constants {
 
   public static class PID {
     public static final double kPTranslation = 2.5;
-    public static final double kITranslation = 0.0;
+    public static final double kITranslation = 1.1;
     public static final double kDTranslation = 0.0;
-    public static final PIDConstants kDefaultPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
+
+    public static final double kPTheta = 5;
+    public static final double kITheta = 1;
+    public static final double kDTheta = 0.0;
+
+    public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
+    public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
 
     public static final double kPAutoTurning = 2.1;
     public static final double kIAutoTurning = 0; //0.02;//0.092505;
