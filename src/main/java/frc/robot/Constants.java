@@ -50,12 +50,12 @@ public final class Constants {
   }
 
   public static class PID {
-    public static final double kPTranslation = 2.5;
-    public static final double kITranslation = 1.1;
+    public static final double kPTranslation = 1.5;//2.5
+    public static final double kITranslation = 0.1;
     public static final double kDTranslation = 0.0;
 
     public static final double kPTheta = 5;
-    public static final double kITheta = 1;
+    public static final double kITheta = 0.1;
     public static final double kDTheta = 0.0;
 
     public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);

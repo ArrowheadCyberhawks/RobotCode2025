@@ -4,9 +4,16 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Seconds;
+
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -72,7 +79,11 @@ public class Robot extends TimedRobot {
   @Override
   public void autonomousInit() {
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
-
+    // m_autonomousCommand = Commands.runEnd(() -> {m_robotContainer.swerveSubsystem.driveFieldOriented(new ChassisSpeeds(0.25, 0, 0));},
+    // () -> {m_robotContainer.swerveSubsystem.driveFieldOriented(new ChassisSpeeds());}, m_robotContainer.swerveSubsystem)
+    // .withTimeout(Time.ofBaseUnits(20, Seconds)).andThen(Commands.runEnd(() -> {m_robotContainer.swerveSubsystem.driveFieldOriented(new ChassisSpeeds(-0.25, 0, 0));},
+    // () -> {m_robotContainer.swerveSubsystem.driveFieldOriented(new ChassisSpeeds());}, m_robotContainer.swerveSubsystem)
+    // .withTimeout(Time.ofBaseUnits(20, Seconds)));
     // schedule the autonomous command (example)
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();

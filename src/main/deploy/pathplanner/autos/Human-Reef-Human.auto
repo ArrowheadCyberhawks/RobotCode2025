@@ -7,7 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "Straight 2m"
+            "pathName": "HumanToReefTest"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "ReefToHumanTest"
           }
         }
       ]

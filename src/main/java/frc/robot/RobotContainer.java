@@ -4,9 +4,11 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.*;
 import lib.frc706.cyberlib.commands.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.LimelightSubsystem;
+import lib.frc706.cyberlib.subsystems.PhotonCameraWrapper;
 import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -16,9 +18,7 @@ import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.*;
 import java.io.File;
 
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -38,7 +38,8 @@ public class RobotContainer {
   File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
   public final SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
-
+  private final PhotonCameraWrapper cam0;
+  
   private Command teleopCommand;
   
   
@@ -60,9 +61,10 @@ public class RobotContainer {
     }
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.kTranslationPIDConstants, PID.kThetaPIDConstants);
-    // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, "limelight-threeg","limelight-three");
-    limelightSubsystem = new LimelightSubsystem(swerveSubsystem);
+    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(9), Inches.of(-3), Inches.of(8)), new Rotation3d(0,0,0)));
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.kTranslationPIDConstants, PID.kThetaPIDConstants, cam0);
+    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, "limelight-threeg","limelight-three");
+    //limelightSubsystem = new LimelightSubsystem(swerveSubsystem);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     autoManager = new AutoCommandManager(swerveSubsystem);
 
