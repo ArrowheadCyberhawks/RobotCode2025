@@ -38,7 +38,7 @@ public class RobotContainer {
   File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
   public final SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
-  private final PhotonCameraWrapper cam0;
+  private final PhotonCameraWrapper cam0, cam1, cam2;
   
   private Command teleopCommand;
   
@@ -61,10 +61,12 @@ public class RobotContainer {
     }
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     
-    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(9), Inches.of(-3), Inches.of(8)), new Rotation3d(0,0,0)));
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.kTranslationPIDConstants, PID.kThetaPIDConstants, cam0);
-    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, "limelight-threeg","limelight-three");
-    //limelightSubsystem = new LimelightSubsystem(swerveSubsystem);
+    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(0), Inches.of(12), Inches.of(4.75)), new Rotation3d(0,0,Math.PI/2)));
+    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(9), Inches.of(-3), Inches.of(8)), new Rotation3d(0,0,0)));
+    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(0), Inches.of(-12), Inches.of(4.75)), new Rotation3d(0,0,-Math.PI/2)));
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.kTranslationPIDConstants, PID.kThetaPIDConstants, cam0, cam1, cam2);
+    // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, "limelight-threeg","limelight-three");
+    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     autoManager = new AutoCommandManager(swerveSubsystem);
 

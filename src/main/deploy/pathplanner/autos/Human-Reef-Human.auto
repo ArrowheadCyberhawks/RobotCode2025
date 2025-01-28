@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "HumanToReefTest"
+            "pathName": "ReefToHumanTest"
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "ReefToHumanTest"
+            "pathName": "HumanToReefTest"
           }
         }
       ]
