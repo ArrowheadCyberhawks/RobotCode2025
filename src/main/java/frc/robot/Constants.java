@@ -45,8 +45,7 @@ public final class Constants {
     public static final Transform3d frontCamRobotToCam = new Transform3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(6.5), new Rotation3d(Math.PI,Math.PI/6,0));
     public static final Transform3d backCamRobotToCam = new Transform3d(Units.inchesToMeters(-10), Units.inchesToMeters(-1), Units.inchesToMeters(18), new Rotation3d(0, 0, Math.PI));
    
-
-    
+    public static final double maxTrackingAngularVel = 4;
   }
 
   public static class PID {
@@ -61,8 +60,8 @@ public final class Constants {
     public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
     public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
 
-    public static final double kPAutoTurning = 2.1;
+    public static final double kPAutoTurning = 7;
     public static final double kIAutoTurning = 0; //0.02;//0.092505;
-    public static final double kDAutoTurning = 0.1; //0.1;
+    public static final double kDAutoTurning = 0; //0.1;
   }
 }

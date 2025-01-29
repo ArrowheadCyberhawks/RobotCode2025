@@ -105,7 +105,7 @@ public class RobotContainer {
           System.out.println("resetting robot pose");
         })); // zero heading and reset position to (0,0) if A is pressed for 2 seconds
     
-    driverController.x().whileTrue(new TrackReefCommand(swerveSubsystem, 
+    driverController.x().whileTrue(new TrackReefCommand(swerveSubsystem, TrackReefCommand.getTagPose(1),
         () -> -driverController.getLeftX(),
         () -> -driverController.getLeftY() 
     ));
