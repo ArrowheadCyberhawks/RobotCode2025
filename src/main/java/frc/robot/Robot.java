@@ -4,16 +4,9 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Seconds;
-
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -52,20 +45,8 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    // System.out.println("frontLeft: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[0].angle.getDegrees());
-    // System.out.println("frontRight: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[1].angle.getDegrees());
-    // System.out.println("backLeft: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[2].angle.getDegrees());
-    // System.out.println("backRight: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[3].angle.getDegrees());
-    //System.out.println("odom heading: " + m_robotContainer.swerveSubsystem.swerveDrive.getOdometryHeading());
 
   }
-//Shuffleboard stuff:
-  /*protected void execute() {
-   SmartDashboard.putNumber("frontLeft: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[0].angle.getDegrees());
-   SmartDashboard.putNumber("frontRight: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[1].angle.getDegrees());
-   SmartDashboard.putNumber("backLeft: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[2].angle.getDegrees());
-   SmartDashboard.putNumber("backRight: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[3].angle.getDegrees());
-}
   
 
   /** This function is called once each time the robot enters Disabled mode. */
