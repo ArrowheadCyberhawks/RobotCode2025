@@ -32,12 +32,12 @@ public final class Constants {
     public static final double wheelBase = Units.inchesToMeters(29);
     public static final double driveBaseRadius = Math.sqrt(wheelBase * wheelBase * 2) / 2;
 
-     public static final double kMaxVelTele = Units.feetToMeters(15);
+    public static final double kMaxVelTele = Units.feetToMeters(15);
     public static final double kMaxAccelTele = kMaxVelTele * 1; //idk what this should be
     public static final double kMaxAngularVelTele = 2 * 2 * Math.PI; //idk 2 radians per second whatever
     public static final double kMaxAngularAccelTele = kMaxAngularVelTele * 3;
-    
-    public static final double kMaxVelAuto = SwerveConstants.kMaxVelTele/10;
+
+    public static final double kMaxVelAuto = SwerveConstants.kMaxVelTele/25;
     public static final double kMaxAccelAuto = SwerveConstants.kMaxAccelTele/10;
     public static final double  kMaxAngularVelAuto = SwerveConstants.kMaxAngularVelTele/5;
     public static final double kMaxAngularAccelAuto = SwerveConstants.kMaxAngularAccelTele/5;
@@ -49,19 +49,31 @@ public final class Constants {
   }
 
   public static class PID {
-    public static final double kPTranslation = 1;//2.5
-    public static final double kITranslation = 0;
-    public static final double kDTranslation = 0;
+    public static class PathPlanner {
+      public static final double kPTranslation = 1; //2.5
+      public static final double kITranslation = 0;
+      public static final double kDTranslation = 0;
 
-    public static final double kPTheta = 1.95;
-    public static final double kITheta = 0.7;
-    public static final double kDTheta = 0.0;
+      public static final double kPTheta = 1.95;
+      public static final double kITheta = 0.7;
+      public static final double kDTheta = 0.0;
+      
+      public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
+      public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
+    }
 
-    public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
-    public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
+    public static class PointTrack {
+      public static final double kPAutoTurning = 7;
+      public static final double kIAutoTurning = 0; 
+      public static final double kDAutoTurning = 0;
 
-    public static final double kPAutoTurning = 7;
-    public static final double kIAutoTurning = 0; //0.02;//0.092505;
-    public static final double kDAutoTurning = 0; //0.1;
+      public static final double kPX = 4;
+      public static final double kIX = 1;
+      public static final double kDX = 0;
+
+      public static final double kPY = 4;
+      public static final double kIY = 1;
+      public static final double kDY = 0;
+    }
   }
 }

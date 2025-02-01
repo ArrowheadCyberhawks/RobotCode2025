@@ -1,12 +1,7 @@
 package frc.robot.commands;
 
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Optional;
 import java.util.function.Supplier;
 
-import edu.wpi.first.apriltag.AprilTag;
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
@@ -28,14 +23,16 @@ import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
 
 public class TrackPointCommand extends Command {
 
-    private final SwerveSubsystem swerveSubsystem;
+    protected final SwerveSubsystem swerveSubsystem;
     private final Supplier<Double> xSupplier, ySupplier, accelSupplier;
-    private final PIDController m_turningController = new PIDController(PID.kPAutoTurning, PID.kIAutoTurning, PID.kDAutoTurning);
+    private final PIDController m_turningController = new PIDController(PID.PointTrack.kPAutoTurning, PID.PointTrack.kIAutoTurning, PID.PointTrack.kDAutoTurning);
     private static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
+
     private final double maxAngularVel;
     private static final Transform2d leftReefTransform = new Transform2d(Units.inchesToMeters(0), Units.inchesToMeters(-6.5), new Rotation2d(0));
     private static final Transform2d rightReefTransform = new Transform2d(Units.inchesToMeters(0), Units.inchesToMeters(6.5), new Rotation2d(0));
-    private Pose2d target;
+    protected Pose2d target;
+    private final double kMaxVel;
 
     public static enum FieldPosition { //nitin don't touch this either I DON'T WANT IT PRETTIER
         kBargeLeft(new Pose2d(8.775, 0.75, new Rotation2d()), new Pose2d(8.775, 7.25, new Rotation2d())),
@@ -84,12 +81,13 @@ public class TrackPointCommand extends Command {
     }
 
     public TrackPointCommand(SwerveSubsystem swerveSubsystem, Pose2d target,
-        Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> accelFunction) {
+        Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> accelFunction, double maxVel) {
         this.swerveSubsystem = swerveSubsystem;
         this.xSupplier = xSpdFunction;
         this.ySupplier = ySpdFunction;
         this.accelSupplier = accelFunction;
         this.target = target;
+        kMaxVel = maxVel;
         maxAngularVel = SwerveConstants.maxTrackingAngularVel;
         field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
         addRequirements(swerveSubsystem);
@@ -148,6 +146,7 @@ public class TrackPointCommand extends Command {
         //Apply deadband
         xInput = MathUtil.applyDeadband(xInput, IOConstants.kDriverControllerDeadband);
         yInput = MathUtil.applyDeadband(yInput, IOConstants.kDriverControllerDeadband);
+        
         //Make driving smoother
         xInput *= Math.abs(xInput);
         yInput *= Math.abs(yInput);
@@ -161,8 +160,8 @@ public class TrackPointCommand extends Command {
         xInput *= MathUtil.interpolate(0.15, 1, accelMultiplier);
 		yInput *= MathUtil.interpolate(0.15, 1, accelMultiplier);
 
-        double xSpeed = xInput * SwerveConstants.kMaxVelTele;
-        double ySpeed = yInput * SwerveConstants.kMaxVelTele;
+        double xSpeed = xInput * kMaxVel;
+        double ySpeed = yInput * kMaxVel;
 
         //Output each module states to wheels
         swerveSubsystem.driveRobotOriented(new ChassisSpeeds(xSpeed, ySpeed, turningSpeed));

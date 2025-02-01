@@ -64,7 +64,7 @@ public class RobotContainer {
     cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(0), Inches.of(12), Inches.of(4.75)), new Rotation3d(0,0,Math.PI/2)));
     cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(9), Inches.of(-3), Inches.of(8)), new Rotation3d(0,0,0)));
     cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(0), Inches.of(-12), Inches.of(4.75)), new Rotation3d(0,0,-Math.PI/2)));
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.kTranslationPIDConstants, PID.kThetaPIDConstants, cam0, cam1, cam2);
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam0, cam1, cam2);
     // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, "limelight-threeg","limelight-three");
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
@@ -108,10 +108,11 @@ public class RobotContainer {
     driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem, TrackPointCommand.ReefPoint.kNearLeftL.getPose(),
         () -> -driverController.getLeftX(),
         () -> -driverController.getLeftY(),
-        () -> driverController.getRightTriggerAxis()
-    ));
-    driverController.b().whileTrue(new ToReefCommand(swerveSubsystem)
-      );
+        () -> driverController.getRightTriggerAxis(),
+        SwerveConstants.kMaxVelTele
+      )
+    );
+    driverController.b().whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.kFarLeftL.getPose(), SwerveConstants.kMaxVelAuto));
     /*driverController.rightBumper().whileTrue(new TrackReefCommand(swerveSubsystem, 
       () -> -driverController.getLeftX(),
       () -> -driverController.getLeftY(), () -> driverController.getRightTriggerAxis() 

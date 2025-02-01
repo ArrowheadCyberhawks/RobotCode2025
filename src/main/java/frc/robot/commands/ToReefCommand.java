@@ -1,44 +1,48 @@
 package frc.robot.commands;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj2.command.Command;
-import lib.frc706.cyberlib.subsystems.LimelightHelpers;
+import static frc.robot.Constants.PID;
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Transform2d;
 import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
 
-public class ToReefCommand extends Command {
+public class ToReefCommand extends TrackPointCommand {
+    private static PIDController xController, yController;
 
-    private final SwerveSubsystem swerveSubsystem;
+    public ToReefCommand(SwerveSubsystem swerveSubsystem, Pose2d target, double maxVel) {
+        super(swerveSubsystem, target,
+            () -> {return -calculateXSpeed(swerveSubsystem.getPose(), target);},
+            () -> {return -calculateYSpeed(swerveSubsystem.getPose(), target.transformBy(new Transform2d(swerveSubsystem.swerveDrive.swerveDriveConfiguration.getTracklength()/2, 0, new Rotation2d())));},
+            () -> 0.05,
+            maxVel
+        );
+        xController = new PIDController(PID.PointTrack.kPX, PID.PointTrack.kIX, PID.PointTrack.kDX);
+        yController = new PIDController(PID.PointTrack.kPY, PID.PointTrack.kIY, PID.PointTrack.kDY);
 
-    public ToReefCommand(SwerveSubsystem swerveSubsystem) {
-        this.swerveSubsystem = swerveSubsystem;
-        addRequirements(swerveSubsystem);
     }
 
-    @Override
-    public void initialize() {
-        LimelightHelpers.setPipelineIndex("limelight-threeg", 0);
+    private static double calculateXSpeed(Pose2d currentPose, Pose2d targetPose) {
+        return xController.calculate(calculateAngleToTarget(currentPose, targetPose), 0);
+    }
+
+    private static double calculateYSpeed(Pose2d currentPose, Pose2d targetPose) {
+        return yController.calculate(currentPose.getTranslation().getDistance(targetPose.getTranslation()), 0);
+    }
+
+    /**
+     * Calculates the angle to point the robot towards the target
+     * @param currentPose current pose of the robot
+     * @param targetPose pose of the apriltag (or whatever else we want to point towards)
+     * @return angle between the robot and the vector facing into the front of the target
+     */
+    private static double calculateAngleToTarget(Pose2d currentPose, Pose2d targetPose) {
+        return currentPose.getRotation().getRadians() - targetPose.getRotation().getRadians() - Math.PI;
     }
 
     @Override
     public void execute() {
-        //Figure out distance and angle to apriltag
-        double xSpeed = 0;
-        double ySpeed;
-        double turningSpeed;
-        double kPturning = 1;
-        double KpDistance = 2;
-        double distance =  LimelightHelpers.getTargetPose3d_RobotSpace("limelight-threeg").getZ();
-        double desiredDistance = 0.5;
-        double distance_error = distance-desiredDistance;
-        ySpeed = 0;
-
-        //Set turning speed and y speed based off of apriltag
-        turningSpeed = kPturning*LimelightHelpers.getTargetPose3d_RobotSpace("limelight-threeg").getX();
-        xSpeed = LimelightHelpers.getTV("limelight-threeg") ? MathUtil.clamp(KpDistance*distance_error, -3, 3) : 0;
-        
-        //Output each module states to wheels
-        swerveSubsystem.driveRobotOriented(swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(xSpeed, ySpeed, turningSpeed));
-
+        super.execute();
     }
 
     @Override
@@ -48,6 +52,7 @@ public class ToReefCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return false;
+        //robot needs to kill itself at some point
+        return super.swerveSubsystem.getPose().getTranslation().getDistance(target.getTranslation()) < 0.05;
     }
 }
