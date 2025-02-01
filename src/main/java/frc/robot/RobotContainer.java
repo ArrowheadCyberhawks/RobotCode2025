@@ -12,18 +12,18 @@ import lib.frc706.cyberlib.subsystems.PhotonCameraWrapper;
 import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import frc.robot.Constants.IOConstants;
-import frc.robot.Constants.PID;
-import frc.robot.Constants.SwerveConstants;
 import frc.robot.commands.*;
 import java.io.File;
 
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 
@@ -42,13 +42,15 @@ public class RobotContainer {
   
   private Command teleopCommand;
   
+  private Trigger nearTrigger, nearLeftTrigger, nearRightTrigger, farTrigger, farLeftTrigger, farRightTrigger, leftBranchTrigger, rightBranchTrigger, centerTrigger;
   
-  private final CommandXboxController driverController;
-  private final CommandXboxController manipulatorController;
+  private final CommandXboxController driverController, manipulatorController;
+  private final CommandGenericHID keypadHID;
   private AutoCommandManager autoManager;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     if (DriverStation.isJoystickConnected(IOConstants.kDriverControllerPortBT)) {
       driverController = new CommandXboxController(IOConstants.kDriverControllerPortBT);
     } else {
@@ -59,6 +61,8 @@ public class RobotContainer {
     } else {
       manipulatorController = new CommandXboxController(IOConstants.kManipulatorControllerPortUSB);
     }
+    keypadHID = new CommandGenericHID(IOConstants.kKeypadPort);
+
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     
     cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(0), Inches.of(12), Inches.of(4.75)), new Rotation3d(0,0,Math.PI/2)));
@@ -105,26 +109,47 @@ public class RobotContainer {
           System.out.println("resetting robot pose");
         })); // zero heading and reset position to (0,0) if A is pressed for 2 seconds
     
-    driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem, TrackPointCommand.ReefPoint.kNearLeftL.getPose(),
+    driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem, () -> TrackPointCommand.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
         () -> -driverController.getLeftX(),
         () -> -driverController.getLeftY(),
-        () -> driverController.getRightTriggerAxis(),
-        SwerveConstants.kMaxVelTele,
-        true
+        () -> driverController.getRightTriggerAxis()
       )
     );
 
-    
-    driverController.b().whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.kNearLeftR.getPose(), SwerveConstants.kMaxVelAuto));
+    driverController.b().whileTrue(new ToReefCommand(swerveSubsystem, ()->TrackPointCommand.getClosestReefPoint(swerveSubsystem.getPose()).getPose()));
     /*driverController.rightBumper().whileTrue(new TrackReefCommand(swerveSubsystem, 
       () -> -driverController.getLeftX(),
       () -> -driverController.getLeftY(), () -> driverController.getRightTriggerAxis() 
     ));*/
-    driverController.y().whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.kFarLeftL.getPose(), SwerveConstants.kMaxVelAuto));
+    driverController.y().whileTrue(new ToReefCommand(swerveSubsystem, ()->TrackPointCommand.ReefPoint.kFarLeftL.getPose()));
+    
+    nearTrigger = keypadHID.button(18);
+    nearLeftTrigger = keypadHID.button(17);
+    nearRightTrigger = keypadHID.button(19);
+    
+    farTrigger = keypadHID.button(15);
+    farLeftTrigger = keypadHID.button(14);
+    farRightTrigger = keypadHID.button(16);
 
+    rightBranchTrigger = keypadHID.button(13);
+    centerTrigger = keypadHID.button(12);
+    leftBranchTrigger = keypadHID.button(11);
+
+    poseButtons(nearTrigger, "Near");
+    poseButtons(nearLeftTrigger, "NearLeft");
+    poseButtons(nearRightTrigger, "NearRight");
+    poseButtons(farTrigger, "Far");
+    poseButtons(farLeftTrigger, "FarLeft");
+    poseButtons(farRightTrigger, "FarRight");
+  
+  }
+
+  private void poseButtons(Trigger trigger, String name) {
+    trigger.and(leftBranchTrigger).whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.valueOf("k" + name + "L").getPose()));
+    trigger.and(centerTrigger).whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.valueOf("k" + name + "C").getPose()));
+    trigger.and(rightBranchTrigger).whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.valueOf("k" + name + "R").getPose()));
   }
   
-
 
   public Command getTeleopCommand() {
     swerveSubsystem.swerveDrive.setHeadingCorrection(false);
@@ -141,11 +166,6 @@ public class RobotContainer {
 
     public Command getAutonomousCommand() {
       Command autoCommand = autoManager.getAutoManagerSelected();
-      /*if(autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@66af20") || autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@12a209c") || autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@93b025") || autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@505305")){ //MStage4, MStage3, MAmp3, M2
-        swerveSubsystem.setPose(new Rotation2d(), new Pose2d(new Translation2d(1.37, 5.56), new Rotation2d())); 
-      } else if(autoManager.getAutoManagerSelected().toString().equals("com.pathplanner.lib.commands.PathPlannerAuto@7ddf94")){ //Amp2
-        swerveSubsystem.setPose(new Rotation2d(), new Pose2d(new Translation2d(0.76, 6.78), new Rotation2d())); 
-      } */
 
       SmartDashboard.putString("Auto Selected", autoManager.getAutoManagerSelected().toString());
       return autoCommand;
