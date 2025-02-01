@@ -37,7 +37,7 @@ public final class Constants {
     public static final double kMaxAngularVelTele = 2 * 2 * Math.PI; //idk 2 radians per second whatever
     public static final double kMaxAngularAccelTele = kMaxAngularVelTele * 3;
 
-    public static final double kMaxVelAuto = SwerveConstants.kMaxVelTele/25;
+    public static final double kMaxVelAuto = 1;
     public static final double kMaxAccelAuto = SwerveConstants.kMaxAccelTele/10;
     public static final double  kMaxAngularVelAuto = SwerveConstants.kMaxAngularVelTele/5;
     public static final double kMaxAngularAccelAuto = SwerveConstants.kMaxAngularAccelTele/5;
@@ -67,12 +67,12 @@ public final class Constants {
       public static final double kIAutoTurning = 0; 
       public static final double kDAutoTurning = 0;
 
-      public static final double kPX = 4;
-      public static final double kIX = 1;
+      public static final double kPX = 1.4;
+      public static final double kIX = 0;
       public static final double kDX = 0;
 
-      public static final double kPY = 4;
-      public static final double kIY = 1;
+      public static final double kPY = 3;
+      public static final double kIY = 0;
       public static final double kDY = 0;
     }
   }

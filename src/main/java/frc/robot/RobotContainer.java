@@ -109,15 +109,22 @@ public class RobotContainer {
         () -> -driverController.getLeftX(),
         () -> -driverController.getLeftY(),
         () -> driverController.getRightTriggerAxis(),
-        SwerveConstants.kMaxVelTele
+        SwerveConstants.kMaxVelTele,
+        true
       )
     );
-    driverController.b().whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.kFarLeftL.getPose(), SwerveConstants.kMaxVelAuto));
+
+    
+    driverController.b().whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.kNearLeftR.getPose(), SwerveConstants.kMaxVelAuto));
     /*driverController.rightBumper().whileTrue(new TrackReefCommand(swerveSubsystem, 
       () -> -driverController.getLeftX(),
       () -> -driverController.getLeftY(), () -> driverController.getRightTriggerAxis() 
     ));*/
-  } 
+    driverController.y().whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.kFarLeftL.getPose(), SwerveConstants.kMaxVelAuto));
+
+  }
+  
+
 
   public Command getTeleopCommand() {
     swerveSubsystem.swerveDrive.setHeadingCorrection(false);

@@ -32,6 +32,7 @@ public class TrackPointCommand extends Command {
     private static final Transform2d leftReefTransform = new Transform2d(Units.inchesToMeters(0), Units.inchesToMeters(-6.5), new Rotation2d(0));
     private static final Transform2d rightReefTransform = new Transform2d(Units.inchesToMeters(0), Units.inchesToMeters(6.5), new Rotation2d(0));
     protected Pose2d target;
+    private final boolean controllerCorrections;
     private final double kMaxVel;
 
     public static enum FieldPosition { //nitin don't touch this either I DON'T WANT IT PRETTIER
@@ -81,12 +82,13 @@ public class TrackPointCommand extends Command {
     }
 
     public TrackPointCommand(SwerveSubsystem swerveSubsystem, Pose2d target,
-        Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> accelFunction, double maxVel) {
+        Supplier<Double> xSpdFunction, Supplier<Double> ySpdFunction, Supplier<Double> accelFunction, double maxVel, boolean controllerCorrections) {
         this.swerveSubsystem = swerveSubsystem;
         this.xSupplier = xSpdFunction;
         this.ySupplier = ySpdFunction;
         this.accelSupplier = accelFunction;
         this.target = target;
+        this.controllerCorrections = controllerCorrections;
         kMaxVel = maxVel;
         maxAngularVel = SwerveConstants.maxTrackingAngularVel;
         field.setOrigin(OriginPosition.kBlueAllianceWallRightSide);
@@ -142,26 +144,31 @@ public class TrackPointCommand extends Command {
         double xInput = ySupplier.get();
         double yInput = xSupplier.get();
         double accelMultiplier = accelSupplier.get();
+        double xSpeed = 0, ySpeed = 0;
+        if(controllerCorrections) {
+            //Apply deadband
+            xInput = MathUtil.applyDeadband(xInput, IOConstants.kDriverControllerDeadband);
+            yInput = MathUtil.applyDeadband(yInput, IOConstants.kDriverControllerDeadband);
+            
+            //Make driving smoother
+            xInput *= Math.abs(xInput);
+            yInput *= Math.abs(yInput);
 
-        //Apply deadband
-        xInput = MathUtil.applyDeadband(xInput, IOConstants.kDriverControllerDeadband);
-        yInput = MathUtil.applyDeadband(yInput, IOConstants.kDriverControllerDeadband);
-        
-        //Make driving smoother
-        xInput *= Math.abs(xInput);
-        yInput *= Math.abs(yInput);
+            xInput *= MathUtil.interpolate(0.15, 1, accelMultiplier);
+            yInput *= MathUtil.interpolate(0.15, 1, accelMultiplier);
+
+            xSpeed = xInput * kMaxVel;
+            ySpeed = yInput * kMaxVel;
+        } else {
+            xSpeed = MathUtil.clamp(xInput, -kMaxVel, kMaxVel);
+            ySpeed = MathUtil.clamp(yInput, -kMaxVel, kMaxVel);
+        }
 
         // MONKEY CODE (made by our fellow monkey)
         //targetAngle = Math.atan2(targetPose.getTranslation().getY()-robotPose.getTranslation().getY(), targetPose.getTranslation().getX()-robotPose.getTranslation().getX());
         
         double turningSpeed = m_turningController.calculate(calculateAngleTo(target, swerveSubsystem.getPose()));
         turningSpeed = MathUtil.clamp(turningSpeed, -maxAngularVel, maxAngularVel);
-
-        xInput *= MathUtil.interpolate(0.15, 1, accelMultiplier);
-		yInput *= MathUtil.interpolate(0.15, 1, accelMultiplier);
-
-        double xSpeed = xInput * kMaxVel;
-        double ySpeed = yInput * kMaxVel;
 
         //Output each module states to wheels
         swerveSubsystem.driveRobotOriented(new ChassisSpeeds(xSpeed, ySpeed, turningSpeed));
