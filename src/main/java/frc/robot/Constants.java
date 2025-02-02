@@ -6,9 +6,14 @@ package frc.robot;
 
 import com.pathplanner.lib.config.PIDConstants;
 
+import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -77,6 +82,70 @@ public final class Constants {
       public static final double kPY = 3;
       public static final double kIY = 0;
       public static final double kDY = 0;
+
+      public static final PIDController kXController = new PIDController(kPX, kIX, kDX);
+      public static final PIDController kYController = new PIDController(kPY, kIY, kDY);
+      public static final PIDController kThetaController = new PIDController(kPAutoTurning, kIAutoTurning, kDAutoTurning);
+
+      public static final double desiredDistance = 0.27;
     }
+  }
+
+  /**
+   * Enum to represent different common field positions.
+   */
+  public static enum FieldPosition { //nitin don't touch this either I DON'T WANT IT PRETTIER
+      kBargeLeft(new Pose2d(8.775, 0.75, new Rotation2d()), new Pose2d(8.775, 7.25, new Rotation2d())),
+      kBargeMiddle(new Pose2d(8.775, 1.9, new Rotation2d()), new Pose2d(8.775, 6.16, new Rotation2d())),
+      kBargeRight(new Pose2d(8.775, 3, new Rotation2d()), new Pose2d(8.775, 5, new Rotation2d())),
+      kLeftCoralStation(new Pose2d(16.75, 0.65, new Rotation2d()), new Pose2d(0.75, 7.35, new Rotation2d())),
+      kRightCoralStation(new Pose2d(16.75, 7.35, new Rotation2d()), new Pose2d(0.75, 0.65, new Rotation2d()));
+
+      public final Pose2d redPose, bluePose;
+
+      private FieldPosition(Pose2d redPose, Pose2d bluePose) {
+          this.redPose = redPose;
+          this.bluePose = bluePose;
+      }
+
+      public Pose2d getPose() {
+          return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? redPose : bluePose;
+      }
+  }
+
+    /**
+   * Enum to represent branches of the reef.
+   */
+  public enum ReefPoint {
+      kCenter(new Pose2d(13, 4, new Rotation2d()), new Pose2d(4.5, 4, new Rotation2d())),
+      kFarR(Utils.getOffsetRightAprilTag(10), Utils.getOffsetRightAprilTag(21)),
+      kFarC(Utils.getTagPose(10), Utils.getTagPose(21)),
+      kFarL(Utils.getOffsetLeftAprilTag(10), Utils.getOffsetLeftAprilTag(21)),
+      kNearR(Utils.getOffsetRightAprilTag(7), Utils.getOffsetRightAprilTag(18)),
+      kNearC(Utils.getTagPose(7), Utils.getTagPose(18)),
+      kNearL(Utils.getOffsetLeftAprilTag(7), Utils.getOffsetLeftAprilTag(18)),
+      kFarRightR(Utils.getOffsetRightAprilTag(9), Utils.getOffsetRightAprilTag(22)),
+      kFarRightC(Utils.getTagPose(9), Utils.getTagPose(22)),
+      kFarRightL(Utils.getOffsetLeftAprilTag(9), Utils.getOffsetLeftAprilTag(22)),
+      kNearRightR(Utils.getOffsetRightAprilTag(8), Utils.getOffsetRightAprilTag(17)),
+      kNearRightC(Utils.getTagPose(8), Utils.getTagPose(17)),
+      kNearRightL(Utils.getOffsetLeftAprilTag(8), Utils.getOffsetLeftAprilTag(17)),
+      kFarLeftR(Utils.getOffsetRightAprilTag(11), Utils.getOffsetRightAprilTag(20)),
+      kFarLeftC(Utils.getTagPose(11), Utils.getTagPose(20)),
+      kFarLeftL(Utils.getOffsetLeftAprilTag(11), Utils.getOffsetLeftAprilTag(20)),
+      kNearLeftR(Utils.getOffsetRightAprilTag(6), Utils.getOffsetRightAprilTag(19)),
+      kNearLeftC(Utils.getTagPose(6), Utils.getTagPose(19)),
+      kNearLeftL(Utils.getOffsetLeftAprilTag(6), Utils.getOffsetLeftAprilTag(19));
+
+      public final Pose2d redPose, bluePose;
+
+      private ReefPoint(Pose2d redPose, Pose2d bluePose) {
+          this.redPose = redPose;
+          this.bluePose = bluePose;
+      }
+
+      public Pose2d getPose() {
+          return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? redPose : bluePose;
+      }
   }
 }

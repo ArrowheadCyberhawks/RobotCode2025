@@ -6,12 +6,17 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import static frc.robot.Constants.*;
+
+import lib.frc706.cyberlib.XboxControllerWrapper;
+import lib.frc706.cyberlib.commands.ToPointCommand;
+import lib.frc706.cyberlib.commands.TrackPointCommand;
 import lib.frc706.cyberlib.commands.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.LimelightSubsystem;
 import lib.frc706.cyberlib.subsystems.PhotonCameraWrapper;
 import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.Constants.PID.PointTrack;
 import frc.robot.commands.*;
 import java.io.File;
 
@@ -22,7 +27,6 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -44,7 +48,8 @@ public class RobotContainer {
   
   private Trigger nearTrigger, nearLeftTrigger, nearRightTrigger, farTrigger, farLeftTrigger, farRightTrigger, leftBranchTrigger, rightBranchTrigger, centerTrigger;
   
-  private final CommandXboxController driverController, manipulatorController;
+  private final XboxControllerWrapper driverController;
+  private final CommandXboxController manipulatorController;
   private final CommandGenericHID keypadHID;
   private AutoCommandManager autoManager;
 
@@ -52,9 +57,9 @@ public class RobotContainer {
   public RobotContainer() {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
     if (DriverStation.isJoystickConnected(IOConstants.kDriverControllerPortBT)) {
-      driverController = new CommandXboxController(IOConstants.kDriverControllerPortBT);
+      driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortBT, IOConstants.kDriverControllerDeadband, 0.15);
     } else {
-      driverController = new CommandXboxController(IOConstants.kDriverControllerPortUSB);
+      driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortUSB, IOConstants.kDriverControllerDeadband, 0.15);
     }
     if (DriverStation.isJoystickConnected(IOConstants.kManipulatorControllerPortBT)) {
       manipulatorController = new CommandXboxController(IOConstants.kManipulatorControllerPortBT);
@@ -73,7 +78,7 @@ public class RobotContainer {
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
     autoManager = new AutoCommandManager(swerveSubsystem);
-
+    
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
         () -> true,
@@ -109,19 +114,24 @@ public class RobotContainer {
           System.out.println("resetting robot pose");
         })); // zero heading and reset position to (0,0) if A is pressed for 2 seconds
     
-    driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem, () -> TrackPointCommand.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
+    driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem, () -> Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
         () -> -driverController.getLeftX(),
         () -> -driverController.getLeftY(),
-        () -> driverController.getRightTriggerAxis()
+        () -> driverController.getRightTriggerAxis(),
+        SwerveConstants.kMaxVelTele, SwerveConstants.kMaxAngularVelTele, true, PointTrack.kThetaController
       )
     );
 
-    driverController.b().whileTrue(new ToReefCommand(swerveSubsystem, ()->TrackPointCommand.getClosestReefPoint(swerveSubsystem.getPose()).getPose()));
+    driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,
+      ()->Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
+      PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance,
+      SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto)
+    );
     /*driverController.rightBumper().whileTrue(new TrackReefCommand(swerveSubsystem, 
       () -> -driverController.getLeftX(),
       () -> -driverController.getLeftY(), () -> driverController.getRightTriggerAxis() 
     ));*/
-    driverController.y().whileTrue(new ToReefCommand(swerveSubsystem, ()->TrackPointCommand.ReefPoint.kFarLeftL.getPose()));
+    driverController.y().whileTrue(new ToPointCommand(swerveSubsystem, ()->ReefPoint.kFarLeftL.getPose(), PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance, SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto));
     
     nearTrigger = keypadHID.button(18);
     nearLeftTrigger = keypadHID.button(17);
@@ -145,9 +155,9 @@ public class RobotContainer {
   }
 
   private void poseButtons(Trigger trigger, String name) {
-    trigger.and(leftBranchTrigger).whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.valueOf("k" + name + "L").getPose()));
-    trigger.and(centerTrigger).whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.valueOf("k" + name + "C").getPose()));
-    trigger.and(rightBranchTrigger).whileTrue(new ToReefCommand(swerveSubsystem, TrackPointCommand.ReefPoint.valueOf("k" + name + "R").getPose()));
+    trigger.and(leftBranchTrigger).whileTrue(new ToPointCommand(swerveSubsystem, ()->ReefPoint.valueOf("k" + name + "L").getPose(), PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance, SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto));
+    trigger.and(centerTrigger).whileTrue(new ToPointCommand(swerveSubsystem, ()->ReefPoint.valueOf("k" + name + "C").getPose(), PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance, SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto));
+    trigger.and(rightBranchTrigger).whileTrue(new ToPointCommand(swerveSubsystem,()->ReefPoint.valueOf("k" + name + "R").getPose(), PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance, SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto));
   }
   
 

@@ -1,6 +1,6 @@
 {
-  "robotWidth": 0.9,
-  "robotLength": 0.9,
+  "robotWidth": 0.62,
+  "robotLength": 0.62,
   "holonomicMode": true,
   "pathFolders": [
     "Left"
@@ -8,7 +8,7 @@
   "autoFolders": [
     "New Folder"
   ],
-  "defaultMaxVel": 3.0,
+  "defaultMaxVel": 2.0,
   "defaultMaxAccel": 3.0,
   "defaultMaxAngVel": 540.0,
   "defaultMaxAngAccel": 720.0,
@@ -22,14 +22,14 @@
   "driveMotorType": "vortex",
   "driveCurrentLimit": 40.0,
   "wheelCOF": 1.2,
-  "flModuleX": 0.273,
-  "flModuleY": 0.273,
-  "frModuleX": 0.273,
-  "frModuleY": -0.273,
-  "blModuleX": -0.273,
-  "blModuleY": 0.273,
-  "brModuleX": -0.273,
-  "brModuleY": -0.273,
+  "flModuleX": 0.235,
+  "flModuleY": 0.235,
+  "frModuleX": 0.235,
+  "frModuleY": -0.235,
+  "blModuleX": -0.235,
+  "blModuleY": 0.235,
+  "brModuleX": -0.235,
+  "brModuleY": -0.235,
   "bumperOffsetX": 0.0,
   "bumperOffsetY": 0.0,
   "robotFeatures": []
