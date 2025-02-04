@@ -36,6 +36,22 @@ public final class Constants {
     public static final double kDriverControllerDeadband = 0.07;
   }
 
+  public static class Intake {
+    public static final int kIntakeMotorPort = 9;
+    public static final int kExtendMotorPort = 10;
+
+    public static final double extendedPosition = 1.0;
+  }
+
+public static class Elevator {
+      public static final double elevatorBaseHeight = 5; //Drew this is not actual number pls go back later and figure it out. ;)
+    }
+  public static class Grabber {
+    public static final int kGrabberMotorPort = 11;
+    public static final int kPivotMotorPort = 12;
+    public static final int kKickerMotorPort = 13;
+  }
+
   public static class SwerveConstants {
     public static final double wheelBase = Units.inchesToMeters(29);
     public static final double driveBaseRadius = Math.sqrt(wheelBase * wheelBase * 2) / 2;

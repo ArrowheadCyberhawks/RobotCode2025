@@ -7,13 +7,13 @@
         {
           "type": "path",
           "data": {
-            "pathName": "RightToNearRight"
+            "pathName": "LeftToNearLeftL"
           }
         }
       ]
     }
   },
   "resetOdom": false,
-  "folder": null,
+  "folder": "Left",
   "choreoAuto": false
 }

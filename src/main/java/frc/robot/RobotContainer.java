@@ -38,7 +38,6 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-  File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
   public final SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
   private final PhotonCameraWrapper cam0, cam1, cam2;
@@ -50,11 +49,13 @@ public class RobotContainer {
   private final XboxControllerWrapper driverController;
   private final CommandXboxController manipulatorController;
   private final CommandGenericHID keypadHID;
-  private AutoCommandManager autoManager;
+  private final AutoCommandManager autoManager;
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+
+    // set up controllers
     if (DriverStation.isJoystickConnected(IOConstants.kDriverControllerPortBT)) {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortBT, IOConstants.kDriverControllerDeadband, 0.15);
     } else {
@@ -65,17 +66,22 @@ public class RobotContainer {
     } else {
       manipulatorController = new CommandXboxController(IOConstants.kManipulatorControllerPortUSB);
     }
+    // set up keypad
     keypadHID = new CommandGenericHID(IOConstants.kKeypadPort);
 
+    // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    
     cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(0), Inches.of(12), Inches.of(4.75)), new Rotation3d(0,0,Math.PI/2)));
     cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(9), Inches.of(-3), Inches.of(8)), new Rotation3d(0,0,0)));
     cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(0), Inches.of(-12), Inches.of(4.75)), new Rotation3d(0,0,-Math.PI/2)));
     swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam0, cam1, cam2);
+    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+
+    // set up limelight
     // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, "limelight-threeg","limelight-three");
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false);
-    SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
+    
+    // commands and stuff
     autoManager = new AutoCommandManager(swerveSubsystem);
     
     teleopCommand = new XboxDriveCommand(driverController,
@@ -113,24 +119,23 @@ public class RobotContainer {
           System.out.println("resetting robot pose");
         })); // zero heading and reset position to (0,0) if A is pressed for 2 seconds
     
-    driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem, () -> Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
+    driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem,
+        PointTrack.kThetaController,
+        () -> Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
         () -> -driverController.getLeftX(),
         () -> -driverController.getLeftY(),
         () -> driverController.getRightTriggerAxis(),
-        SwerveConstants.kMaxVelTele, SwerveConstants.kMaxAngularVelTele, true, PointTrack.kThetaController
-      )
+        SwerveConstants.kMaxVelTele, SwerveConstants.kMaxAngularVelTele)
     );
 
     driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,
+      PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController,
       ()->Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
-      PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance,
-      SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto)
+      PointTrack.desiredDistance,
+      SwerveConstants.kMaxVelAuto,
+      SwerveConstants.kMaxAngularVelAuto)
     );
-    /*driverController.rightBumper().whileTrue(new TrackReefCommand(swerveSubsystem, 
-      () -> -driverController.getLeftX(),
-      () -> -driverController.getLeftY(), () -> driverController.getRightTriggerAxis() 
-    ));*/
-    driverController.y().whileTrue(new ToPointCommand(swerveSubsystem, ()->ReefPoint.kFarLeftL.getPose(), PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance, SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto));
+    driverController.y().whileTrue(new ToPointCommand(()->ReefPoint.kFarLeftL.getPose(), PointTrack.desiredDistance));
     
     nearTrigger = keypadHID.button(18);
     nearLeftTrigger = keypadHID.button(17);
@@ -154,31 +159,20 @@ public class RobotContainer {
   }
 
   private void poseButtons(Trigger trigger, String name) {
-    trigger.and(leftBranchTrigger).whileTrue(new ToPointCommand(swerveSubsystem, ()->ReefPoint.valueOf("k" + name + "L").getPose(), PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance, SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto));
-    trigger.and(centerTrigger).whileTrue(new ToPointCommand(swerveSubsystem, ()->ReefPoint.valueOf("k" + name + "C").getPose(), PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance, SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto));
-    trigger.and(rightBranchTrigger).whileTrue(new ToPointCommand(swerveSubsystem,()->ReefPoint.valueOf("k" + name + "R").getPose(), PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController, PointTrack.desiredDistance, SwerveConstants.kMaxVelAuto, SwerveConstants.kMaxAngularVelAuto));
+    trigger.and(leftBranchTrigger).whileTrue(new ToPointCommand(()->ReefPoint.valueOf("k" + name + "L").getPose(),  PointTrack.desiredDistance));
+    trigger.and(centerTrigger).whileTrue(new ToPointCommand(()->ReefPoint.valueOf("k" + name + "C").getPose(),  PointTrack.desiredDistance));
+    trigger.and(rightBranchTrigger).whileTrue(new ToPointCommand(()->ReefPoint.valueOf("k" + name + "R").getPose(), PointTrack.desiredDistance));
   }
   
 
   public Command getTeleopCommand() {
-    swerveSubsystem.swerveDrive.setHeadingCorrection(false);
     return teleopCommand;
   }
 
-    /*public Command getAutonomousCommand() {
-    // This method loads the auto when it is called, however, it is recommended
-    // to first load your paths/autos when code starts, then return the
-    // pre-loaded auto/path
-    SmartDashboard.putString("Auto Selected", "Test Auto");
-    return new PathPlannerAuto("Test Auto");
-  }*/
+  public Command getAutonomousCommand() {
+    Command autoCommand = autoManager.getAutoManagerSelected();
 
-    public Command getAutonomousCommand() {
-      Command autoCommand = autoManager.getAutoManagerSelected();
-
-      SmartDashboard.putString("Auto Selected", autoManager.getAutoManagerSelected().toString());
-      return autoCommand;
-    } 
-  
-
+    SmartDashboard.putString("Auto Selected", autoManager.getAutoManagerSelected().toString());
+    return autoCommand;
+  } 
 }
