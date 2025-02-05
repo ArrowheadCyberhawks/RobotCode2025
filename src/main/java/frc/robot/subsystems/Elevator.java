@@ -7,19 +7,22 @@ import static frc.robot.Constants.Elevator.*;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Elevator extends SubsystemBase {
-
+    private SparkMax elevatorMotor;
     public Elevator() {
-        //elevatorMotor = new SparkMax(kElevatorMotor, SparkMax.MotorType.kBrushless);
+        elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
     }
 
-    //public Command elevatorMotorUpCommand() {
-        
-    //}
+    //double monkey = 2;
+    // public Command elevatorMotorUpCommand(double monkey) {
+    //     double ;
+
+    // }
 }
 
 

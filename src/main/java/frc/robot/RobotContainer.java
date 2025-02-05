@@ -78,8 +78,8 @@ public class RobotContainer {
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     // set up limelight
-    // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, "limelight-threeg","limelight-three");
-    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false);
+    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, "limelight","limelight-three");
+    // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false);
     
     // commands and stuff
     autoManager = new AutoCommandManager(swerveSubsystem);

@@ -5,6 +5,7 @@
   "pathFolders": [
     "Center",
     "Left",
+    "BranchToStation",
     "Right"
   ],
   "autoFolders": [

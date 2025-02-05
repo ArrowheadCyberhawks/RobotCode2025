@@ -44,7 +44,8 @@ public final class Constants {
   }
 
 public static class Elevator {
-      public static final double elevatorBaseHeight = 5; //Drew this is not actual number pls go back later and figure it out. ;)
+      public static final double elevatorBaseHeight = 5;//Drew this is not actual number pls go back later and figure it out. ;)
+      public static final int elevatorMotorID = 2;//Drew this is not actual number pls go back later and figure it out. ;)
     }
   public static class Grabber {
     public static final int kGrabberMotorPort = 11;
@@ -74,7 +75,7 @@ public static class Elevator {
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 1; //2.5
+      public static final double kPTranslation = 4.5; //1
       public static final double kITranslation = 0;
       public static final double kDTranslation = 0;
 
