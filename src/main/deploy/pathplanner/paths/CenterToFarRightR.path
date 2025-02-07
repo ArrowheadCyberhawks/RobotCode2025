@@ -12,7 +12,7 @@
         "y": 5.179009840911707
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "StartingCenter"
     },
     {
       "anchor": {
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 120.96375653207365
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "Center",

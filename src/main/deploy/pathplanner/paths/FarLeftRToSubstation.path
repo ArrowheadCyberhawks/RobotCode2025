@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.469466019417475,
-        "y": 6.0185436893203885
+        "x": 4.293257756563246,
+        "y": 5.993615751789975
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 1.1245631068031288,
-        "y": 7.07495145630106
+        "x": 1.125,
+        "y": 7.075
       },
       "prevControl": {
-        "x": 2.620197324788508,
-        "y": 6.391903424837496
+        "x": 2.4336265765420233,
+        "y": 6.43019614292153
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "LeftStation"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -143.5307656099482
+    "rotation": -143.531
   },
   "reversed": false,
   "folder": "BranchToStation",

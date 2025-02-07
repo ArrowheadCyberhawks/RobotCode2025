@@ -44,7 +44,7 @@ public class RobotContainer {
   
   private Command teleopCommand;
   
-  private Trigger nearTrigger, nearLeftTrigger, nearRightTrigger, farTrigger, farLeftTrigger, farRightTrigger, leftBranchTrigger, rightBranchTrigger, centerTrigger;
+  private Trigger[] nearTriggers, nearLeftTriggers, nearRightTriggers, farTriggers, farLeftTriggers, farRightTriggers, leftBranchTriggers, rightBranchTriggers, centerTriggers;
   
   private final XboxControllerWrapper driverController;
   private final CommandXboxController manipulatorController;
@@ -137,31 +137,27 @@ public class RobotContainer {
     );
     driverController.y().whileTrue(new ToPointCommand(()->ReefPoint.kFarLeftL.getPose(), PointTrack.desiredDistance));
     
-    nearTrigger = keypadHID.button(18);
-    nearLeftTrigger = keypadHID.button(17);
-    nearRightTrigger = keypadHID.button(19);
+    nearTriggers = new Trigger[]{keypadHID.button(22), keypadHID.button(23)};
+    nearLeftTriggers = new Trigger[]{keypadHID.button(13), keypadHID.button(17)};
+    nearRightTriggers = new Trigger[]{keypadHID.button(20), keypadHID.button(16)};
     
-    farTrigger = keypadHID.button(15);
-    farLeftTrigger = keypadHID.button(14);
-    farRightTrigger = keypadHID.button(16);
-
-    rightBranchTrigger = keypadHID.button(13);
-    centerTrigger = keypadHID.button(12);
-    leftBranchTrigger = keypadHID.button(11);
-
-    poseButtons(nearTrigger, "Near");
-    poseButtons(nearLeftTrigger, "NearLeft");
-    poseButtons(nearRightTrigger, "NearRight");
-    poseButtons(farTrigger, "Far");
-    poseButtons(farLeftTrigger, "FarLeft");
-    poseButtons(farRightTrigger, "FarRight");
+    farTriggers = new Trigger[]{keypadHID.button(3), keypadHID.button(2)};
+    farLeftTriggers = new Trigger[]{keypadHID.button(5), keypadHID.button(9)};
+    farRightTriggers = new Trigger[]{keypadHID.button(12), keypadHID.button(8)};
+  
+    poseButtons(nearTriggers, "Near");
+    poseButtons(nearLeftTriggers, "NearLeft");
+    poseButtons(nearRightTriggers, "NearRight");
+    poseButtons(farTriggers, "Far");
+    poseButtons(farLeftTriggers, "FarLeft");
+    poseButtons(farRightTriggers, "FarRight");
   
   }
 
-  private void poseButtons(Trigger trigger, String name) {
-    trigger.and(leftBranchTrigger).whileTrue(new ToPointCommand(()->ReefPoint.valueOf("k" + name + "L").getPose(),  PointTrack.desiredDistance));
-    trigger.and(centerTrigger).whileTrue(new ToPointCommand(()->ReefPoint.valueOf("k" + name + "C").getPose(),  PointTrack.desiredDistance));
-    trigger.and(rightBranchTrigger).whileTrue(new ToPointCommand(()->ReefPoint.valueOf("k" + name + "R").getPose(), PointTrack.desiredDistance));
+  private void poseButtons(Trigger[] triggers, String name) {
+    triggers[0].whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "L").getPose(),  PointTrack.desiredDistance));
+    triggers[1].whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "R").getPose(),  PointTrack.desiredDistance));
+    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "C").getPose(), PointTrack.desiredDistance));
   }
   
 

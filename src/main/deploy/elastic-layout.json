@@ -43,24 +43,10 @@
             }
           },
           {
-            "title": "botpose",
+            "title": "SelectAuto",
             "x": 384.0,
             "y": 384.0,
             "width": 768.0,
-            "height": 128.0,
-            "type": "Text Display",
-            "properties": {
-              "topic": "/limelight-threeg/botpose",
-              "period": 0.06,
-              "data_type": "double[]",
-              "show_submit_button": false
-            }
-          },
-          {
-            "title": "SelectAuto",
-            "x": 0.0,
-            "y": 640.0,
-            "width": 384.0,
             "height": 128.0,
             "type": "ComboBox Chooser",
             "properties": {
@@ -258,14 +244,14 @@
             }
           },
           {
-            "title": "limelight-threeg",
+            "title": "limelight",
             "x": 0.0,
             "y": 384.0,
             "width": 768.0,
             "height": 384.0,
             "type": "Camera Stream",
             "properties": {
-              "topic": "/CameraPublisher/limelight-threeg",
+              "topic": "/CameraPublisher/limelight",
               "period": 0.06
             }
           },
