@@ -44,7 +44,7 @@ public class RobotContainer {
   
   private Command teleopCommand;
   
-  private Trigger[] nearTriggers, nearLeftTriggers, nearRightTriggers, farTriggers, farLeftTriggers, farRightTriggers, leftBranchTriggers, rightBranchTriggers, centerTriggers;
+  private Trigger[] nearTriggers, nearLeftTriggers, nearRightTriggers, farTriggers, farLeftTriggers, farRightTriggers;
   
   private final XboxControllerWrapper driverController;
   private final CommandXboxController manipulatorController;

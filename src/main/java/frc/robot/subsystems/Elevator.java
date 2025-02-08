@@ -14,11 +14,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.commands.ElevatorCommand;
 
@@ -31,20 +28,18 @@ public class Elevator extends SubsystemBase {
     
     private ControlState controlState = ControlState.MANUAL;
     private ElevatorLevel targetLevel = ElevatorLevel.L1;
-    Distance targetHeight = targetLevel.getHeight();
+    double targetHeight = targetLevel.getHeight();
 
     public Elevator() {
         elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
         elevatorEncoder = elevatorMotor.getEncoder();
         elevatorPID = elevatorMotor.getClosedLoopController();
-        trapezoidProfile = new TrapezoidProfile(new Constraints(elevatorMotor.configAccessor.closedLoop.maxMotion.getMaxVelocity(), elevatorMotor.configAccessor.closedLoop.maxMotion.getMaxAcceleration()));
+        // trapezoidProfile = new TrapezoidProfile(new Constraints(elevatorMotor.configAccessor.closedLoop.maxMotion.getMaxVelocity(), elevatorMotor.configAccessor.closedLoop.maxMotion.getMaxAcceleration()));
     }    
 
     @Override
     public void periodic() {
-        if (controlState == ControlState.AUTO) {
-            setPosition(trapezoidProfile.calculate(0.02, getState(), new State(targetLevel.getHeight(), 0)).position);
-        }
+        setHeight(targetHeight);
     }
 
     public State getState() {
@@ -57,17 +52,17 @@ public class Elevator extends SubsystemBase {
     /**
      * @return Returns the target encoder position of the elevator.
      */
-    public double getTargetPosition() {
+    public double getTargetHeight() {
         return targetHeight;
     }
 
     /**
      * Set the elevator PID to a specific position.
-     * @param position The position to set the elevator to IN ROTATIONS.
+     * @param height The position to set the elevator to IN ROTATIONS.
      */
-    public void setPosition(double position) {
-        elevatorPID.setReference(position, ControlType.kMAXMotionPositionControl);
-
+    public void setHeight(double height) {
+        this.targetHeight = height;
+        elevatorPID.setReference(height, ControlType.kMAXMotionPositionControl);
     }
 
     /**
@@ -101,11 +96,11 @@ public class Elevator extends SubsystemBase {
     }
     
     /**
-     * @param position The RELATIVE encoder value the elevator motor will move up to.
+     * @param level The RELATIVE encoder value the elevator motor will move up to.
      * @return Returns a command to move the elevator to a certain encoder position.
      */
-    public Command setPositionCommand(ElevatorLevel position) {
-        return runOnce(() -> this.targetLevel = position);
+    public Command setLevelCommand(ElevatorLevel level) {
+        return runOnce(() -> this.targetLevel = level);
     }
     
     /**
@@ -113,7 +108,7 @@ public class Elevator extends SubsystemBase {
      * @return Returns a command to move the elevator up/down at a certain power.
      */
     public Command runPowerCommand(Supplier<Double> power) {
-        return run(() -> setPosition(getTargetPosition() + power.get()));
+        return run(() -> setHeight(getTargetHeight() + power.get()));
     }
 
     /**
@@ -122,9 +117,9 @@ public class Elevator extends SubsystemBase {
      */
     public Command setControlStateCommand(ControlState state) {
         if (state == ControlState.AUTO) {
-            return runOnce(() -> controlState = state).andThen(setPositionCommand(this.targetPosition));
+            return runOnce(() -> controlState = state).andThen(setLevelCommand(this.targetLevel));
         } else {
-            return new ElevatorCommand(this, null);
+            return new ElevatorCommand(this, null); //TODO: REMOVE THIS
         }
     }
     

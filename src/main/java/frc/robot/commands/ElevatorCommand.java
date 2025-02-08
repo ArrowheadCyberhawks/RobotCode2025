@@ -23,8 +23,7 @@ public class ElevatorCommand extends Command{
 
     public void execute() {
         //Moves up to certain heights and applies different power values based on the enum :)
-        SmartDashboard.putNumber("Elevator", m_Elevator.getTargetPosition()); //updates telemetry
-        m_Elevator.setPosition(m_Elevator.getTargetPosition() + m_power.getAsDouble());
+        m_Elevator.setHeight(m_Elevator.getTargetHeight() + m_power.getAsDouble());
     }
 
     public boolean isFinished(){

@@ -12,6 +12,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -44,7 +45,6 @@ public final class Constants {
   }
 
 public static class Elevator {
-
     public static final double elevatorBaseHeight = 5; //TODO update base height
     public static final int elevatorMotorID = 2; //TODO update port number
     public static enum ElevatorLevel { //TODO update positions
