@@ -7,13 +7,61 @@
         {
           "type": "path",
           "data": {
-            "pathName": "CenterToFarLeftR"
+            "pathName": "CenterToFarLeftL"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
           }
         },
         {
           "type": "path",
           "data": {
-            "pathName": "FarLeftRToSubstation"
+            "pathName": "FarLeftLToStation"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftStationToFarLeftR"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "FarLeftRToStation"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftStationToNearLeftL"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 0.5
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "NearLeftLToStation"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "LeftStationToNearLeftR"
           }
         }
       ]

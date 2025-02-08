@@ -16,16 +16,16 @@
     },
     {
       "anchor": {
-        "x": 5.238764912494439,
-        "y": 3.043297612237452
+        "x": 5.28338539150014,
+        "y": 2.9599150324198114
       },
       "prevControl": {
-        "x": 6.611067961165048,
-        "y": 2.5255825242718437
+        "x": 6.655688440170749,
+        "y": 2.442199944454203
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "FarRightR"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 1.5,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,

@@ -39,14 +39,16 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
-        setHeight(targetHeight);
+        // if (controlState == ControlState.AUTO) {
+        //     setHeight(targetLevel.getHeight());
+        // } else if (controlState == ControlState.MANUAL) {
+        //     setHeight(targetHeight);
+        // }
     }
 
     public State getState() {
         return new State(elevatorEncoder.getPosition(), elevatorEncoder.getVelocity());
     }
-
-    //Enum that controls how the driver moves the slides
 
 
     /**
@@ -69,14 +71,14 @@ public class Elevator extends SubsystemBase {
      * @return A command to bring the elevator to the height of the L1 branch.
      */
     public Command L1() {
-        return runOnce(() -> targetLevel = ElevatorLevel.L1);
+        return setLevelCommand(ElevatorLevel.L1);
     }
 
     /**
      * @return A command to bring the elevator to the height of the L2 branch.
      */
     public Command L2() {
-        return runOnce(() -> targetLevel = ElevatorLevel.L2);
+        return setLevelCommand(ElevatorLevel.L2);
     }
 
     /**
@@ -84,7 +86,7 @@ public class Elevator extends SubsystemBase {
      * @return A command to bring the elevator to the height of the L3 branch.
      */
     public Command L3() {
-        return runOnce(() -> targetLevel = ElevatorLevel.L3);
+        return setLevelCommand(ElevatorLevel.L3);
     }
 
     /**
@@ -92,7 +94,7 @@ public class Elevator extends SubsystemBase {
      * @return A command to bring the elevator to the height of the L4 branch.
      */
     public Command L4() {
-        return runOnce(() -> targetLevel = ElevatorLevel.L4);
+        return setLevelCommand(ElevatorLevel.L4);
     }
     
     /**
@@ -100,7 +102,8 @@ public class Elevator extends SubsystemBase {
      * @return Returns a command to move the elevator to a certain encoder position.
      */
     public Command setLevelCommand(ElevatorLevel level) {
-        return runOnce(() -> this.targetLevel = level);
+        this.targetLevel = level;
+        return runOnce(() -> setHeight(level.getHeight()));
     }
     
     /**
@@ -112,6 +115,7 @@ public class Elevator extends SubsystemBase {
     }
 
     /**
+     * DO NOT USE YET!
      * @param state
      * @return
      */

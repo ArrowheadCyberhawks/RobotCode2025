@@ -97,7 +97,7 @@ public static class Elevator {
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 4.5; //1
+      public static final double kPTranslation = 4.5; //4.5
       public static final double kITranslation = 0;
       public static final double kDTranslation = 0;
 

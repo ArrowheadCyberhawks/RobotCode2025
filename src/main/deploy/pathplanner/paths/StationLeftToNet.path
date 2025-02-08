@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.782,
-        "y": 6.264
-      },
-      "prevControl": null,
-      "nextControl": {
-        "x": 5.442161832793176,
-        "y": 6.525136402799255
-      },
-      "isLocked": false,
-      "linkedName": null
-    },
-    {
-      "anchor": {
         "x": 1.125,
         "y": 7.075
       },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.446947447775646,
+        "y": 6.776735226274008
+      },
+      "isLocked": false,
+      "linkedName": "LeftStation"
+    },
+    {
+      "anchor": {
+        "x": 7.782,
+        "y": 6.264
+      },
       "prevControl": {
-        "x": 2.5669150236332383,
-        "y": 6.874840241172952
+        "x": 6.341238554141777,
+        "y": 6.458346999264395
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "CenterNet"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 1.5,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -143.531
+    "rotation": 0.0
   },
   "reversed": false,
   "folder": "StationToNet",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -4.782260217568139e-14
+    "rotation": -143.531
   },
   "useDefaultConstraints": true
 }

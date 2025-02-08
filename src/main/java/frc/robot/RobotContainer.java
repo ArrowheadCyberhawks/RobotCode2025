@@ -121,7 +121,7 @@ public class RobotContainer {
     
     driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem,
         PointTrack.kThetaController,
-        () -> Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
+        () -> ReefPoint.kCenter.getPose(),
         () -> -driverController.getLeftX(),
         () -> -driverController.getLeftY(),
         () -> driverController.getRightTriggerAxis(),
