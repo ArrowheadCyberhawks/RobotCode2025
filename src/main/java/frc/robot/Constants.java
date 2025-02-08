@@ -44,9 +44,31 @@ public final class Constants {
   }
 
 public static class Elevator {
-      public static final double elevatorBaseHeight = 5;//Drew this is not actual number pls go back later and figure it out. ;)
-      public static final int elevatorMotorID = 2;//Drew this is not actual number pls go back later and figure it out. ;)
+
+    public static final double elevatorBaseHeight = 5; //TODO update base height
+    public static final int elevatorMotorID = 2; //TODO update port number
+    public static enum ElevatorLevel { //TODO update positions
+      L1(0.0),
+      L2(0.0),
+      L3(0.0),
+      L4(0.0);  
+
+      private final double height;
+
+      private ElevatorLevel(double height) {
+          this.height = height;
+      }
+
+      public double getHeight() {
+          return height;
+      }
     }
+    
+    public static enum ControlState {
+        MANUAL,
+        AUTO        
+    }
+  }
   public static class Grabber {
     public static final int kGrabberMotorPort = 11;
     public static final int kPivotMotorPort = 12;
@@ -133,7 +155,7 @@ public static class Elevator {
     /**
    * Enum to represent branches of the reef.
    */
-  public enum ReefPoint {
+  public static enum ReefPoint {
       kCenter(new Pose2d(13, 4, new Rotation2d()), new Pose2d(4.5, 4, new Rotation2d())),
       kFarR(Utils.getOffsetRightAprilTag(10), Utils.getOffsetRightAprilTag(21)),
       kFarC(Utils.getTagPose(10), Utils.getTagPose(21)),
