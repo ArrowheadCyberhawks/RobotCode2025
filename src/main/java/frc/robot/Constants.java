@@ -12,7 +12,6 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.networktables.NetworkTableType;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -37,21 +36,23 @@ public final class Constants {
     public static final double kDriverControllerDeadband = 0.07;
   }
 
-  public static class Intake {
-    public static final int kIntakeMotorPort = 9;
-    public static final int kExtendMotorPort = 10;
+  public static class IntakeConstants {
+    public static final int kIntakeMotorPort = 10;
+    public static final int kExtendMotorPort = 11;
 
     public static final double extendedPosition = 1.0;
   }
 
-public static class Elevator {
+public static class ElevatorConstants {
     public static final double elevatorBaseHeight = 5; //TODO update base height
-    public static final int elevatorMotorID = 2; //TODO update port number
+    public static final int elevatorMotorID = 9; //TODO update port number
     public static enum ElevatorLevel { //TODO update positions
+      LOW(0.0),
       L1(0.0),
       L2(0.0),
       L3(0.0),
-      L4(0.0);  
+      L4(0.0),
+      HIGH(155.0);
 
       private final double height;
 
@@ -69,7 +70,7 @@ public static class Elevator {
         AUTO        
     }
   }
-  public static class Grabber {
+  public static class GrabberConstants {
     public static final int kGrabberMotorPort = 11;
     public static final int kPivotMotorPort = 12;
     public static final int kKickerMotorPort = 13;

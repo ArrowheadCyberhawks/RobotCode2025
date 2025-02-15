@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Seconds;
-import static frc.robot.Constants.Grabber.*;
+import static frc.robot.Constants.GrabberConstants.*;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;

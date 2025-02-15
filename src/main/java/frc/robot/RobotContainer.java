@@ -14,8 +14,10 @@ import lib.frc706.cyberlib.commands.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.LimelightSubsystem;
 import lib.frc706.cyberlib.subsystems.PhotonCameraWrapper;
 import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
+import frc.robot.subsystems.Elevator;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
+import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.Constants.PID.PointTrack;
 import java.io.File;
 
@@ -40,6 +42,7 @@ public class RobotContainer {
 
   public final SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
+  private final Elevator elevator;
   private final PhotonCameraWrapper cam0, cam1, cam2;
   
   private Command teleopCommand;
@@ -81,6 +84,9 @@ public class RobotContainer {
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, "limelight","limelight-three");
     // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false);
     
+    // set up elevator
+    elevator = new Elevator();
+
     // commands and stuff
     autoManager = new AutoCommandManager(swerveSubsystem);
     
@@ -152,6 +158,8 @@ public class RobotContainer {
     poseButtons(farLeftTriggers, "FarLeft");
     poseButtons(farRightTriggers, "FarRight");
   
+    keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LOW));
+    keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HIGH));
   }
 
   private void poseButtons(Trigger[] triggers, String name) {

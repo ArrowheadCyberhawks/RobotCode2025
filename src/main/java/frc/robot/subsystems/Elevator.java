@@ -2,7 +2,7 @@
 
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.Elevator.*;
+import static frc.robot.Constants.ElevatorConstants.*;
 
 import java.util.function.Supplier;
 
@@ -64,7 +64,7 @@ public class Elevator extends SubsystemBase {
      */
     public void setHeight(double height) {
         this.targetHeight = height;
-        elevatorPID.setReference(height, ControlType.kMAXMotionPositionControl);
+        elevatorPID.setReference(height, ControlType.kPosition);
     }
 
     /**
