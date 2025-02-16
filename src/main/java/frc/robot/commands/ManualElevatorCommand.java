@@ -2,16 +2,15 @@ package frc.robot.commands;
 
 import java.util.function.DoubleSupplier;
 
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 
-public class ElevatorCommand extends Command{
+public class ManualElevatorCommand extends Command{
 
     private final Elevator m_Elevator;
     private final DoubleSupplier m_power;
 
-    public ElevatorCommand(Elevator elevatorSubsystem, DoubleSupplier power){
+    public ManualElevatorCommand(Elevator elevatorSubsystem, DoubleSupplier power){
         m_Elevator = elevatorSubsystem;
         m_power = power;
         addRequirements(elevatorSubsystem);

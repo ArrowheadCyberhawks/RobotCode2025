@@ -37,8 +37,8 @@ public final class Constants {
   }
 
   public static class IntakeConstants {
-    public static final int kIntakeMotorPort = 10;
-    public static final int kExtendMotorPort = 11;
+    public static final int kIntakeMotorPort = 13;
+    public static final int kExtendMotorPort = 12;
 
     public static final double extendedPosition = 1.0;
   }
@@ -47,12 +47,12 @@ public static class ElevatorConstants {
     public static final double elevatorBaseHeight = 5; //TODO update base height
     public static final int elevatorMotorID = 9; //TODO update port number
     public static enum ElevatorLevel { //TODO update positions
-      LOW(0.0),
-      L1(0.0),
-      L2(0.0),
-      L3(0.0),
-      L4(0.0),
-      HIGH(155.0);
+      LO(0.0),  //x is about 1.143 cm //0
+      L1(40.0), //40
+      L2(60.0), //60
+      L3(80.0), //80
+      L4(100.0), //100
+      HI(155.0); // 155
 
       private final double height;
 
@@ -71,9 +71,24 @@ public static class ElevatorConstants {
     }
   }
   public static class GrabberConstants {
-    public static final int kGrabberMotorPort = 11;
-    public static final int kPivotMotorPort = 12;
-    public static final int kKickerMotorPort = 13;
+    public static final int kGrabberMotorPort = 10;
+    public static final int kPivotMotorPort = 11;
+
+    public static enum GrabberPosition { //TODO update positions
+      DOWN(new Rotation2d(-15.0)),
+      OUT(new Rotation2d(0.0)),
+      UP(new Rotation2d(13.0));
+      
+      private final Rotation2d angle;
+
+      private GrabberPosition(Rotation2d angle) {
+          this.angle = angle;
+      }
+
+      public Rotation2d getAngle() {
+          return angle;
+      }
+    }
   }
 
   public static class SwerveConstants {

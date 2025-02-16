@@ -5,20 +5,24 @@
 package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
-import static frc.robot.Constants.*;
-
 import lib.frc706.cyberlib.XboxControllerWrapper;
 import lib.frc706.cyberlib.commands.ToPointCommand;
 import lib.frc706.cyberlib.commands.TrackPointCommand;
 import lib.frc706.cyberlib.commands.XboxDriveCommand;
-import lib.frc706.cyberlib.subsystems.LimelightSubsystem;
-import lib.frc706.cyberlib.subsystems.PhotonCameraWrapper;
-import lib.frc706.cyberlib.subsystems.SwerveSubsystem;
-import frc.robot.subsystems.Elevator;
+
+import lib.frc706.cyberlib.subsystems.*;
+import frc.robot.subsystems.*;
+import frc.robot.subsystems.Intake.ExtendState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
+import frc.robot.Constants.GrabberConstants.GrabberPosition;
+import frc.robot.Constants.IOConstants;
+import frc.robot.Constants.PID;
 import frc.robot.Constants.PID.PointTrack;
+import frc.robot.Constants.ReefPoint;
+import frc.robot.Constants.SwerveConstants;
+
 import java.io.File;
 
 import edu.wpi.first.math.geometry.*;
@@ -28,6 +32,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -42,8 +47,13 @@ public class RobotContainer {
 
   public final SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
+  private final PhotonCameraWrapper cam0, cam1, cam2, cam3, cam4, cam5, cam6;
+
+
   private final Elevator elevator;
-  private final PhotonCameraWrapper cam0, cam1, cam2;
+  private final Grabber grabber;
+  private final Intake intake;
+
   
   private Command teleopCommand;
   
@@ -74,18 +84,24 @@ public class RobotContainer {
 
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(0), Inches.of(12), Inches.of(4.75)), new Rotation3d(0,0,Math.PI/2)));
-    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(9), Inches.of(-3), Inches.of(8)), new Rotation3d(0,0,0)));
-    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(0), Inches.of(-12), Inches.of(4.75)), new Rotation3d(0,0,-Math.PI/2)));
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam0, cam1, cam2);
+    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(-5.750), Inches.of(-15), Inches.of(23)), new Rotation3d(0,0, Math.PI/2)));
+    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(-2.25), Inches.of(-13.75), Inches.of(23)), new Rotation3d(0,0,0)));
+    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(-9.25), Inches.of(-13.75), Inches.of(23)), new Rotation3d(0,0,-Math.PI)));
+    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(9.25), Inches.of(-13.75), Inches.of(27.5)), new Rotation3d(0,0,Math.PI)));
+    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(2.25), Inches.of(13.75), Inches.of(27.5)), new Rotation3d(0,0,-Math.PI/2)));
+    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(5.750), Inches.of(15), Inches.of(27.5)), new Rotation3d(0,0,0)));
+    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(9.25), Inches.of(13.75), Inches.of(27.5)), new Rotation3d(0,0,Math.PI/2)));
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam0, cam1, cam2, cam4, cam5);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     // set up limelight
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, "limelight","limelight-three");
     // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false);
     
-    // set up elevator
+    // set up subsystems
     elevator = new Elevator();
+    grabber = new Grabber();
+    intake = new Intake();
 
     // commands and stuff
     autoManager = new AutoCommandManager(swerveSubsystem);
@@ -158,8 +174,40 @@ public class RobotContainer {
     poseButtons(farLeftTriggers, "FarLeft");
     poseButtons(farRightTriggers, "FarRight");
   
-    keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LOW));
-    keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HIGH));
+    keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO));
+    keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI));
+    keypadHID.button(6).onTrue(elevator.setLevelCommand(ElevatorLevel.L4));
+    keypadHID.button(10).onTrue(elevator.setLevelCommand(ElevatorLevel.L3));
+    keypadHID.button(14).onTrue(elevator.setLevelCommand(ElevatorLevel.L2));
+    keypadHID.button(18).onTrue(elevator.setLevelCommand(ElevatorLevel.L1)); //12.75 inces 
+
+    
+
+    //turn on intake
+    keypadHID.button(11).onTrue(intake.toggleIntakeCommand(true));
+
+
+    //temp, not as many things
+    manipulatorController.pov(0).onTrue(grabber.runGrabberCommand(.25));
+    manipulatorController.pov(180).onTrue(grabber.runGrabberCommand(-.25));
+    manipulatorController.pov(270).onTrue(grabber.runGrabberCommand(0));
+
+    //keypadHID.button(1).onTrue(grabber.setpiv));
+
+
+    keypadHID.button(1).onTrue(elevator.L2().andThen(new WaitCommand(1)).andThen(grabber.setPivotPositionCommand(GrabberPosition.DOWN)));
+    //keypadHID.button(1).onTrue(grabber.runPivotCommand(0.4));
+
+
+    //keypadHID.button(4).onTrue(grabber.setPivotAngleCommand(new Rotation2d(0)));
+   // manipulatorController.leftBumper().onTrue(intake.runIntakeCommand(1)); //retract // ignore brokeafied code 
+    //manipulatorController.rightBumper().onTrue(intake.runIntakeCommand(1)); //retract
+//MONKEY CODE 
+    keypadHID.button(11).whileTrue(intake.runIntakeCommand(1));
+
+   // keypadHID.button(4).onTrue(intake.runRetractCommand(1)); //maybe fix code   MAYBE TEST LATER 
+  //  keypadHID.button(15).onTrue(intake.runRetractCommand(-1));  MAYBE TEST LATER
+
   }
 
   private void poseButtons(Trigger[] triggers, String name) {

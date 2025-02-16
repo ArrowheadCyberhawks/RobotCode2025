@@ -16,6 +16,8 @@ public class Intake extends SubsystemBase {
     private final SparkMax intakeMotor, extendMotor;
     private final SparkClosedLoopController extendController;
 
+    private boolean intakeOn;
+
     /**
      * Enum to represent the extension state of the intake mechanism.
      */
@@ -33,20 +35,26 @@ public class Intake extends SubsystemBase {
         extendController = extendMotor.getClosedLoopController();
     }
 
-    /**
-     * Sets the speed of the intake motor.
-     * 
-     * @param speed The percent speed to set the motor to. Should be between -1 and 1.
-     */
-    public void setIntakeMotor(double speed) {
-        intakeMotor.set(speed);
-    }
 
     /**
      * Stops the intake motor.
      */
     public void stopIntakeMotor() {
         intakeMotor.stopMotor();
+    }
+
+
+    public void stopRetractMotor() {
+        extendMotor.stopMotor();
+    }
+    public void setIntakeMotor(double speed) {
+        intakeMotor.set(speed);
+    }
+
+    
+
+    public void setRetractMotor(double speed){
+        extendMotor.set(speed);
     }
 
     /**
@@ -60,6 +68,29 @@ public class Intake extends SubsystemBase {
         } else {
             extendController.setReference(0, ControlType.kMAXMotionPositionControl);
         }
+
+    }
+
+    public void setIntakeState(boolean intakeOn){
+        this.intakeOn = intakeOn;
+    }
+
+        /**
+     * Sets the speed of the intake motor.
+     * 
+     * @param speed The percent speed to set the motor to. Should be between -1 and 1.
+     */
+    public void toggleIntakeMotor() {
+        if(intakeMotor.get() == 0){
+            intakeMotor.set(1);
+        } else {
+            intakeMotor.stopMotor();
+        }
+    }
+
+
+    public Command toggleIntakeCommand(boolean intakeOn){
+        return this.runOnce(() -> setIntakeState(intakeOn));
     }
 
     /**
@@ -72,6 +103,9 @@ public class Intake extends SubsystemBase {
         return this.runEnd(() -> setIntakeMotor(speed), () -> stopIntakeMotor());
     }
 
+    public Command runRetractCommand(double speed) {
+        return this.runEnd(() -> setRetractMotor(speed), () -> stopRetractMotor());
+    }
     /**
      * Sets the extension state of the intake.
      * 
@@ -82,7 +116,7 @@ public class Intake extends SubsystemBase {
         return this.runOnce(() -> setState(state));
     }
 
-    /**
+    /**s
      * Extends the intake.
      * 
      * @return A command that extends the intake.
@@ -99,4 +133,5 @@ public class Intake extends SubsystemBase {
     public Command retractCommand() {
         return this.runOnce(() -> setState(ExtendState.RETRACTED));
     }
+
 }

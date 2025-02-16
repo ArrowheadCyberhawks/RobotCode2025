@@ -1,13 +1,13 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Seconds;
 import static frc.robot.Constants.GrabberConstants.*;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -18,17 +18,20 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  */
 public class Grabber extends SubsystemBase {
     private SparkFlex grabberMotor;
-    private SparkMax pivotMotor, kickerMotor;
+    private SparkMax pivotMotor;
+    private RelativeEncoder pivotEncoder;
     private SparkClosedLoopController pivotController;
-
+    private PIDController pivotPID = new PIDController(0.09,0, 0);
+    private double setpoint = 0;
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
      */
     public Grabber() {
         grabberMotor = new SparkFlex(kGrabberMotorPort, MotorType.kBrushless);
         pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
-        kickerMotor = new SparkMax(kKickerMotorPort, MotorType.kBrushless);
         pivotController = pivotMotor.getClosedLoopController();
+        pivotEncoder = pivotMotor.getEncoder();
+        // pivotMotor.configure(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI)), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     /**
@@ -47,6 +50,23 @@ public class Grabber extends SubsystemBase {
     }
 
     /**
+     * Periodically prints the rotational values of the grabber motor and pivot motor.
+     */
+
+
+    public void trackGrabMot(){
+        // double grabberMotorPos =  grabberMotor.getEncoder().getPosition();
+        // System.out.println("Grabber Motor Position: " + grabberMotorPos);
+        System.out.println("Pivot Motor Position: " + pivotEncoder.getPosition());
+    }
+
+    
+    public void periodic() {
+        setPivotMotor(pivotPID.calculate(pivotEncoder.getPosition(), setpoint));
+        System.out.println("Pivot Motor Position: " + pivotEncoder.getPosition());
+    }
+
+    /**
      * Sets the speed of the pivot motor.
      * @param speed The percent speed to set the motor to. Should be between -1 and 1.
      */
@@ -62,26 +82,17 @@ public class Grabber extends SubsystemBase {
     }
 
     /**
-     * Sets the speed of the kicker motor.
-     * @param speed The percent speed to set the motor to. Should be between -1 and 1.
-     */
-    public void setKickerMotor(double speed) {
-        kickerMotor.set(speed);
-    }
-
-    /**
-     * Stops the kicker motor.
-     */
-    public void stopKickerMotor() {
-        kickerMotor.stopMotor();
-    }
-
-    /**
      * Sets the pivot angle of the grabber.
      * @param angle The Rotation2d to set the pivot to. 0 is horizontal, positive is up.
      */
     public void setPivotAngle(Rotation2d angle) {
-        pivotController.setReference(angle.getRotations(), ControlType.kMAXMotionPositionControl);
+        System.out.println("set pivot angle");
+        setpoint = angle.getRotations();
+        // pivotController.setReference(10, ControlType.kPosition);
+    }
+
+    public void setPivotPosition(GrabberPosition position) {
+        setpoint = position.getAngle().getRotations();
     }
 
     /**
@@ -93,6 +104,10 @@ public class Grabber extends SubsystemBase {
         return runOnce(() -> setPivotAngle(angle));
     }
 
+    public Command setPivotPositionCommand(GrabberPosition position) {
+        return runOnce(() -> setPivotPosition(position));
+    }
+
     /**
      * Runs the grabber motor at a given speed.
      * @param speed The speed to run the grabber motor at. Should be between -1 and 1.
@@ -102,11 +117,7 @@ public class Grabber extends SubsystemBase {
         return runEnd(() -> setGrabberMotor(speed), () -> stopGrabberMotor());
     }
 
-    /**
-     * Ejects the game piece using the kicker motor.
-     * @return A command that runs the kicker motor at full speed for 1 second.
-     */
-    public Command kickCommand() {
-        return runEnd(() -> setKickerMotor(1), () -> stopKickerMotor()).withTimeout(Seconds.of(1));
+    public Command runPivotCommand(double speed) {
+        return runEnd(() -> setPivotMotor(speed), () -> stopPivotMotor());
     }
 }

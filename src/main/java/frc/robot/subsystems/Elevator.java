@@ -1,5 +1,3 @@
-//don't cry ;)
-
 package frc.robot.subsystems;
 
 import static frc.robot.Constants.ElevatorConstants.*;
@@ -17,7 +15,7 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.ElevatorCommand;
+import frc.robot.commands.ManualElevatorCommand;
 
 
 public class Elevator extends SubsystemBase {
@@ -37,6 +35,16 @@ public class Elevator extends SubsystemBase {
         // trapezoidProfile = new TrapezoidProfile(new Constraints(elevatorMotor.configAccessor.closedLoop.maxMotion.getMaxVelocity(), elevatorMotor.configAccessor.closedLoop.maxMotion.getMaxAcceleration()));
     }    
 
+
+    public void trackElvMot(){
+        double ElvMotorPos =  elevatorMotor.getEncoder().getPosition();
+        System.out.println("Elevator Motor Position: " + ElvMotorPos);
+    }
+
+
+
+
+
     @Override
     public void periodic() {
         // if (controlState == ControlState.AUTO) {
@@ -44,6 +52,7 @@ public class Elevator extends SubsystemBase {
         // } else if (controlState == ControlState.MANUAL) {
         //     setHeight(targetHeight);
         // }
+        // trackElvMot();
     }
 
     public State getState() {
@@ -123,7 +132,7 @@ public class Elevator extends SubsystemBase {
         if (state == ControlState.AUTO) {
             return runOnce(() -> controlState = state).andThen(setLevelCommand(this.targetLevel));
         } else {
-            return new ElevatorCommand(this, null); //TODO: REMOVE THIS
+            return new ManualElevatorCommand(this, null); //TODO: REMOVE THIS
         }
     }
     
@@ -133,6 +142,7 @@ public class Elevator extends SubsystemBase {
     public Command resetElevatorEncoders() {
         return runOnce(() -> elevatorEncoder.setPosition(0));
     }
+
 
     /**
      * Stops the elevator motor.
