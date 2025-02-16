@@ -53,6 +53,7 @@ public class Elevator extends SubsystemBase {
         //     setHeight(targetHeight);
         // }
         // trackElvMot();
+        System.out.println("elevator motor height" + elevatorMotor.getEncoder().getPosition());
     }
 
     public State getState() {
@@ -104,6 +105,19 @@ public class Elevator extends SubsystemBase {
      */
     public Command L4() {
         return setLevelCommand(ElevatorLevel.L4);
+    }
+
+    /**
+     * 
+     * @return A command to bring the leevator to the default resting position of the robot.
+     */
+    public Command DEF() {
+        return setLevelCommand(ElevatorLevel.DEF);
+    }
+
+
+    public Command PICK() {
+        return setLevelCommand(ElevatorLevel.PICK);
     }
     
     /**

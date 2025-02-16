@@ -20,6 +20,8 @@ import frc.robot.Constants.GrabberConstants.GrabberPosition;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.PID;
 import frc.robot.Constants.PID.PointTrack;
+import frc.robot.commands.ManualElevatorCommand;
+import frc.robot.commands.ManualPivotCommand;
 import frc.robot.Constants.ReefPoint;
 import frc.robot.Constants.SwerveConstants;
 
@@ -29,8 +31,10 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -86,11 +90,11 @@ public class RobotContainer {
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(-5.750), Inches.of(-15), Inches.of(23)), new Rotation3d(0,0, Math.PI/2)));
     cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(-2.25), Inches.of(-13.75), Inches.of(23)), new Rotation3d(0,0,0)));
-    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(-9.25), Inches.of(-13.75), Inches.of(23)), new Rotation3d(0,0,-Math.PI)));
+    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(-9.25), Inches.of(-13.75), Inches.of(23)), new Rotation3d(0,0,Math.PI)));
     cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(9.25), Inches.of(-13.75), Inches.of(27.5)), new Rotation3d(0,0,Math.PI)));
-    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(2.25), Inches.of(13.75), Inches.of(27.5)), new Rotation3d(0,0,-Math.PI/2)));
-    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(5.750), Inches.of(15), Inches.of(27.5)), new Rotation3d(0,0,0)));
-    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(9.25), Inches.of(13.75), Inches.of(27.5)), new Rotation3d(0,0,Math.PI/2)));
+    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-2.25), Inches.of(13.75), Inches.of(27.5)), new Rotation3d(0,0,0)));
+    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-5.750), Inches.of(15), Inches.of(27.5)), new Rotation3d(0,0,-Math.PI/2)));
+    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-9.25), Inches.of(13.75), Inches.of(27.5)), new Rotation3d(0,0,-Math.PI)));
     swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam0, cam1, cam2, cam4, cam5);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -104,7 +108,7 @@ public class RobotContainer {
     intake = new Intake();
 
     // commands and stuff
-    autoManager = new AutoCommandManager(swerveSubsystem);
+    autoManager = new AutoCommandManager(swerveSubsystem, intake, elevator, grabber);
     
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
@@ -150,6 +154,12 @@ public class RobotContainer {
         SwerveConstants.kMaxVelTele, SwerveConstants.kMaxAngularVelTele)
     );
 
+    manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator,
+      () -> -manipulatorController.getLeftY())
+    );
+
+    manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()));
+
     driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,
       PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController,
       ()->Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
@@ -173,29 +183,46 @@ public class RobotContainer {
     poseButtons(farTriggers, "Far");
     poseButtons(farLeftTriggers, "FarLeft");
     poseButtons(farRightTriggers, "FarRight");
-  
-    keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO));
-    keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI));
-    keypadHID.button(6).onTrue(elevator.setLevelCommand(ElevatorLevel.L4));
-    keypadHID.button(10).onTrue(elevator.setLevelCommand(ElevatorLevel.L3));
-    keypadHID.button(14).onTrue(elevator.setLevelCommand(ElevatorLevel.L2));
-    keypadHID.button(18).onTrue(elevator.setLevelCommand(ElevatorLevel.L1)); //12.75 inces 
+    //keypadHID.button(21).onTrue(FieldObject2d)
+
+    elevatorButtons(19, "LO");
+    elevatorButtons(7, "HI");
+    elevatorButtons(6, "L4");
+    elevatorButtons(10, "L3");
+    elevatorButtons(14, "L2");
+    elevatorButtons(18, "L1");
+
+    keypadHID.button(15).onTrue(elevator.DEF().andThen(new WaitCommand(0.9)).andThen(grabber.setPivotPositionCommand(GrabberPosition.DOWN)));
+    keypadHID.button(11).onTrue(
+      grabber.runGrabberCommand(-1)
+      .withTimeout(2)
+      .alongWith(elevator.PICK())
+    );
+
+    /*keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
+    keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
+    keypadHID.button(6).onTrue(elevator.setLevelCommand(ElevatorLevel.L4).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
+    keypadHID.button(10).onTrue(elevator.setLevelCommand(ElevatorLevel.L3).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
+    keypadHID.button(14).onTrue(elevator.setLevelCommand(ElevatorLevel.L2).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
+    keypadHID.button(18).onTrue(elevator.setLevelCommand(ElevatorLevel.L1).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP))); //12.75 inces 
+    */
 
     
 
     //turn on intake
-    keypadHID.button(11).onTrue(intake.toggleIntakeCommand(true));
+    //keypadHID.button(11).onTrue(intake.toggleIntakeCommand(true));
 
 
     //temp, not as many things
-    manipulatorController.pov(0).onTrue(grabber.runGrabberCommand(.25));
-    manipulatorController.pov(180).onTrue(grabber.runGrabberCommand(-.25));
-    manipulatorController.pov(270).onTrue(grabber.runGrabberCommand(0));
+    manipulatorController.pov(0).whileTrue(grabber.runGrabberCommand(.25));
+    manipulatorController.pov(180).whileTrue(grabber.runGrabberCommand(-1));
 
     //keypadHID.button(1).onTrue(grabber.setpiv));
 
 
-    keypadHID.button(1).onTrue(elevator.L2().andThen(new WaitCommand(1)).andThen(grabber.setPivotPositionCommand(GrabberPosition.DOWN)));
+    
+    //keypadHID.button(15).onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));
+
     //keypadHID.button(1).onTrue(grabber.runPivotCommand(0.4));
 
 
@@ -214,6 +241,14 @@ public class RobotContainer {
     triggers[0].whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "L").getPose(),  PointTrack.desiredDistance));
     triggers[1].whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "R").getPose(),  PointTrack.desiredDistance));
     triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "C").getPose(), PointTrack.desiredDistance));
+  }
+
+  private void elevatorButtons(int buttonNum, String name) {
+    keypadHID.button(buttonNum).onTrue(
+      elevator.setLevelCommand(ElevatorLevel.valueOf(name))
+      .andThen(new WaitCommand(0.3))
+      .andThen(grabber.setPivotPositionCommand(GrabberPosition.UP))
+    );
   }
   
 

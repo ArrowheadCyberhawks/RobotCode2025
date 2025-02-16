@@ -48,11 +48,13 @@ public static class ElevatorConstants {
     public static final int elevatorMotorID = 9; //TODO update port number
     public static enum ElevatorLevel { //TODO update positions
       LO(0.0),  //x is about 1.143 cm //0
-      L1(40.0), //40
-      L2(60.0), //60
-      L3(80.0), //80
-      L4(100.0), //100
-      HI(155.0); // 155
+      L1(10.0), //40 // 22
+      L2(24.0), //60 //50 / 22 
+      L3(40.0), //80
+      L4(60.0), //100
+      HI(156.0),
+      DEF(60), // 155
+      PICK(40);
 
       private final double height;
 
@@ -75,9 +77,9 @@ public static class ElevatorConstants {
     public static final int kPivotMotorPort = 11;
 
     public static enum GrabberPosition { //TODO update positions
-      DOWN(new Rotation2d(-15.0)),
-      OUT(new Rotation2d(0.0)),
-      UP(new Rotation2d(13.0));
+      DOWN(new Rotation2d(-65.0)),//-15
+      OUT(new Rotation2d(5.0)),
+      UP(new Rotation2d(70.0));//13
       
       private final Rotation2d angle;
 
@@ -95,8 +97,8 @@ public static class ElevatorConstants {
     public static final double wheelBase = Units.inchesToMeters(29);
     public static final double driveBaseRadius = Math.sqrt(wheelBase * wheelBase * 2) / 2;
 
-    public static final double kMaxVelTele = Units.feetToMeters(15);
-    public static final double kMaxAccelTele = kMaxVelTele * 1; //idk what this should be
+    public static final double kMaxVelTele = Units.feetToMeters(19);
+    public static final double kMaxAccelTele = kMaxVelTele * 3; //idk what this should be
     public static final double kMaxAngularVelTele = 2 * 2 * Math.PI; //idk 2 radians per second whatever
     public static final double kMaxAngularAccelTele = kMaxAngularVelTele * 3;
 
@@ -142,7 +144,7 @@ public static class ElevatorConstants {
       public static final PIDController kYController = new PIDController(kPY, kIY, kDY);
       public static final PIDController kThetaController = new PIDController(kPAutoTurning, kIAutoTurning, kDAutoTurning);
 
-      public static final double desiredDistance = 0.27;
+      public static final double desiredDistance = 0.3;
     }
   }
 

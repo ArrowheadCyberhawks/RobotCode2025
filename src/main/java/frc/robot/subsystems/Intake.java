@@ -8,6 +8,9 @@ import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
+import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
+import frc.robot.Constants.GrabberConstants.GrabberPosition;
 
 /**
  * Subsystem for the intake. Includes a motor to intake game pieces and a motor to extend the intake.

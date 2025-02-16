@@ -7,9 +7,11 @@ import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 /**
@@ -21,8 +23,9 @@ public class Grabber extends SubsystemBase {
     private SparkMax pivotMotor;
     private RelativeEncoder pivotEncoder;
     private SparkClosedLoopController pivotController;
-    private PIDController pivotPID = new PIDController(0.09,0, 0);
-    private double setpoint = 0;
+    private PIDController pivotPID = new PIDController(0.09,0, 0); //0.09
+
+    private double setpoint = GrabberPosition.UP.getAngle().getRotations();
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
      */
@@ -71,7 +74,11 @@ public class Grabber extends SubsystemBase {
      * @param speed The percent speed to set the motor to. Should be between -1 and 1.
      */
     public void setPivotMotor(double speed) {
-        pivotMotor.set(speed);
+        pivotMotor.set(MathUtil.clamp(speed, -0.5, 0.5));
+    }
+
+    public double getPivotAngle() {
+        return pivotMotor.getEncoder().getPosition();
     }
 
     /**
@@ -114,10 +121,14 @@ public class Grabber extends SubsystemBase {
      * @return A command that runs the grabber motor at the given speed.
      */
     public Command runGrabberCommand(double speed) {
-        return runEnd(() -> setGrabberMotor(speed), () -> stopGrabberMotor());
+        return new RunCommand(() -> setGrabberMotor(speed)).finallyDo(() -> stopGrabberMotor());
     }
 
     public Command runPivotCommand(double speed) {
         return runEnd(() -> setPivotMotor(speed), () -> stopPivotMotor());
+    }
+
+    public Command stopGrabberCommand() {
+        return runOnce(() -> stopGrabberMotor());
     }
 }
