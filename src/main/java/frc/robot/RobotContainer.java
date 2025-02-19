@@ -214,7 +214,7 @@ public class RobotContainer {
 
 
     //temp, not as many things
-    manipulatorController.pov(0).whileTrue(grabber.runGrabberCommand(.25));
+    manipulatorController.pov(0).whileTrue(grabber.runGrabberCommand(-.25)); //was 0.25
     manipulatorController.pov(180).whileTrue(grabber.runGrabberCommand(-1));
 
     //keypadHID.button(1).onTrue(grabber.setpiv));

@@ -77,9 +77,9 @@ public static class ElevatorConstants {
     public static final int kPivotMotorPort = 11;
 
     public static enum GrabberPosition { //TODO update positions
-      DOWN(new Rotation2d(-65.0)),//-15
+      DOWN(new Rotation2d(-40.0)),//-65  was at - 40 
       OUT(new Rotation2d(5.0)),
-      UP(new Rotation2d(70.0));//13
+      UP(new Rotation2d(70.0));//70
       
       private final Rotation2d angle;
 

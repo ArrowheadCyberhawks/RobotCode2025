@@ -13,6 +13,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants.GrabberConstants.GrabberPosition;
 
 /**
  * The Grabber subsystem covers the motors that manipulate the game piece
@@ -24,8 +25,8 @@ public class Grabber extends SubsystemBase {
     private RelativeEncoder pivotEncoder;
     private SparkClosedLoopController pivotController;
     private PIDController pivotPID = new PIDController(0.09,0, 0); //0.09
-
     private double setpoint = GrabberPosition.UP.getAngle().getRotations();
+
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
      */
@@ -34,7 +35,14 @@ public class Grabber extends SubsystemBase {
         pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
         pivotController = pivotMotor.getClosedLoopController();
         pivotEncoder = pivotMotor.getEncoder();
-        // pivotMotor.configure(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI)), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        //pivotMotor.configure(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI)), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+
+
+    public void periodic() {
+        //setPivotMotor(toPosition(setpoint));
+        setPivotMotor(pivotPID.calculate(pivotEncoder.getPosition(), setpoint));
+        System.out.println("Pivot Motor Position: " + pivotEncoder.getPosition());
     }
 
     /**
@@ -45,7 +53,7 @@ public class Grabber extends SubsystemBase {
         grabberMotor.set(speed);
     }
 
-    /**
+     /**
      * Stops the grabber motor.
      */
     public void stopGrabberMotor() {
@@ -63,18 +71,13 @@ public class Grabber extends SubsystemBase {
         System.out.println("Pivot Motor Position: " + pivotEncoder.getPosition());
     }
 
-    
-    public void periodic() {
-        setPivotMotor(pivotPID.calculate(pivotEncoder.getPosition(), setpoint));
-        System.out.println("Pivot Motor Position: " + pivotEncoder.getPosition());
-    }
 
     /**
      * Sets the speed of the pivot motor.
      * @param speed The percent speed to set the motor to. Should be between -1 and 1.
      */
     public void setPivotMotor(double speed) {
-        pivotMotor.set(MathUtil.clamp(speed, -0.5, 0.5));
+        pivotMotor.set(MathUtil.clamp(speed, -0.2, 0.2));
     }
 
     public double getPivotAngle() {
@@ -98,8 +101,19 @@ public class Grabber extends SubsystemBase {
         // pivotController.setReference(10, ControlType.kPosition);
     }
 
+    
+
     public void setPivotPosition(GrabberPosition position) {
         setpoint = position.getAngle().getRotations();
+    }
+
+
+    public double toPosition(double position) {
+        double power = ((((pivotEncoder.getPosition() - position) / 100)));
+        if(Math.abs(power) > 0.25){
+            power = 0.25 * Math.signum(power);
+        }
+        return power;
     }
 
     /**
