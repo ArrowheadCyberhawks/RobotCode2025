@@ -17,12 +17,11 @@ public class ManualElevatorCommand extends Command{
     }
 
     public void initialize(){
-        //nothing atm
     }
 
     public void execute() {
         //Moves up to certain heights and applies different power values based on the enum :)
-        m_Elevator.setHeight(m_Elevator.getTargetHeight() + m_power.getAsDouble());
+        m_Elevator.setHeight(m_Elevator.getTargetPosition() + m_power.getAsDouble());
     }
 
     public boolean isFinished(){

@@ -12,7 +12,6 @@ import lib.frc706.cyberlib.commands.XboxDriveCommand;
 
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.subsystems.*;
-import frc.robot.subsystems.Intake.ExtendState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
@@ -31,10 +30,8 @@ import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
-import edu.wpi.first.wpilibj.smartdashboard.FieldObject2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
@@ -198,6 +195,8 @@ public class RobotContainer {
       .withTimeout(2)
       .alongWith(elevator.PICK())
     );
+    manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT));
+    manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));
 
     /*keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
     keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));

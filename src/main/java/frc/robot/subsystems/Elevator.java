@@ -4,68 +4,54 @@ import static frc.robot.Constants.ElevatorConstants.*;
 
 import java.util.function.Supplier;
 
-import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import com.revrobotics.RelativeEncoder;
 
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.State;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.util.sendable.Sendable;
+import edu.wpi.first.util.sendable.SendableBuilder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.commands.ManualElevatorCommand;
+import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
 
 
 public class Elevator extends SubsystemBase {
     private SparkMax elevatorMotor;
     private RelativeEncoder elevatorEncoder;
-    private SparkClosedLoopController elevatorPID;
-    private TrapezoidProfile trapezoidProfile;
-    
-    private ControlState controlState = ControlState.MANUAL;
-    private ElevatorLevel targetLevel = ElevatorLevel.L1;
-    double targetHeight = targetLevel.getHeight();
+    private final ProfiledPIDController elevatorController = new ProfiledPIDController(kElevatorP, kElevatorI, kElevatorD,
+        new Constraints(kElevatorMaxVel, kElevatorMaxAccel));
 
     public Elevator() {
         elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
         elevatorEncoder = elevatorMotor.getEncoder();
-        elevatorPID = elevatorMotor.getClosedLoopController();
-        // trapezoidProfile = new TrapezoidProfile(new Constraints(elevatorMotor.configAccessor.closedLoop.maxMotion.getMaxVelocity(), elevatorMotor.configAccessor.closedLoop.maxMotion.getMaxAcceleration()));
-    }    
+        elevatorController.setGoal(getPosition());
 
-
-    public void trackElvMot(){
-        double ElvMotorPos =  elevatorMotor.getEncoder().getPosition();
-        System.out.println("Elevator Motor Position: " + ElvMotorPos);
+        SmartDashboard.putData("Elevator", new Sendable() {
+            @Override
+            public void initSendable(SendableBuilder builder) {
+                builder.addDoubleProperty("Elevator Position", () -> getPosition(), null);
+            }
+        });
     }
-
-
-
-
 
     @Override
     public void periodic() {
-        // if (controlState == ControlState.AUTO) {
-        //     setHeight(targetLevel.getHeight());
-        // } else if (controlState == ControlState.MANUAL) {
-        //     setHeight(targetHeight);
-        // }
-        // trackElvMot();
-        System.out.println("elevator motor height" + elevatorMotor.getEncoder().getPosition());
+        elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
     }
 
-    public State getState() {
-        return new State(elevatorEncoder.getPosition(), elevatorEncoder.getVelocity());
+    public double getPosition() {
+        return elevatorEncoder.getPosition();
     }
-
 
     /**
      * @return Returns the target encoder position of the elevator.
      */
-    public double getTargetHeight() {
-        return targetHeight;
+    public double getTargetPosition() {
+        return elevatorController.getGoal().position;
     }
 
     /**
@@ -73,8 +59,7 @@ public class Elevator extends SubsystemBase {
      * @param height The position to set the elevator to IN ROTATIONS.
      */
     public void setHeight(double height) {
-        this.targetHeight = height;
-        elevatorPID.setReference(height, ControlType.kPosition);
+        elevatorController.setGoal(height);
     }
 
     /**
@@ -125,7 +110,6 @@ public class Elevator extends SubsystemBase {
      * @return Returns a command to move the elevator to a certain encoder position.
      */
     public Command setLevelCommand(ElevatorLevel level) {
-        this.targetLevel = level;
         return runOnce(() -> setHeight(level.getHeight()));
     }
     
@@ -134,20 +118,7 @@ public class Elevator extends SubsystemBase {
      * @return Returns a command to move the elevator up/down at a certain power.
      */
     public Command runPowerCommand(Supplier<Double> power) {
-        return run(() -> setHeight(getTargetHeight() + power.get()));
-    }
-
-    /**
-     * DO NOT USE YET!
-     * @param state
-     * @return
-     */
-    public Command setControlStateCommand(ControlState state) {
-        if (state == ControlState.AUTO) {
-            return runOnce(() -> controlState = state).andThen(setLevelCommand(this.targetLevel));
-        } else {
-            return new ManualElevatorCommand(this, null); //TODO: REMOVE THIS
-        }
+        return run(() -> setHeight(getTargetPosition() + power.get()));
     }
     
     /**
@@ -157,7 +128,6 @@ public class Elevator extends SubsystemBase {
         return runOnce(() -> elevatorEncoder.setPosition(0));
     }
 
-
     /**
      * Stops the elevator motor.
      */
@@ -165,23 +135,3 @@ public class Elevator extends SubsystemBase {
         elevatorMotor.stopMotor();
     }
 }
-
-
-
-
-
-
-
-
-
-/* 
-    private final SparkMax elevatorMotor;
-    private final SparkClosedLoopController elevatorController;
-    }
-
-    public void elevatorMotorMethod() {
-        elevatorMotor = new SparkMax(kElevatorMotor, SparkMax.MotorType.kBrushless);
-    } */
-
-
-// :(

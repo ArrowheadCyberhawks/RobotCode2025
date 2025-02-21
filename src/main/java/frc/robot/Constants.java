@@ -39,20 +39,24 @@ public final class Constants {
   public static class IntakeConstants {
     public static final int kIntakeMotorPort = 13;
     public static final int kExtendMotorPort = 12;
-
-    public static final double extendedPosition = 1.0;
   }
 
 public static class ElevatorConstants {
-    public static final double elevatorBaseHeight = 5; //TODO update base height
-    public static final int elevatorMotorID = 9; //TODO update port number
+    public static final double kElevatorP = 0.08;
+    public static final double kElevatorI = 0.0;
+    public static final double kElevatorD = 0.0;
+
+    public static final double kElevatorMaxVel = 2000;
+    public static final double kElevatorMaxAccel = 5000;
+
+    public static final int elevatorMotorID = 9;
     public static enum ElevatorLevel { //TODO update positions
       LO(0.0),  //x is about 1.143 cm //0
       L1(10.0), //40 // 22
-      L2(24.0), //60 //50 / 22 
-      L3(40.0), //80
-      L4(60.0), //100
-      HI(156.0),
+      L2(40.0), //60 //50 / 22 
+      L3(80.0), //80
+      L4(120.0), //100
+      HI(148.0),
       DEF(60), // 155
       PICK(40);
 
@@ -66,15 +70,13 @@ public static class ElevatorConstants {
           return height;
       }
     }
-    
-    public static enum ControlState {
-        MANUAL,
-        AUTO        
-    }
   }
   public static class GrabberConstants {
     public static final int kGrabberMotorPort = 10;
     public static final int kPivotMotorPort = 11;
+
+    public static final double kPivotMaxVel = 35;
+    public static final double kPivotMaxAccel = 40;
 
     public static enum GrabberPosition { //TODO update positions
       DOWN(new Rotation2d(-40.0)),//-65  was at - 40 

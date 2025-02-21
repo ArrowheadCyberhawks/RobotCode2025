@@ -8,9 +8,6 @@ import com.revrobotics.spark.SparkBase.ControlType;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
-import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
-import frc.robot.Constants.GrabberConstants.GrabberPosition;
 
 /**
  * Subsystem for the intake. Includes a motor to intake game pieces and a motor to extend the intake.
@@ -18,9 +15,6 @@ import frc.robot.Constants.GrabberConstants.GrabberPosition;
 public class Intake extends SubsystemBase {
     private final SparkMax intakeMotor, extendMotor;
     private final SparkClosedLoopController extendController;
-
-    private boolean intakeOn;
-
     /**
      * Enum to represent the extension state of the intake mechanism.
      */
@@ -54,8 +48,6 @@ public class Intake extends SubsystemBase {
         intakeMotor.set(speed);
     }
 
-    
-
     public void setRetractMotor(double speed){
         extendMotor.set(speed);
     }
@@ -74,10 +66,6 @@ public class Intake extends SubsystemBase {
 
     }
 
-    public void setIntakeState(boolean intakeOn){
-        this.intakeOn = intakeOn;
-    }
-
         /**
      * Sets the speed of the intake motor.
      * 
@@ -89,11 +77,6 @@ public class Intake extends SubsystemBase {
         } else {
             intakeMotor.stopMotor();
         }
-    }
-
-
-    public Command toggleIntakeCommand(boolean intakeOn){
-        return this.runOnce(() -> setIntakeState(intakeOn));
     }
 
     /**
