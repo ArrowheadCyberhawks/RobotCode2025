@@ -4,16 +4,16 @@
 
 package frc.robot;
 
-import static edu.wpi.first.units.Units.Seconds;
+import org.littletonrobotics.junction.AutoLogOutputManager;
+import org.littletonrobotics.junction.LoggedRobot;
+import org.littletonrobotics.junction.Logger;
+import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
+import org.littletonrobotics.junction.networktables.NT4Publisher;
+import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
-import edu.wpi.first.math.geometry.Translation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.units.measure.Time;
-import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.Subsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -21,7 +21,8 @@ import edu.wpi.first.wpilibj2.command.Subsystem;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+
+public class Robot extends LoggedRobot {
   private Command m_autonomousCommand;
 
   private RobotContainer m_robotContainer;
@@ -32,6 +33,14 @@ public class Robot extends TimedRobot {
    */
   @Override
   public void robotInit() {
+    Logger.recordMetadata("ProjectName", "RobotCode2025");
+    if (isReal()) {
+      Logger.addDataReceiver(new NT4Publisher());
+      Logger.addDataReceiver(new WPILOGWriter());
+      LoggedPowerDistribution.getInstance(32, ModuleType.kRev);
+    }
+    AutoLogOutputManager.addPackage("lib.frc706");
+    Logger.start();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();
@@ -52,20 +61,8 @@ public class Robot extends TimedRobot {
     // and running subsystem periodic() methods.  This must be called from the robot's periodic
     // block in order for anything in the Command-based framework to work.
     CommandScheduler.getInstance().run();
-    // System.out.println("frontLeft: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[0].angle.getDegrees());
-    // System.out.println("frontRight: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[1].angle.getDegrees());
-    // System.out.println("backLeft: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[2].angle.getDegrees());
-    // System.out.println("backRight: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[3].angle.getDegrees());
-    //System.out.println("odom heading: " + m_robotContainer.swerveSubsystem.swerveDrive.getOdometryHeading());
 
   }
-//Shuffleboard stuff:
-  /*protected void execute() {
-   SmartDashboard.putNumber("frontLeft: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[0].angle.getDegrees());
-   SmartDashboard.putNumber("frontRight: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[1].angle.getDegrees());
-   SmartDashboard.putNumber("backLeft: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[2].angle.getDegrees());
-   SmartDashboard.putNumber("backRight: " + m_robotContainer.swerveSubsystem.swerveDrive.getModulePositions()[3].angle.getDegrees());
-}
   
 
   /** This function is called once each time the robot enters Disabled mode. */
