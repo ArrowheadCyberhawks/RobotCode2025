@@ -5,6 +5,12 @@
     "data": {
       "commands": [
         {
+          "type": "sequential",
+          "data": {
+            "commands": []
+          }
+        },
+        {
           "type": "named",
           "data": {
             "name": "raiseArm"
@@ -62,30 +68,6 @@
           "type": "path",
           "data": {
             "pathName": "FarLeftRToStation"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftStationToNearLeftL"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "NearLeftLToStation"
-          }
-        },
-        {
-          "type": "path",
-          "data": {
-            "pathName": "LeftStationToNearLeftR"
           }
         }
       ]

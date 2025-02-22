@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.6799919706771735,
-        "y": 6.374785425076063
+        "x": 4.3875,
+        "y": 6.608350409836065
       },
       "isLocked": false,
       "linkedName": "FarLeftR"
@@ -20,8 +20,8 @@
         "y": 7.003944672131147
       },
       "prevControl": {
-        "x": 2.555347888017433,
-        "y": 6.359140815052677
+        "x": 2.6372950819672134,
+        "y": 6.524436475409836
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -143.531
+    "rotation": -145.0
   },
   "reversed": false,
   "folder": "BranchToStation",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -119.12120125565615
+    "rotation": 150.0
   },
   "useDefaultConstraints": true
 }

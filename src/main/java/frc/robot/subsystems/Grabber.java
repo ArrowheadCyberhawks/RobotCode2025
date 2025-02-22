@@ -1,6 +1,7 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Constants.GrabberConstants.*;
+import frc.robot.Constants.SensorConstants;
 import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
@@ -13,6 +14,8 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
+import com.playingwithfusion.TimeOfFlight;
+
 /**
  * The Grabber subsystem covers the motors that manipulate the game piece
  * as well as the pivoting mechanism.
@@ -21,7 +24,9 @@ public class Grabber extends SubsystemBase {
     private final SparkFlex grabberMotor;
     private final SparkMax pivotMotor;
     private final RelativeEncoder pivotEncoder;
-    private final ProfiledPIDController pivotController = new ProfiledPIDController(0.3, 0, 0, new Constraints(kPivotMaxVel, kPivotMaxAccel)); //0.09
+    private final ProfiledPIDController pivotController = new ProfiledPIDController(0.4, 0, 0, new Constraints(kPivotMaxVel, kPivotMaxAccel)); //0.09
+    //private final TimeOfFlight grabberSensor;
+
 
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
@@ -31,6 +36,7 @@ public class Grabber extends SubsystemBase {
         pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
         pivotEncoder = pivotMotor.getEncoder();
         pivotController.setGoal(getPivotAngle());
+        //grabberSensor = new TimeOfFlight(SensorConstants.kTimeOfFlightPort);
         // pivotController.setGoal(GrabberPosition.UP.getAngle().getRotations());
         //pivotMotor.configure(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI)), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
@@ -40,6 +46,11 @@ public class Grabber extends SubsystemBase {
         setPivotMotor(pivotController.calculate(pivotEncoder.getPosition()));
     }
 
+
+    /*public double getSensorDistance() {
+        return grabberSensor.getRange();
+    }*/
+
     /**
      * Sets the speed of the grabber motor.
      * @param speed The percent speed to set the motor to. Should be between -1 and 1.
@@ -48,6 +59,9 @@ public class Grabber extends SubsystemBase {
         grabberMotor.set(speed);
     }
 
+    /**
+     * Stops the grabber motor.
+     */
     public void stopGrabberMotor() {
         grabberMotor.stopMotor();
     }
@@ -59,7 +73,11 @@ public class Grabber extends SubsystemBase {
     public void setPivotMotor(double speed) {
         pivotMotor.set(speed);
     }
-
+    
+    /**
+     * Returns the position of the pivot motor.
+     * @return The position of the encoder on the pivot motor.
+     */
     public double getPivotAngle() {
         return pivotMotor.getEncoder().getPosition();
     }

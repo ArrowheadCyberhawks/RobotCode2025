@@ -48,7 +48,7 @@
   "folder": "StationToNet",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -34.29
+    "rotation": -35.0
   },
   "useDefaultConstraints": true
 }

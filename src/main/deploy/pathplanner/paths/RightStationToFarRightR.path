@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 5.28338539150014,
-        "y": 2.9599150324198114
+        "x": 5.315868466959727,
+        "y": 2.9349242946916196
       },
       "prevControl": {
-        "x": 5.212120479005701,
-        "y": 2.3523674201823583
+        "x": 5.2446035544652885,
+        "y": 2.3273766824541666
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 120.96375653207365
+    "rotation": 29.999999999999996
   },
   "reversed": false,
   "folder": "StationToBranch",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -34.29
+    "rotation": -35.0
   },
   "useDefaultConstraints": true
 }

@@ -47,7 +47,6 @@ public class AutoCommandManager {
           .alongWith(elevatorSubsystem.PICK())
         );
 
-
         elevatorCommands("L1", elevatorSubsystem, grabberSubsystem);
         elevatorCommands("L2", elevatorSubsystem, grabberSubsystem);
         elevatorCommands("L3", elevatorSubsystem, grabberSubsystem);

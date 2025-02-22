@@ -75,8 +75,8 @@ public static class ElevatorConstants {
     public static final int kGrabberMotorPort = 10;
     public static final int kPivotMotorPort = 11;
 
-    public static final double kPivotMaxVel = 35;
-    public static final double kPivotMaxAccel = 40;
+    public static final double kPivotMaxVel = 150;
+    public static final double kPivotMaxAccel = 120;
 
     public static enum GrabberPosition { //TODO update positions
       DOWN(new Rotation2d(-40.0)),//-65  was at - 40 
@@ -113,6 +113,10 @@ public static class ElevatorConstants {
     public static final Transform3d backCamRobotToCam = new Transform3d(Units.inchesToMeters(-10), Units.inchesToMeters(-1), Units.inchesToMeters(18), new Rotation3d(0, 0, Math.PI));
    
     public static final double maxTrackingAngularVel = 4;
+  }
+
+  public static class SensorConstants {
+    public static final int kTimeOfFlightPort = 12;
   }
 
   public static class PID {

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.28338539150014,
-        "y": 2.9599150324198114
+        "x": 5.315868466959727,
+        "y": 2.9349242946916196
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.885999789350528,
-        "y": 2.1261001788030485
+        "x": 4.918482864810115,
+        "y": 2.1011094410748568
       },
       "isLocked": false,
       "linkedName": "FarRightR"
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -34.29
+    "rotation": -35.0
   },
   "reversed": false,
   "folder": "BranchToStation",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 120.96375653207365
+    "rotation": 29.999999999999996
   },
   "useDefaultConstraints": true
 }
