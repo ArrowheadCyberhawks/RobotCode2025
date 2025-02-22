@@ -150,7 +150,7 @@ public static class ElevatorConstants {
       public static final PIDController kYController = new PIDController(kPY, kIY, kDY);
       public static final PIDController kThetaController = new PIDController(kPAutoTurning, kIAutoTurning, kDAutoTurning);
 
-      public static final double desiredDistance = 0.3;
+      public static final double desiredDistance = 0.4;
     }
   }
 

@@ -145,8 +145,8 @@ public class RobotContainer {
     driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem,
         PointTrack.kThetaController,
         () -> ReefPoint.kCenter.getPose(),
-        () -> -driverController.getLeftX(),
-        () -> -driverController.getLeftY(),
+        () -> driverController.getLeftX(),
+        () -> driverController.getLeftY(),
         () -> driverController.getRightTriggerAxis(),
         SwerveConstants.kMaxVelTele, SwerveConstants.kMaxAngularVelTele)
     );
