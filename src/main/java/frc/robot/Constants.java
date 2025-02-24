@@ -41,7 +41,7 @@ public final class Constants {
     public static final int kExtendMotorPort = 12;
   }
 
-public static class ElevatorConstants {
+  public static class ElevatorConstants {
     public static final double kElevatorP = 0.08;
     public static final double kElevatorI = 0.0;
     public static final double kElevatorD = 0.0;
@@ -71,6 +71,7 @@ public static class ElevatorConstants {
       }
     }
   }
+
   public static class GrabberConstants {
     public static final int kGrabberMotorPort = 10;
     public static final int kPivotMotorPort = 11;
@@ -100,7 +101,7 @@ public static class ElevatorConstants {
     public static final double driveBaseRadius = Math.sqrt(wheelBase * wheelBase * 2) / 2;
 
     public static final double kMaxVelTele = Units.feetToMeters(19);
-    public static final double kMaxAccelTele = kMaxVelTele * 3; //idk what this should be
+    public static final double kMaxAccelTele = kMaxVelTele * 5; //idk what this should be
     public static final double kMaxAngularVelTele = 2 * 2 * Math.PI; //idk 2 radians per second whatever
     public static final double kMaxAngularAccelTele = kMaxAngularVelTele * 3;
 
@@ -134,14 +135,16 @@ public static class ElevatorConstants {
     }
 
     public static class PointTrack {
-      public static final double kPAutoTurning = 7;
+      public static final double kPAutoTurning = 8;
       public static final double kIAutoTurning = 0; 
       public static final double kDAutoTurning = 0;
 
-      public static final double kPX = 1.4;
+      // how fast the robot revolves around the tag when moving to a point
+      public static final double kPX = 2;//1.4
       public static final double kIX = 0;
       public static final double kDX = 0;
 
+      // how fast the robot moves towards the tag when moving to a point
       public static final double kPY = 3;
       public static final double kIY = 0;
       public static final double kDY = 0;

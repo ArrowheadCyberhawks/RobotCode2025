@@ -7,6 +7,7 @@ package frc.robot;
 import static edu.wpi.first.units.Units.*;
 import lib.frc706.cyberlib.XboxControllerWrapper;
 import lib.frc706.cyberlib.commands.ToPointCommand;
+import lib.frc706.cyberlib.commands.ToTagCommand;
 import lib.frc706.cyberlib.commands.TrackPointCommand;
 import lib.frc706.cyberlib.commands.XboxDriveCommand;
 
@@ -33,6 +34,8 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -130,6 +133,7 @@ public class RobotContainer {
    * joysticks}.
    */
   private void configureBindings() {
+    //Drive Controller
     driverController.a()
         .onTrue(swerveSubsystem.runOnce(() -> {
           swerveSubsystem.zeroHeading();
@@ -151,36 +155,34 @@ public class RobotContainer {
         SwerveConstants.kMaxVelTele, SwerveConstants.kMaxAngularVelTele)
     );
 
-    manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator,
-      () -> -manipulatorController.getLeftY())
-    );
-
-    manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()));
-
     driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,
       PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController,
-      ()->Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
+      () -> Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
       PointTrack.desiredDistance,
       SwerveConstants.kMaxVelAuto,
       SwerveConstants.kMaxAngularVelAuto)
     );
-    driverController.y().whileTrue(new ToPointCommand(()->ReefPoint.kFarLeftL.getPose(), PointTrack.desiredDistance));
+
+    driverController.y().whileTrue(new ToPointCommand(() -> ReefPoint.kFarLeftL.getPose(), PointTrack.desiredDistance));
+  
+    //TODO change to different keybind
+    driverController.start().whileTrue(new ToTagCommand(swerveSubsystem, "limelight"));
     
+
+    //X-Keys Lightboard
     nearTriggers = new Trigger[]{keypadHID.button(22), keypadHID.button(23)};
     nearLeftTriggers = new Trigger[]{keypadHID.button(13), keypadHID.button(17)};
     nearRightTriggers = new Trigger[]{keypadHID.button(20), keypadHID.button(16)};
-    
     farTriggers = new Trigger[]{keypadHID.button(3), keypadHID.button(2)};
     farLeftTriggers = new Trigger[]{keypadHID.button(5), keypadHID.button(9)};
     farRightTriggers = new Trigger[]{keypadHID.button(12), keypadHID.button(8)};
-  
+
     poseButtons(nearTriggers, "Near");
     poseButtons(nearLeftTriggers, "NearLeft");
     poseButtons(nearRightTriggers, "NearRight");
     poseButtons(farTriggers, "Far");
     poseButtons(farLeftTriggers, "FarLeft");
     poseButtons(farRightTriggers, "FarRight");
-    //keypadHID.button(21).onTrue(FieldObject2d)
 
     elevatorButtons(19, "LO");
     elevatorButtons(7, "HI");
@@ -189,14 +191,25 @@ public class RobotContainer {
     elevatorButtons(14, "L2");
     elevatorButtons(18, "L1");
 
-    keypadHID.button(15).onTrue(elevator.DEF().andThen(new WaitCommand(0.9)).andThen(grabber.setPivotPositionCommand(GrabberPosition.DOWN)));
-    keypadHID.button(11).onTrue(
-      grabber.runGrabberCommand(-1)
-      .withTimeout(2)
-      .alongWith(elevator.PICK())
+    keypadHID.button(15).onTrue(new SequentialCommandGroup(
+      elevator.DEF(),
+      new WaitCommand(0.9),
+      grabber.setPivotPositionCommand(GrabberPosition.DOWN)
+    ));
+    
+    keypadHID.button(11).onTrue(new ParallelCommandGroup(
+      grabber.runGrabberCommand(-1).withTimeout(2),
+      elevator.PICK()
+    ));
+
+    //Manipulator Controller
+    manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator,
+      () -> -manipulatorController.getLeftY())
     );
-    manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT));
-    manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));
+
+    manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()));
+    manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT)); //TODO debug
+    manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP)); //TODO debug
 
     /*keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
     keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
@@ -213,17 +226,12 @@ public class RobotContainer {
 
 
     //temp, not as many things
-    manipulatorController.pov(0).whileTrue(grabber.runGrabberCommand(-.25)); //was 0.25
-    manipulatorController.pov(180).whileTrue(grabber.runGrabberCommand(-1));
+    manipulatorController.pov(0).whileTrue(grabber.runGrabberCommand(-0.25)); //was 0.25
+    manipulatorController.pov(180).whileTrue(grabber.runGrabberCommand(0.25));
 
     //keypadHID.button(1).onTrue(grabber.setpiv));
-
-
-    
     //keypadHID.button(15).onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));
-
     //keypadHID.button(1).onTrue(grabber.runPivotCommand(0.4));
-
 
     //keypadHID.button(4).onTrue(grabber.setPivotAngleCommand(new Rotation2d(0)));
    // manipulatorController.leftBumper().onTrue(intake.runIntakeCommand(1)); //retract // ignore brokeafied code 
