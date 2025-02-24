@@ -41,7 +41,7 @@ public final class Constants {
     public static final int kExtendMotorPort = 12;
   }
 
-public static class ElevatorConstants {
+  public static class ElevatorConstants {
     public static final double kElevatorP = 0.08;
     public static final double kElevatorI = 0.0;
     public static final double kElevatorD = 0.0;
@@ -71,6 +71,7 @@ public static class ElevatorConstants {
       }
     }
   }
+
   public static class GrabberConstants {
     public static final int kGrabberMotorPort = 10;
     public static final int kPivotMotorPort = 11;
@@ -134,7 +135,7 @@ public static class ElevatorConstants {
     }
 
     public static class PointTrack {
-      public static final double kPAutoTurning = 9;
+      public static final double kPAutoTurning = 8;
       public static final double kIAutoTurning = 0; 
       public static final double kDAutoTurning = 0;
 
