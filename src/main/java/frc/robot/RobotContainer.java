@@ -88,13 +88,13 @@ public class RobotContainer {
 
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(-4.75), Inches.of(15.75), Inches.of(22.875)), new Rotation3d(0,0, Math.PI/2))); // left side 
-    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(-1), Inches.of(14.5), Inches.of(22.875)), new Rotation3d(0,0,0))); // left front
-    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(-8), Inches.of(14.5), Inches.of(22.875)), new Rotation3d(0,0,Math.PI))); // left back
-    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(9.25), Inches.of(14.5), Inches.of(27.5)), new Rotation3d(0,0,Math.PI)));
-    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-1), Inches.of(-15.5), Inches.of(27.125)), new Rotation3d(0,0,0))); //right front
-    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-4.75), Inches.of(-15.75), Inches.of(27.125)), new Rotation3d(0,0,-Math.PI/2))); //right side
-    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-8), Inches.of(-13.75), Inches.of(27.125)), new Rotation3d(0,0,-Math.PI))); // right back 
+    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(15.75), Inches.of(4.75), Inches.of(22.875)), new Rotation3d(0, 0, 0))); // left side 
+    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(14.5), Inches.of(1), Inches.of(22.875)), new Rotation3d(0,0, -Math.PI/2))); // left front
+    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(14.5), Inches.of(8), Inches.of(22.875)), new Rotation3d(0,0, Math.PI/2))); // left back
+    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(14.5), Inches.of(9.25), Inches.of(27.5)), new Rotation3d(0,0, Math.PI))); // ???
+    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(1), Inches.of(27.125)), new Rotation3d(0,0, -Math.PI/2))); //right front
+    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-15.75), Inches.of(4.75), Inches.of(27.125)), new Rotation3d(0,0, Math.PI))); //right side
+    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(8), Inches.of(27.125)), new Rotation3d(0,0, Math.PI/2))); // right back 
     swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam4, cam5);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
