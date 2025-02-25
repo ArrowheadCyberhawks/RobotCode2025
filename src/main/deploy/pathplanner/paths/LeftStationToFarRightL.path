@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.5257213114754093,
-        "y": 3.3006946721311463
+        "x": 0.9230532786885242,
+        "y": 2.832223360655737
       },
       "isLocked": false,
       "linkedName": "LeftStation"
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 29.999999999999996
+    "rotation": 119.99999999999999
   },
   "reversed": false,
   "folder": "StationToBranch",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": -55.0
   },
   "useDefaultConstraints": true
 }

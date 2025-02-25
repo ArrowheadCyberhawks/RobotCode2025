@@ -8,8 +8,8 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.775581967213116,
-        "y": 4.916725409836066
+        "x": 4.95092213114754,
+        "y": 5.325665983606557
       },
       "isLocked": false,
       "linkedName": "StartingCenter"
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -150.0
+    "rotation": -59.99999999999999
   },
   "reversed": false,
   "folder": "Center",

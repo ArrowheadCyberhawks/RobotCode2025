@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.9319672131147536,
-        "y": 5.373616803278688
+        "x": 3.9544968572949295,
+        "y": 5.3136864550912675
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.041813175733732,
-        "y": 5.92679975212416
+        "x": 3.064342819913908,
+        "y": 5.8668694039367395
       },
       "isLocked": false,
       "linkedName": "NearLeftL"
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -145.0
+    "rotation": -55.0
   },
   "reversed": false,
   "folder": "BranchToStation",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -150.0
+    "rotation": -59.99999999999999
   },
   "useDefaultConstraints": true
 }

@@ -20,6 +20,7 @@ import frc.robot.Constants.GrabberConstants.GrabberPosition;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.PID;
 import frc.robot.Constants.PID.PointTrack;
+import frc.robot.Constants.PID.ToPoint;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
 import frc.robot.Constants.ReefPoint;
@@ -95,7 +96,7 @@ public class RobotContainer {
     cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(1), Inches.of(27.125)), new Rotation3d(0,0, -Math.PI/2))); //right front
     cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-15.75), Inches.of(4.75), Inches.of(27.125)), new Rotation3d(0,0, Math.PI))); //right side
     cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(8), Inches.of(27.125)), new Rotation3d(0,0, Math.PI/2))); // right back 
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam4, cam5);
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam4, cam5);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     // set up limelight
@@ -114,12 +115,12 @@ public class RobotContainer {
         swerveSubsystem,
         () -> true,
         IOConstants.kDriverControllerDeadband,
-        SwerveConstants.kMaxVelTele,
-        SwerveConstants.kMaxAccelTele,
-        SwerveConstants.kMaxAngularVelTele,
-        SwerveConstants.kMaxAngularAccelTele).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        SwerveConstants.kMaxVelTele.in(MetersPerSecond),
+        SwerveConstants.kMaxAccelTele.in(MetersPerSecondPerSecond),
+        SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond),
+        SwerveConstants.kMaxAngularAccelTele.in(RadiansPerSecondPerSecond))
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf);
         swerveSubsystem.setDefaultCommand(getTeleopCommand());
-
     configureBindings();
   }   
 
@@ -152,18 +153,16 @@ public class RobotContainer {
         () -> driverController.getLeftX(),
         () -> driverController.getLeftY(),
         () -> driverController.getRightTriggerAxis(),
-        SwerveConstants.kMaxVelTele, SwerveConstants.kMaxAngularVelTele)
+        SwerveConstants.kMaxVelTele.in(MetersPerSecond), SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond))
     );
 
-    driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,
-      PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController,
-      () -> Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
-      PointTrack.desiredDistance,
-      SwerveConstants.kMaxVelAuto,
-      SwerveConstants.kMaxAngularVelAuto)
+    driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftR.getPose(),
+      ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance)
     );
 
-    driverController.y().whileTrue(new ToPointCommand(() -> ReefPoint.kFarLeftL.getPose(), PointTrack.desiredDistance));
+    driverController.y().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftL.getPose(),
+      ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance)
+    );
   
     //TODO change to different keybind
     driverController.start().whileTrue(new ToTagCommand(swerveSubsystem, "limelight"));
@@ -245,9 +244,12 @@ public class RobotContainer {
   }
 
   private void poseButtons(Trigger[] triggers, String name) {
-    triggers[0].whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "L").getPose(),  PointTrack.desiredDistance));
-    triggers[1].whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "R").getPose(),  PointTrack.desiredDistance));
-    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "C").getPose(), PointTrack.desiredDistance));
+    triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose(),
+      ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance));
+    triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose(), 
+      ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance));
+    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose(),
+    ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance));
   }
 
   private void elevatorButtons(int buttonNum, String name) {
