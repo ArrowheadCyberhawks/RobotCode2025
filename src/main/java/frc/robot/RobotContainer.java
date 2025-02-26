@@ -156,12 +156,10 @@ public class RobotContainer {
         SwerveConstants.kMaxVelTele.in(MetersPerSecond), SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond))
     );
 
-    driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftR.getPose(),
-      ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance)
+    driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftR.getPose())
     );
 
-    driverController.y().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftL.getPose(),
-      ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance)
+    driverController.y().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftL.getPose())
     );
   
     //TODO change to different keybind
@@ -244,12 +242,9 @@ public class RobotContainer {
   }
 
   private void poseButtons(Trigger[] triggers, String name) {
-    triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose(),
-      ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance));
-    triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose(), 
-      ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance));
-    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose(),
-    ToPoint.kXController, ToPoint.kYController, ToPoint.kThetaController, ToPoint.kTranslationTolerance, ToPoint.kRotationTolerance));
+    triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose()));
+    triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose()));
+    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose()));
   }
 
   private void elevatorButtons(int buttonNum, String name) {

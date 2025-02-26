@@ -110,14 +110,14 @@ public final class Constants {
     public static final Distance robotWidth = Meters.of(0.927);
 
     public static final LinearVelocity kMaxVelTele = FeetPerSecond.of(19);
-    public static final LinearAcceleration kMaxAccelTele = kMaxVelTele.times(5).per(Second); //idk what this should be
+    public static final LinearAcceleration kMaxAccelTele = kMaxVelTele.per(Second).times(5); //idk what this should be
     public static final AngularVelocity kMaxAngularVelTele = RadiansPerSecond.of(2 * Math.PI); //idk 2 radians per second whatever
-    public static final AngularAcceleration kMaxAngularAccelTele = kMaxAngularVelTele.times(5).per(Second);
+    public static final AngularAcceleration kMaxAngularAccelTele = kMaxAngularVelTele.per(Second).times(5);
 
     public static final LinearVelocity kMaxVelAuto = MetersPerSecond.of(1);
-    public static final LinearAcceleration kMaxAccelAuto = kMaxVelAuto.times(5).per(Second);
+    public static final LinearAcceleration kMaxAccelAuto = kMaxVelAuto.per(Second).times(5);
     public static final AngularVelocity  kMaxAngularVelAuto = RadiansPerSecond.of(Math.PI);
-    public static final AngularAcceleration kMaxAngularAccelAuto = kMaxAngularVelAuto.times(5).per(Second);
+    public static final AngularAcceleration kMaxAngularAccelAuto = kMaxAngularVelAuto.per(Second).times(5);
   }
 
   public static class SensorConstants {

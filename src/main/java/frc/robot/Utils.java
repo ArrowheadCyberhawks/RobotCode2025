@@ -3,9 +3,8 @@ package frc.robot;
 import static edu.wpi.first.units.Units.Inches;
 import static frc.robot.Constants.*;
 
-import com.ctre.phoenix6.swerve.SwerveRequest;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
@@ -15,13 +14,13 @@ import frc.robot.Constants.ReefPoint;
 
 public class Utils {
     private static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-    private static final Transform2d leftReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(-6.5), new Rotation2d(0));
-    private static final Transform2d centerReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(0), new Rotation2d(0));
-    private static final Transform2d rightReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(6.5), new Rotation2d(0));
+    private static final Transform2d leftReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(-6.5), new Rotation2d(Math.PI));
+    private static final Transform2d centerReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(0), new Rotation2d(Math.PI));
+    private static final Transform2d rightReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(6.5), new Rotation2d(Math.PI));
     
 
     public static Pose2d getTagPose(int tagId) {
-        // field.setOrigin(OriginPosition.kBlueAllianceWallRightSide); this shouldn't be necessary
+        field.setOrigin(OriginPosition.kBlueAllianceWallRightSide); //this shouldn't be necessary
         return field.getTagPose(tagId).orElse(new Pose3d()).toPose2d();
     }
 
