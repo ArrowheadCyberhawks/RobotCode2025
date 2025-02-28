@@ -14,9 +14,9 @@ import frc.robot.Constants.ReefPoint;
 
 public class Utils {
     private static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-    private static final Transform2d leftReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(-6.5), new Rotation2d(Math.PI));
+    private static final Transform2d leftReefTransform = new Transform2d(Inches.of(15), Inches.of(-6.5), new Rotation2d(Math.PI));
     private static final Transform2d centerReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(0), new Rotation2d(Math.PI));
-    private static final Transform2d rightReefTransform = new Transform2d(SwerveConstants.robotLength.div(2), Inches.of(6.5), new Rotation2d(Math.PI));
+    private static final Transform2d rightReefTransform = new Transform2d(Inches.of(15), Inches.of(6.5), new Rotation2d(Math.PI));
     
 
     public static Pose2d getTagPose(int tagId) {
