@@ -158,7 +158,7 @@ public class RobotContainer {
     driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftR.getPose())
     );
 
-    driverController.y().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftL.getPose())
+    driverController.y().whileTrue(AutoCommandManager.pathfindCommand(ReefPoint.kFarLeftL.getPose())
     );
   
     //TODO change to different keybind

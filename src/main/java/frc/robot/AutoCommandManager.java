@@ -1,12 +1,21 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecond;
+import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.pathfinding.Pathfinding;
 
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
+import lib.frc706.cyberlib.LocalADStarAK;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.Constants.GrabberConstants.GrabberPosition;
@@ -19,6 +28,7 @@ public class AutoCommandManager {
 
     public AutoCommandManager(SwerveSubsystem swerveSubsystem, Intake intakeSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) {
         configureNamedCommands(swerveSubsystem, intakeSubsystem, elevatorSubsystem, grabberSubsystem);
+        Pathfinding.setPathfinder(new LocalADStarAK());
         //all pathplanner autos
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("SelectAuto", autoChooser);
@@ -58,6 +68,15 @@ public class AutoCommandManager {
 
     }
 
+    public static Command pathfindCommand(Pose2d targetPose) {
+        PathConstraints constraints = new PathConstraints(
+            MetersPerSecond.of(1),
+            MetersPerSecondPerSecond.of(1),
+            RadiansPerSecond.of(Math.PI),
+            RadiansPerSecondPerSecond.of(Math.PI)
+        );
+        return AutoBuilder.pathfindToPose(targetPose, constraints);
+    }
     
     private void elevatorCommands(String name, Elevator elevator, Grabber grabber) {
      NamedCommands.registerCommand(name, elevator.setLevelCommand(ElevatorLevel.valueOf(name))
