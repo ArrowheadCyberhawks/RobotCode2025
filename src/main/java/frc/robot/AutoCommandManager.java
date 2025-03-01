@@ -57,12 +57,12 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("armDown", grabberSubsystem.setPivotPositionCommand(GrabberPosition.DOWN));
         NamedCommands.registerCommand("armOut", grabberSubsystem.setPivotPositionCommand(GrabberPosition.OUT));
 
-        NamedCommands.registerCommand("dropCoral", grabberSubsystem.runGrabberCommand(1).withTimeout(1));
+        NamedCommands.registerCommand("dropCoral", grabberSubsystem.runGrabberCommand(1, 1).withTimeout(1));
 
         NamedCommands.registerCommand("defaultArm", elevatorSubsystem.DEF().andThen(new WaitCommand(0.9)).andThen(grabberSubsystem.setPivotPositionCommand(GrabberPosition.DOWN)));
         NamedCommands.registerCommand("pickup", 
-        grabberSubsystem.runGrabberCommand(-0.9
-          ).withTimeout(2)
+        grabberSubsystem.runGrabberCommand(-0.9)
+          .withTimeout(2)
           .alongWith(elevatorSubsystem.PICK())
         );
 

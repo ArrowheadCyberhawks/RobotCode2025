@@ -6,13 +6,13 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.pathplanner.lib.config.PIDConstants;
 
 import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -48,14 +48,12 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    public static final double kElevatorP = 0.08;
-    public static final double kElevatorI = 0.0;
-    public static final double kElevatorD = 0.0;
-
-    public static final double kElevatorMaxVel = 2000;
-    public static final double kElevatorMaxAccel = 5000;
+    public static final LoggedNetworkNumber kElevatorP = new LoggedNetworkNumber("Elevator/kElevatorP", 0.08);
+    public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 2000);
+    public static final LoggedNetworkNumber kElevatorMaxAccel = new LoggedNetworkNumber("Elevator/kElevatorMaxAccel", 5000);
 
     public static final int elevatorMotorID = 9;
+
     public static enum ElevatorLevel { //TODO update positions
       LO(0.0),  //x is about 1.143 cm //0
       L1(10.0), //40 // 22
@@ -79,16 +77,18 @@ public final class Constants {
   }
 
   public static class GrabberConstants {
-    public static final int kGrabberMotorPort = 10;
+    public static final int kGrabberMotor1Port = 10;
+    public static final int kGrabberMotor2Port = 14;
     public static final int kPivotMotorPort = 11;
 
-    public static final double kPivotMaxVel = 150;
-    public static final double kPivotMaxAccel = 120;
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 0.4);
+    public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 150);
+    public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 120);
 
     public static enum GrabberPosition { //TODO update positions
       DOWN(new Rotation2d(-40.0)),//-65  was at - 40 
       OUT(new Rotation2d(5.0)),
-      UP(new Rotation2d(70.0));//70
+      UP(new Rotation2d(0));//70
       
       private final Rotation2d angle;
 
@@ -147,32 +147,17 @@ public final class Constants {
     }
 
     public static class ToPoint {
-      public static final double kPTheta = 1;
-      public static final double kITheta = 0; 
-      public static final double kDTheta = 0;
+      public static final LoggedNetworkNumber kPDrive = new LoggedNetworkNumber("ToPoint/kPDrive", 5);
+      public static final LoggedNetworkNumber kPTheta = new LoggedNetworkNumber("ToPoint/kPTheta", 5);
 
-      public static final double kPX = 0.5;
-      public static final double kIX = 0;
-      public static final double kDX = 0;
+      public static final LoggedNetworkNumber kDriveMaxVel = new LoggedNetworkNumber("ToPoint/kDriveMaxVel", 1);
+      public static final LoggedNetworkNumber kDriveMaxAccel = new LoggedNetworkNumber("ToPoint/kDriveMaxAccel", 1);
 
-      public static final double kPY = 0.5;
-      public static final double kIY = 0;
-      public static final double kDY = 0;
+      public static final LoggedNetworkNumber kThetaMaxVel = new LoggedNetworkNumber("ToPoint/kThetaMaxVel", Math.PI);
+      public static final LoggedNetworkNumber kThetaMaxAccel = new LoggedNetworkNumber("ToPoint/kThetaMaxAccel", 2 * Math.PI);
 
-      public static final double kMaxTranslationVel = 0;
-      public static final double kMaxTranslationAccel = 0;
-      public static final Constraints kTranslationConstraints = new Constraints(kMaxTranslationVel, kMaxTranslationAccel);
-
-      public static final double kMaxRotationVel = 1;
-      public static final double kMaxRotationAccel = 1;
-      public static final Constraints kRotationConstraints = new Constraints(kMaxRotationVel, kMaxRotationAccel);
-
-      public static final double kTranslationTolerance = 0.1;
-      public static final double kRotationTolerance = 0.1;
-
-      public static final ProfiledPIDController kXController = new ProfiledPIDController(kPX, kIX, kDX, kTranslationConstraints);
-      public static final ProfiledPIDController kYController = new ProfiledPIDController(kPY, kIY, kDY, kTranslationConstraints);
-      public static final ProfiledPIDController kThetaController = new ProfiledPIDController(kPTheta, kITheta, kDTheta, kRotationConstraints);
+      public static final LoggedNetworkNumber kDriveTolerance = new LoggedNetworkNumber("ToPoint/kDriveTolerance", 0.01);
+      public static final LoggedNetworkNumber kThetaTolerance = new LoggedNetworkNumber("ToPoint/kThetaTolerance", 0.01);
     }
   }
 
@@ -230,7 +215,7 @@ public final class Constants {
       }
 
       public Pose2d getPose() {
-          return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? redPose : bluePose;
+          return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red) ? redPose : bluePose;
       }
   }
 }

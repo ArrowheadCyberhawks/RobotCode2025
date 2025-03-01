@@ -2,7 +2,6 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.GrabberConstants.*;
 import frc.robot.Constants.SensorConstants;
-import com.revrobotics.spark.SparkFlex;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -21,10 +20,11 @@ import com.playingwithfusion.TimeOfFlight;
  * as well as the pivoting mechanism.
  */
 public class Grabber extends SubsystemBase {
-    private final SparkFlex grabberMotor;
+    private final SparkMax grabberMotor1; // left motor
+    private final SparkMax grabberMotor2; // right motor
     private final SparkMax pivotMotor;
     private final RelativeEncoder pivotEncoder;
-    private final ProfiledPIDController pivotController = new ProfiledPIDController(0.4, 0, 0, new Constraints(kPivotMaxVel, kPivotMaxAccel)); //0.09
+    private final ProfiledPIDController pivotController = new ProfiledPIDController(kPivotP.get(), 0, 0, new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get())); //0.09
     //private final TimeOfFlight grabberSensor;
 
 
@@ -32,7 +32,8 @@ public class Grabber extends SubsystemBase {
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
      */
     public Grabber() {
-        grabberMotor = new SparkFlex(kGrabberMotorPort, MotorType.kBrushless);
+        grabberMotor1 = new SparkMax(kGrabberMotor1Port, MotorType.kBrushless);
+        grabberMotor2 = new SparkMax(kGrabberMotor2Port, MotorType.kBrushless);
         pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
         pivotEncoder = pivotMotor.getEncoder();
         pivotController.setGoal(getPivotAngle());
@@ -43,7 +44,15 @@ public class Grabber extends SubsystemBase {
 
 
     public void periodic() {
+        updateConstants();
         setPivotMotor(pivotController.calculate(pivotEncoder.getPosition()));
+    }
+
+    private void updateConstants() {
+        if (kPivotP.get() != pivotController.getP() || kPivotMaxVel.get() != pivotController.getConstraints().maxVelocity) {
+            pivotController.setP(kPivotP.get());
+            pivotController.setConstraints(new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get()));
+        }
     }
 
 
@@ -52,18 +61,21 @@ public class Grabber extends SubsystemBase {
     }*/
 
     /**
-     * Sets the speed of the grabber motor.
-     * @param speed The percent speed to set the motor to. Should be between -1 and 1.
+     * Sets the speeds of the grabber motors independently.
+     * @param speed1 The percent speed to set the left motor to. Should be between -1 and 1.
+     * @param speed2 The percent speed to set the right motor to. Should be between -1 and 1.
      */
-    public void setGrabberMotor(double speed) {
-        grabberMotor.set(speed);
+    public void setGrabberMotors(double speed1, double speed2) {
+        grabberMotor1.set(speed1);
+        grabberMotor2.set(speed2);
     }
 
     /**
-     * Stops the grabber motor.
+     * Stops both grabber motors.
      */
-    public void stopGrabberMotor() {
-        grabberMotor.stopMotor();
+    public void stopGrabberMotors() {
+        grabberMotor1.stopMotor();
+        grabberMotor2.stopMotor();
     }
 
     /**
@@ -95,7 +107,6 @@ public class Grabber extends SubsystemBase {
     }
 
     
-
     public void setPivotPosition(GrabberPosition position) {
         setPivotAngle(position.getAngle());
     }
@@ -114,12 +125,22 @@ public class Grabber extends SubsystemBase {
     }
 
     /**
-     * Runs the grabber motor at a given speed.
-     * @param speed The speed to run the grabber motor at. Should be between -1 and 1.
-     * @return A command that runs the grabber motor at the given speed.
+     * Runs each grabber motor at a given speed.
+     * @param speed1 The speed to run the left grabber motor at. Should be between -1 and 1.
+     * @param speed2 The speed to run the right grabber motor at. Should be between -1 and 1.
+     * @return A command that runs the grabber motors at the given speed.
+     */
+    public Command runGrabberCommand(double speed1, double speed2) {
+        return new RunCommand(() -> setGrabberMotors(speed1, speed2)).finallyDo(() -> stopGrabberMotors());
+    }
+
+    /**
+     * Runs both grabber motors at the same speed.
+     * @param speed The speed to run the grabber motors at. Should be between -1 and 1.
+     * @return A command that runs the grabber motors at the given speed.
      */
     public Command runGrabberCommand(double speed) {
-        return new RunCommand(() -> setGrabberMotor(speed)).finallyDo(() -> stopGrabberMotor());
+        return runGrabberCommand(speed, speed);
     }
 
     public Command runPivotCommand(double speed) {
@@ -127,6 +148,6 @@ public class Grabber extends SubsystemBase {
     }
 
     public Command stopGrabberCommand() {
-        return runOnce(() -> stopGrabberMotor());
+        return runOnce(() -> stopGrabberMotors());
     }
 }

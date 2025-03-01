@@ -22,8 +22,7 @@ import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
 public class Elevator extends SubsystemBase {
     private SparkMax elevatorMotor;
     private RelativeEncoder elevatorEncoder;
-    private final ProfiledPIDController elevatorController = new ProfiledPIDController(kElevatorP, kElevatorI, kElevatorD,
-        new Constraints(kElevatorMaxVel, kElevatorMaxAccel));
+    private final ProfiledPIDController elevatorController = new ProfiledPIDController(kElevatorP.get(), 0, 0, new Constraints(kElevatorMaxVel.get(), kElevatorMaxAccel.get()));
 
     public Elevator() {
         elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
@@ -40,7 +39,17 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
+        updateConstants();
         elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
+    }
+
+    private void updateConstants() {
+        if (kElevatorP.get() != elevatorController.getP()
+            || kElevatorMaxVel.get() != elevatorController.getConstraints().maxVelocity
+            || kElevatorMaxAccel.get() != elevatorController.getConstraints().maxAcceleration) {
+            elevatorController.setP(kElevatorP.get());
+            elevatorController.setConstraints(new Constraints(kElevatorMaxVel.get(), kElevatorMaxAccel.get()));
+        }
     }
 
     public double getPosition() {
