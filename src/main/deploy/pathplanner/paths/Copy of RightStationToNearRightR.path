@@ -8,24 +8,24 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.039569672131145,
-        "y": 1.6505430327868849
+        "x": 2.558200819767526,
+        "y": 2.0186577665868324
       },
       "isLocked": false,
       "linkedName": "RightStation"
     },
     {
       "anchor": {
-        "x": 5.873975409836062,
-        "y": 4.182842122788574
+        "x": 3.9319672131147536,
+        "y": 2.736321721311475
       },
       "prevControl": {
-        "x": 6.602878652208465,
-        "y": 3.6036948571491085
+        "x": 3.2712378765725343,
+        "y": 2.297462458623576
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "FarR"
+      "linkedName": "NearRightR"
     }
   ],
   "rotationTargets": [],
@@ -42,10 +42,10 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 180.0
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "StationToBranch",
+  "folder": "WaypointToBranch",
   "idealStartingState": {
     "velocity": 0,
     "rotation": -38.36748538486157

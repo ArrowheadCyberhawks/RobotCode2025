@@ -5,8 +5,11 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
+import com.pathplanner.lib.commands.PathfindingCommand;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
@@ -26,12 +29,18 @@ public class AutoCommandManager {
 
     SendableChooser<Command> autoChooser;
 
+    private static final LoggedNetworkNumber maxVel = new LoggedNetworkNumber("AutoCommandManager/maxVel", 1);
+    private static final LoggedNetworkNumber maxAccel = new LoggedNetworkNumber("AutoCommandManager/maxAccel", 1);
+    private static final LoggedNetworkNumber maxAngularVel = new LoggedNetworkNumber("AutoCommandManager/maxAngularVel", 2*Math.PI);
+    private static final LoggedNetworkNumber maxAngularAccel = new LoggedNetworkNumber("AutoCommandManager/maxAngularAccel", 4*Math.PI);
+
     public AutoCommandManager(SwerveSubsystem swerveSubsystem, Intake intakeSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) {
         configureNamedCommands(swerveSubsystem, intakeSubsystem, elevatorSubsystem, grabberSubsystem);
         Pathfinding.setPathfinder(new LocalADStarAK());
         //all pathplanner autos
         autoChooser = AutoBuilder.buildAutoChooser();
         SmartDashboard.putData("SelectAuto", autoChooser);
+        PathfindingCommand.warmupCommand().schedule();
     }
 
     public SendableChooser<Command> getChooser() {
@@ -70,10 +79,10 @@ public class AutoCommandManager {
 
     public static Command pathfindCommand(Pose2d targetPose) {
         PathConstraints constraints = new PathConstraints(
-            MetersPerSecond.of(1),
-            MetersPerSecondPerSecond.of(1),
-            RadiansPerSecond.of(Math.PI),
-            RadiansPerSecondPerSecond.of(Math.PI)
+            MetersPerSecond.of(maxVel.get()),
+            MetersPerSecondPerSecond.of(maxAccel.get()),
+            RadiansPerSecond.of(maxAngularVel.get()),
+            RadiansPerSecondPerSecond.of(maxAngularAccel.get())
         );
         return AutoBuilder.pathfindToPose(targetPose, constraints);
     }

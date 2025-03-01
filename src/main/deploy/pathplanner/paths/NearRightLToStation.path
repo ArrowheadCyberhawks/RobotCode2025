@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 1.2587090163934425,
-        "y": 0.9981045081967216
+        "x": 1.1508196721311474,
+        "y": 1.058043032786885
       },
       "prevControl": {
-        "x": 2.0610950262949106,
-        "y": 1.6532146691996341
+        "x": 1.9532056820326158,
+        "y": 1.7131531937897975
       },
       "nextControl": null,
       "isLocked": false,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 55.0
+    "rotation": -38.36748538486157
   },
   "reversed": false,
   "folder": "BranchToStation",

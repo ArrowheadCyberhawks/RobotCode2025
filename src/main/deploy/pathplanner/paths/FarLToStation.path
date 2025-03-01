@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.849813574713129,
+        "x": 6.26,
         "y": 3.8625601014242377
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.528519457066071,
-        "y": 5.565148336718352
+        "x": 6.01,
+        "y": 3.8625601014242377
       },
       "isLocked": false,
-      "linkedName": "FarL"
+      "linkedName": "FarLWaypoint"
     },
     {
       "anchor": {
-        "x": 1.2467213114754097,
-        "y": 7.003944672131147
+        "x": 5.849813574713129,
+        "y": 3.8625601014242377
       },
       "prevControl": {
-        "x": 4.727603664416587,
-        "y": 5.780415260366439
+        "x": 6.099813574713129,
+        "y": 3.8625601014242377
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "LeftStation"
+      "linkedName": "FarL"
     }
   ],
   "rotationTargets": [],
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -55.0
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": "BranchToStation",
