@@ -1,10 +1,14 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Constants.GrabberConstants.*;
-import frc.robot.Constants.SensorConstants;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.EncoderConfig;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -25,7 +29,7 @@ public class Grabber extends SubsystemBase {
     private final SparkMax pivotMotor;
     private final RelativeEncoder pivotEncoder;
     private final ProfiledPIDController pivotController = new ProfiledPIDController(kPivotP.get(), 0, 0, new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get())); //0.09
-    //private final TimeOfFlight grabberSensor;
+    private final TimeOfFlight coralSensor, algaeSensor;
 
 
     /**
@@ -34,10 +38,16 @@ public class Grabber extends SubsystemBase {
     public Grabber() {
         grabberMotor1 = new SparkMax(kGrabberMotor1Port, MotorType.kBrushless);
         grabberMotor2 = new SparkMax(kGrabberMotor2Port, MotorType.kBrushless);
+        grabberMotor2.configure(new SparkMaxConfig().inverted(false), ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+
         pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
+        pivotMotor.configure(new SparkMaxConfig().apply(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI))), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
         pivotEncoder = pivotMotor.getEncoder();
+
         pivotController.setGoal(getPivotAngle());
-        //grabberSensor = new TimeOfFlight(SensorConstants.kTimeOfFlightPort);
+
+        coralSensor = new TimeOfFlight(kCoralSensorPort);
+        algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
         // pivotController.setGoal(GrabberPosition.UP.getAngle().getRotations());
         //pivotMotor.configure(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI)), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
@@ -55,10 +65,13 @@ public class Grabber extends SubsystemBase {
         }
     }
 
+    public boolean hasCoral() {
+        return coralSensor.getRange() < kCoralSensorThreshold;
+    }
 
-    /*public double getSensorDistance() {
-        return grabberSensor.getRange();
-    }*/
+    public boolean hasAlgae() {
+        return algaeSensor.getRange() < kAlgaeSensorThreshold;
+    }
 
     /**
      * Sets the speeds of the grabber motors independently.

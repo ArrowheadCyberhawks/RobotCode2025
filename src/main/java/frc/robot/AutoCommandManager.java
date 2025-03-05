@@ -34,8 +34,8 @@ public class AutoCommandManager {
     private static final LoggedNetworkNumber maxAngularVel = new LoggedNetworkNumber("AutoCommandManager/maxAngularVel", 2*Math.PI);
     private static final LoggedNetworkNumber maxAngularAccel = new LoggedNetworkNumber("AutoCommandManager/maxAngularAccel", 4*Math.PI);
 
-    public AutoCommandManager(SwerveSubsystem swerveSubsystem, Intake intakeSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) {
-        configureNamedCommands(swerveSubsystem, intakeSubsystem, elevatorSubsystem, grabberSubsystem);
+    public AutoCommandManager(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) {
+        configureNamedCommands(swerveSubsystem, elevatorSubsystem, grabberSubsystem);
         Pathfinding.setPathfinder(new LocalADStarAK());
         //all pathplanner autos
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -51,7 +51,7 @@ public class AutoCommandManager {
         return autoChooser.getSelected();
     }
 
-    public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Intake intakeSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) { //add more when more subsystems are made
+    public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) { //add more when more subsystems are made
         //NamedCommands.registerCommand("intakeOn", intakeSubsystem.autoIntake());
         NamedCommands.registerCommand("armUp", grabberSubsystem.setPivotPositionCommand(GrabberPosition.UP));
         NamedCommands.registerCommand("armDown", grabberSubsystem.setPivotPositionCommand(GrabberPosition.DOWN));

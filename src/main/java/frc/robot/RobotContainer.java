@@ -56,7 +56,7 @@ public class RobotContainer {
 
   private final Elevator elevator;
   private final Grabber grabber;
-  private final Intake intake;
+  // private final Intake intake;
 
   
   private Command teleopCommand;
@@ -91,10 +91,10 @@ public class RobotContainer {
     cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(15.75), Inches.of(4.75), Inches.of(22.875)), new Rotation3d(0, 0, 0))); // left side 
     cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(14.5), Inches.of(1), Inches.of(22.875)), new Rotation3d(0,0, -Math.PI/2))); // left front
     cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(14.5), Inches.of(8), Inches.of(22.875)), new Rotation3d(0,0, Math.PI/2))); // left back
-    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(15.75), Inches.of(4.75), Inches.of(22.875)), new Rotation3d(0,0, 0))); // ???
-    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(1), Inches.of(27.125)), new Rotation3d(0,0, -Math.PI/2))); //right front
-    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-15.75), Inches.of(4.75), Inches.of(27.125)), new Rotation3d(0,0, Math.PI))); //right side
-    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(8), Inches.of(27.125)), new Rotation3d(0,0, Math.PI/2))); // right back 
+    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(15.75), Inches.of(4.75), Inches.of(22.875)), new Rotation3d(0,0, 0))); // front
+    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(1), Inches.of(27.125)), new Rotation3d(0,0, -Math.PI/2))); //
+    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-15.75), Inches.of(4.75), Inches.of(27.125)), new Rotation3d(0,0, Math.PI))); //back
+    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(8), Inches.of(27.125)), new Rotation3d(0,0, Math.PI/2))); 
     swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam3, cam4, cam5);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -105,10 +105,10 @@ public class RobotContainer {
     // set up subsystems
     elevator = new Elevator();
     grabber = new Grabber();
-    intake = new Intake();
+    // intake = new Intake();
 
     // commands and stuff
-    autoManager = new AutoCommandManager(swerveSubsystem, intake, elevator, grabber);
+    autoManager = new AutoCommandManager(swerveSubsystem, elevator, grabber);
     
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
@@ -233,7 +233,6 @@ public class RobotContainer {
    // manipulatorController.leftBumper().onTrue(intake.runIntakeCommand(1)); //retract // ignore brokeafied code 
     //manipulatorController.rightBumper().onTrue(intake.runIntakeCommand(1)); //retract
 //MONKEY CODE 
-    keypadHID.button(11).whileTrue(intake.runIntakeCommand(1));
 
    // keypadHID.button(4).onTrue(intake.runRetractCommand(1)); //maybe fix code   MAYBE TEST LATER 
   //  keypadHID.button(15).onTrue(intake.runRetractCommand(-1));  MAYBE TEST LATER

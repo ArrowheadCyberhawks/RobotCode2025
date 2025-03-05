@@ -29,6 +29,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
+
+
+
 public final class Constants {
   public static class IOConstants {
     public static final int kDriverControllerPortUSB = 0;
@@ -78,8 +81,14 @@ public final class Constants {
 
   public static class GrabberConstants {
     public static final int kGrabberMotor1Port = 10;
-    public static final int kGrabberMotor2Port = 14;
+    public static final int kGrabberMotor2Port = 12;
     public static final int kPivotMotorPort = 11;
+
+    public static final int kCoralSensorPort = 13;
+    public static final int kAlgaeSensorPort = 22;
+
+    public static final double kCoralSensorThreshold = 0.1;
+    public static final double kAlgaeSensorThreshold = 0.1;
 
     public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 0.4);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 150);
@@ -118,10 +127,6 @@ public final class Constants {
     public static final LinearAcceleration kMaxAccelAuto = kMaxVelAuto.per(Second).times(5);
     public static final AngularVelocity  kMaxAngularVelAuto = RadiansPerSecond.of(Math.PI);
     public static final AngularAcceleration kMaxAngularAccelAuto = kMaxAngularVelAuto.per(Second).times(5);
-  }
-
-  public static class SensorConstants {
-    public static final int kTimeOfFlightPort = 12;
   }
 
   public static class PID {
