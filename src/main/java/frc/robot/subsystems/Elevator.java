@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
 
+import org.littletonrobotics.junction.Logger;
 
 public class Elevator extends SubsystemBase {
     private SparkMax elevatorMotor;
@@ -41,6 +42,7 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         updateConstants();
         elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
+        Logger.recordOutput(getName() + "/Position", getPosition());
     }
 
     private void updateConstants() {

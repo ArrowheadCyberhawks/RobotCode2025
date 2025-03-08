@@ -74,7 +74,9 @@ public class Robot extends LoggedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.grabber.resetPivotTarget();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -104,6 +106,9 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    //Sets the target angle of the pivot motor to the current angle
+    m_robotContainer.grabber.resetPivotTarget();
   }
 
   /** This function is called periodically during operator control. */

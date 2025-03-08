@@ -23,6 +23,7 @@ import frc.robot.Constants.PID;
 import frc.robot.Constants.PID.PointTrack;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
+// import frc.robot.subsystems.Intake;
 import frc.robot.Constants.ReefPoint;
 import frc.robot.Constants.SwerveConstants;
 
@@ -35,6 +36,7 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -56,7 +58,7 @@ public class RobotContainer {
 
 
   private final Elevator elevator;
-  private final Grabber grabber;
+  final Grabber grabber;
   // private final Intake intake;
 
   
@@ -79,6 +81,8 @@ public class RobotContainer {
     } else {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortUSB, IOConstants.kDriverControllerDeadband, 0.15);
     }
+
+    
     if (DriverStation.isJoystickConnected(IOConstants.kManipulatorControllerPortBT)) {
       manipulatorController = new CommandXboxController(IOConstants.kManipulatorControllerPortBT);
     } else {
@@ -147,6 +151,7 @@ public class RobotContainer {
           System.out.println("resetting robot pose");
         })); // zero heading and reset position to (0,0) if A is pressed for 2 seconds
     
+    
     driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem,
         PointTrack.kThetaController,
         () -> ReefPoint.kCenter.getPose(),
@@ -166,7 +171,7 @@ public class RobotContainer {
     driverController.start().whileTrue(new ToTagCommand(swerveSubsystem, "limelight"));
     
 
-    //X-Keys Lightboard
+    //X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[]{keypadHID.button(22), keypadHID.button(23)};
     nearLeftTriggers = new Trigger[]{keypadHID.button(13), keypadHID.button(17)};
     nearRightTriggers = new Trigger[]{keypadHID.button(20), keypadHID.button(16)};
@@ -174,6 +179,7 @@ public class RobotContainer {
     farLeftTriggers = new Trigger[]{keypadHID.button(5), keypadHID.button(9)};
     farRightTriggers = new Trigger[]{keypadHID.button(12), keypadHID.button(8)};
 
+    //Move to Pose
     poseButtons(nearTriggers, "Near");
     poseButtons(nearLeftTriggers, "NearLeft");
     poseButtons(nearRightTriggers, "NearRight");
@@ -181,6 +187,7 @@ public class RobotContainer {
     poseButtons(farLeftTriggers, "FarLeft");
     poseButtons(farRightTriggers, "FarRight");
 
+    //Elevator Presets
     elevatorButtons(19, "LO");
     elevatorButtons(7, "HI");
     elevatorButtons(6, "L4");
@@ -188,25 +195,23 @@ public class RobotContainer {
     elevatorButtons(14, "L2");
     elevatorButtons(18, "L1");
 
-    keypadHID.button(15).onTrue(new SequentialCommandGroup(
-      elevator.DEF(),
-      new WaitCommand(0.9),
-      grabber.setPivotPositionCommand(GrabberPosition.DOWN)
-    ));
-    
-    keypadHID.button(11).onTrue(new ParallelCommandGroup(
-      grabber.runGrabberCommand(-1).withTimeout(2),
-      elevator.PICK()
-    ));
 
-    //Manipulator Controller
+    //MANIPULATOR CONTROLLER
+
+    //Manual Elevator control
     manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator,
       () -> -manipulatorController.getLeftY())
     );
-
     manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()));
+
+    //Pivot
     manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT)); //TODO debug
     manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP)); //TODO debug
+
+    //Intake/Outtake
+    manipulatorController.pov(0).whileTrue(grabber.intakeCommand());
+    manipulatorController.pov(180).whileTrue(grabber.outtakeCommand());
+    manipulatorController.povRight().onTrue(new InstantCommand(() -> grabber.resetPivotTarget()).ignoringDisable(true));
 
     /*keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
     keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
@@ -214,31 +219,40 @@ public class RobotContainer {
     keypadHID.button(10).onTrue(elevator.setLevelCommand(ElevatorLevel.L3).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
     keypadHID.button(14).onTrue(elevator.setLevelCommand(ElevatorLevel.L2).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
     keypadHID.button(18).onTrue(elevator.setLevelCommand(ElevatorLevel.L1).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP))); //12.75 inces 
-    */
+    */    
 
-    
-
-    //turn on intake
-    //keypadHID.button(11).onTrue(intake.toggleIntakeCommand(true));
-
-
-    //temp, not as many things
-    manipulatorController.pov(0).whileTrue(grabber.intakeCommand());
-    manipulatorController.pov(180).whileTrue(grabber.outtakeCommand());
-    
 
     //keypadHID.button(1).onTrue(grabber.setpiv));
     //keypadHID.button(15).onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));
     //keypadHID.button(1).onTrue(grabber.runPivotCommand(0.4));
 
     //keypadHID.button(4).onTrue(grabber.setPivotAngleCommand(new Rotation2d(0)));
-   // manipulatorController.leftBumper().onTrue(intake.runIntakeCommand(1)); //retract // ignore brokeafied code 
+    //manipulatorController.leftBumper().onTrue(intake.runIntakeCommand(1)); //retract // ignore brokeafied code 
     //manipulatorController.rightBumper().onTrue(intake.runIntakeCommand(1)); //retract
-//MONKEY CODE 
 
-   // keypadHID.button(4).onTrue(intake.runRetractCommand(1)); //maybe fix code   MAYBE TEST LATER 
-  //  keypadHID.button(15).onTrue(intake.runRetractCommand(-1));  MAYBE TEST LATER
+    // keypadHID.button(15).onTrue(new SequentialCommandGroup(
+    //   elevator.DEF(),
+    //   new WaitCommand(0.9),
+    //   grabber.setPivotPositionCommand(GrabberPosition.DOWN)
+    // ));
+    
+    // keypadHID.button(11).onTrue(new ParallelCommandGroup(
+    //   grabber.runGrabberCommand(-1).withTimeout(2),
+    //   elevator.PICK()
+    // ));
+    
+    
+    //free button 1, 4, 6, 15
 
+    
+    // keypadHID.button(1).whileTrue(intake.runIntakeCommand(0.1));
+    // keypadHID.button(4).whileTrue(intake.runIntakeCommand(-0.1));
+    
+    // // //IM FIRED
+
+    // keypadHID.button(6).whileTrue(intake.runRetractCommand(0.1));
+    // keypadHID.button(15).whileTrue(intake.runExtendCommand(0.1));
+  
   }
 
   private void poseButtons(Trigger[] triggers, String name) {

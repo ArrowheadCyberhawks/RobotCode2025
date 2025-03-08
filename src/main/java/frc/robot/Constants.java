@@ -18,6 +18,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -45,10 +46,15 @@ public final class Constants {
     public static final double kDriverControllerDeadband = 0.07;
   }
 
-  public static class IntakeConstants {
-    public static final int kIntakeMotorPort = 13;
-    public static final int kExtendMotorPort = 12;
-  }
+  // public static class IntakeConstants {
+  //   public static final int kIntakeMotorPort = 13;
+  //   public static final int kExtendMotorPort = 14;
+
+  //   public static enum intakeState {
+  //       In(0.0),
+  //       Out(1.0);
+  //   }
+  // }
 
   public static class ClimberConstants {
     public static final int kClimberMotorPort = 1; // change later 
@@ -76,7 +82,8 @@ public final class Constants {
       L4(120.0), //100
       HI(148.0),
       DEF(60), // 155
-      PICK(40);
+      PICK(40),
+      CLEAR(50);
 
       private final double height;
 
@@ -98,17 +105,17 @@ public final class Constants {
     public static final int kCoralSensorPort = 13;
     public static final int kAlgaeSensorPort = 22;
 
-    public static final double kCoralSensorThreshold = 100;
-    public static final double kAlgaeSensorThreshold = 100;
+    public static final MutDistance kCoralSensorThreshold = Centimeters.mutable(10);
+    public static final MutDistance kAlgaeSensorThreshold = Centimeters.mutable(2);
 
-    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 0.4);
-    public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 150);
-    public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 120);
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 3);
+    public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 5);
+    public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 15);
 
     public static enum GrabberPosition { //TODO update positions
-      DOWN(new Rotation2d(-40.0)),//-65  was at - 40 
-      OUT(new Rotation2d(5.0)),
-      UP(new Rotation2d(0));//70
+      DOWN(Rotation2d.fromDegrees(-40)),//-65  was at - 40 
+      OUT(Rotation2d.fromDegrees(5.0)),
+      UP(Rotation2d.kZero);//70
       
       private final Rotation2d angle;
 
@@ -124,7 +131,7 @@ public final class Constants {
     public static enum GrabberState {
       INTAKE(0.75),
       OUTTAKE(-0.75),
-      HOLD(0.10),
+      HOLD(0.05),
       STOP(0.0);
 
       private final double speed;
