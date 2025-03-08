@@ -1,7 +1,11 @@
 package frc.robot.subsystems;
 
 import static frc.robot.Constants.GrabberConstants.*;
+
+import org.littletonrobotics.junction.Logger;
+
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.RelativeEncoder;
@@ -14,10 +18,15 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
+import frc.robot.Constants.GrabberConstants.GrabberPosition;
+import frc.robot.subsystems.Intake.ExtendState;
 
 import com.playingwithfusion.TimeOfFlight;
+import com.playingwithfusion.TimeOfFlight.RangingMode;
 
 /**
  * The Grabber subsystem covers the motors that manipulate the game piece
@@ -30,7 +39,10 @@ public class Grabber extends SubsystemBase {
     private final RelativeEncoder pivotEncoder;
     private final ProfiledPIDController pivotController = new ProfiledPIDController(kPivotP.get(), 0, 0, new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get())); //0.09
     private final TimeOfFlight coralSensor, algaeSensor;
+    private boolean hasLeftStartingPosition = false;
 
+    private GrabberState grabberState = GrabberState.STOP;
+    
 
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
@@ -48,6 +60,8 @@ public class Grabber extends SubsystemBase {
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
+        coralSensor.setRangingMode(RangingMode.Short, 100);
+        algaeSensor.setRangingMode(RangingMode.Short, 100);
         // pivotController.setGoal(GrabberPosition.UP.getAngle().getRotations());
         //pivotMotor.configure(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI)), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
@@ -56,6 +70,10 @@ public class Grabber extends SubsystemBase {
     public void periodic() {
         updateConstants();
         setPivotMotor(pivotController.calculate(pivotEncoder.getPosition()));
+        setGrabberMotors(grabberState.getSpeed());
+
+        Logger.recordOutput(getName() + "/Coral Sensor", hasCoral());
+        Logger.recordOutput(getName() + "/Algae Sensor", hasAlgae());
     }
 
     private void updateConstants() {
@@ -65,12 +83,24 @@ public class Grabber extends SubsystemBase {
         }
     }
 
+    public double getCoralRange() {
+        return coralSensor.getRange();
+    }
+
+    public double getAlgaeRange() {
+        return algaeSensor.getRange();
+    }
+
     public boolean hasCoral() {
-        return coralSensor.getRange() < kCoralSensorThreshold;
+        return getCoralRange() < kCoralSensorThreshold;
     }
 
     public boolean hasAlgae() {
-        return algaeSensor.getRange() < kAlgaeSensorThreshold;
+        return getAlgaeRange() < kAlgaeSensorThreshold;
+    }
+
+    public void setGrabberMotors(double speed) {
+        setGrabberMotors(speed, speed);
     }
 
     /**
@@ -80,7 +110,7 @@ public class Grabber extends SubsystemBase {
      */
     public void setGrabberMotors(double speed1, double speed2) {
         grabberMotor1.set(speed1);
-        grabberMotor2.set(speed2);
+        grabberMotor2.set(-speed2);
     }
 
     /**
@@ -89,6 +119,10 @@ public class Grabber extends SubsystemBase {
     public void stopGrabberMotors() {
         grabberMotor1.stopMotor();
         grabberMotor2.stopMotor();
+    }
+    
+    public void setGrabberState(GrabberState state) {
+        grabberState = state;
     }
 
     /**
@@ -162,5 +196,26 @@ public class Grabber extends SubsystemBase {
 
     public Command stopGrabberCommand() {
         return runOnce(() -> stopGrabberMotors());
+    }
+
+    public Command intakeCommand() {
+        return setGrabberStateCommand(GrabberState.INTAKE).repeatedly().until(this::hasAlgae).finallyDo(() -> holdCommand().schedule());
+        //make it so that run hold command after it finds algae
+    }
+
+    public Command holdCommand() {
+        return setGrabberStateCommand(GrabberState.HOLD).repeatedly().until(this::hasCoral).finallyDo(() -> stopIntakeCommand().schedule());
+    }
+
+    public Command outtakeCommand() {
+        return setGrabberStateCommand(GrabberState.OUTTAKE).finallyDo(() -> stopIntakeCommand().schedule());
+    }
+
+    public Command stopIntakeCommand() {
+        return setGrabberStateCommand(GrabberState.STOP);
+    }
+
+    private Command setGrabberStateCommand(GrabberState state) {
+        return new InstantCommand(() -> setGrabberState(state));
     }
 }

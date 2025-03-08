@@ -63,7 +63,6 @@ public class Intake extends SubsystemBase {
         } else {
             extendController.setReference(0, ControlType.kMAXMotionPositionControl);
         }
-
     }
 
         /**

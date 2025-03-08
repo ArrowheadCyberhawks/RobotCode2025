@@ -16,6 +16,7 @@ import frc.robot.subsystems.*;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
+import frc.robot.Constants.GrabberConstants;
 import frc.robot.Constants.GrabberConstants.GrabberPosition;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.PID;
@@ -222,8 +223,9 @@ public class RobotContainer {
 
 
     //temp, not as many things
-    manipulatorController.pov(0).whileTrue(grabber.runGrabberCommand(-0.25)); //was 0.25
-    manipulatorController.pov(180).whileTrue(grabber.runGrabberCommand(0.25));
+    manipulatorController.pov(0).whileTrue(grabber.intakeCommand());
+    manipulatorController.pov(180).whileTrue(grabber.outtakeCommand());
+    
 
     //keypadHID.button(1).onTrue(grabber.setpiv));
     //keypadHID.button(15).onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));

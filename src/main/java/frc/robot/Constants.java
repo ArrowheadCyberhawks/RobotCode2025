@@ -50,6 +50,17 @@ public final class Constants {
     public static final int kExtendMotorPort = 12;
   }
 
+  public static class ClimberConstants {
+    public static final int kClimberMotorPort = 1; // change later 
+
+    public static final LoggedNetworkNumber kClimbP = new LoggedNetworkNumber("Climb/kPivotP", 0.1); //change later 
+    public static final LoggedNetworkNumber kClimbI = new LoggedNetworkNumber("Climb/kPivotI", 0);
+    
+    public static final LoggedNetworkNumber kClimbMaxVel = new LoggedNetworkNumber("Climb/kElevatorMaxVel", 100);
+    public static final LoggedNetworkNumber kClimbMaxAccel = new LoggedNetworkNumber("Climb/kElevatorMaxAccel", 100);
+
+  }
+
   public static class ElevatorConstants {
     public static final LoggedNetworkNumber kElevatorP = new LoggedNetworkNumber("Elevator/kElevatorP", 0.08);
     public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 2000);
@@ -87,8 +98,8 @@ public final class Constants {
     public static final int kCoralSensorPort = 13;
     public static final int kAlgaeSensorPort = 22;
 
-    public static final double kCoralSensorThreshold = 0.1;
-    public static final double kAlgaeSensorThreshold = 0.1;
+    public static final double kCoralSensorThreshold = 100;
+    public static final double kAlgaeSensorThreshold = 100;
 
     public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 0.4);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 150);
@@ -109,7 +120,25 @@ public final class Constants {
           return angle;
       }
     }
+
+    public static enum GrabberState {
+      INTAKE(0.75),
+      OUTTAKE(-0.75),
+      HOLD(0.10),
+      STOP(0.0);
+
+      private final double speed;
+
+      private GrabberState(double speed) {
+          this.speed = speed;
+      }
+
+      public double getSpeed() {
+          return speed;
+      }
+    }
   }
+
 
   public static class SwerveConstants {
     public static final Distance wheelBase = Inches.of(29);
