@@ -83,7 +83,7 @@ public class Grabber extends SubsystemBase {
         Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
         Logger.recordOutput(getName() + "/Coral Range", getCoralRange().in(Meters));
         Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Meters));
-        Logger.recordOutput(getName() + "/Pivot Angle", getPivotAngle());
+        Logger.recordOutput(getName() + "/Pivot Angle", getPivotAngle().getRadians());
         Logger.recordOutput(getName() + "/Pivot Target", pivotController.getGoal().position);
         Logger.recordOutput(getName() + "/Grabber State", grabberState);
     }
@@ -192,7 +192,7 @@ public class Grabber extends SubsystemBase {
     
     /**
      * Returns the position of the pivot motor.
-     * @return The position of the encoder on the pivot motor.
+     * @return A Rotation2d representing the position of the pivot motor encoder.
      */
     public Rotation2d getPivotAngle() {
         return new Rotation2d(pivotMotor.getEncoder().getPosition());

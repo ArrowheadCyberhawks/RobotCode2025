@@ -16,19 +16,20 @@ import frc.robot.subsystems.*;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
-import frc.robot.Constants.GrabberConstants;
 import frc.robot.Constants.GrabberConstants.GrabberPosition;
 import frc.robot.Constants.IOConstants;
 import frc.robot.Constants.PID;
 import frc.robot.Constants.PID.PointTrack;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
+import frc.robot.commands.SetSuperstructureCommand;
 // import frc.robot.subsystems.Intake;
 import frc.robot.Constants.ReefPoint;
 import frc.robot.Constants.SwerveConstants;
 
 import java.io.File;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
@@ -37,8 +38,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -59,6 +58,7 @@ public class RobotContainer {
 
   private final Elevator elevator;
   final Grabber grabber;
+  private final Climber climber;
   // private final Intake intake;
 
   
@@ -75,9 +75,20 @@ public class RobotContainer {
   public RobotContainer() {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
+    // set up subsystems
+    // these should be down below swervesubsystem but i need the elevator
+    elevator = new Elevator();
+    grabber = new Grabber();
+    climber = new Climber();
+
     // set up controllers
     if (DriverStation.isJoystickConnected(IOConstants.kDriverControllerPortBT)) {
-      driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortBT, IOConstants.kDriverControllerDeadband, 0.15);
+      driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortBT, IOConstants.kDriverControllerDeadband, 0.15) {
+        @Override
+        public double interpolate(double value) {
+        return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+    }
+      };
     } else {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortUSB, IOConstants.kDriverControllerDeadband, 0.15);
     }
@@ -107,9 +118,6 @@ public class RobotContainer {
     //limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false, "limelight","limelight-three");
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false);
     
-    // set up subsystems
-    elevator = new Elevator();
-    grabber = new Grabber();
     // intake = new Intake();
 
     // commands and stuff
@@ -170,6 +178,8 @@ public class RobotContainer {
     //TODO change to different keybind
     driverController.start().whileTrue(new ToTagCommand(swerveSubsystem, "limelight"));
     
+    driverController.povUp().whileTrue(climber.runClimbCommand(() -> 0.8));
+    driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.2));
 
     //X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[]{keypadHID.button(22), keypadHID.button(23)};
@@ -199,10 +209,8 @@ public class RobotContainer {
     //MANIPULATOR CONTROLLER
 
     //Manual Elevator control
-    manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator,
-      () -> -manipulatorController.getLeftY())
-    );
-    manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()));
+    manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator, () -> -manipulatorController.getLeftY()/50));
+    manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()/8));
 
     //Pivot
     manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT)); //TODO debug
@@ -248,7 +256,7 @@ public class RobotContainer {
     // keypadHID.button(1).whileTrue(intake.runIntakeCommand(0.1));
     // keypadHID.button(4).whileTrue(intake.runIntakeCommand(-0.1));
     
-    // // //IM FIRED
+    //IM FIRED
 
     // keypadHID.button(6).whileTrue(intake.runRetractCommand(0.1));
     // keypadHID.button(15).whileTrue(intake.runExtendCommand(0.1));
@@ -262,11 +270,7 @@ public class RobotContainer {
   }
 
   private void elevatorButtons(int buttonNum, String name) {
-    keypadHID.button(buttonNum).onTrue(
-      elevator.setLevelCommand(ElevatorLevel.valueOf(name))
-      .andThen(new WaitCommand(0.3))
-      .andThen(grabber.setPivotPositionCommand(GrabberPosition.UP))
-    );
+    keypadHID.button(buttonNum).onTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.PLACE::getAngle, ElevatorLevel.valueOf(name)::getHeight));
   }
   
 

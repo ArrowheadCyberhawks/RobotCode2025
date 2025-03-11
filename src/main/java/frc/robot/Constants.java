@@ -57,7 +57,7 @@ public final class Constants {
   // }
 
   public static class ClimberConstants {
-    public static final int kClimberMotorPort = 1; // change later 
+    public static final int kClimberMotorPort = 14; // change later 
 
     public static final LoggedNetworkNumber kClimbP = new LoggedNetworkNumber("Climb/kPivotP", 0.1); //change later 
     public static final LoggedNetworkNumber kClimbI = new LoggedNetworkNumber("Climb/kPivotI", 0);
@@ -68,22 +68,22 @@ public final class Constants {
   }
 
   public static class ElevatorConstants {
-    public static final LoggedNetworkNumber kElevatorP = new LoggedNetworkNumber("Elevator/kElevatorP", 0.08);
-    public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 2000);
-    public static final LoggedNetworkNumber kElevatorMaxAccel = new LoggedNetworkNumber("Elevator/kElevatorMaxAccel", 5000);
+    public static final LoggedNetworkNumber kElevatorP = new LoggedNetworkNumber("Elevator/kElevatorP", 3.5);
+    public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 5);
+    public static final LoggedNetworkNumber kElevatorMaxAccel = new LoggedNetworkNumber("Elevator/kElevatorMaxAccel", 10);
 
     public static final int elevatorMotorID = 9;
 
     public static enum ElevatorLevel { //TODO update positions
-      LO(0.0),  //x is about 1.143 cm //0
-      L1(10.0), //40 // 22
-      L2(40.0), //60 //50 / 22 
-      L3(80.0), //80
-      L4(120.0), //100
-      HI(148.0),
-      DEF(60), // 155
-      PICK(40),
-      CLEAR(50);
+      LO(0.0),
+      L1(1.0),
+      L2(0.244), 
+      L3(0.64), 
+      L4(1.27),
+      HI(1.7),
+      DEF(1),
+      PICK(1),
+      CLEAR(1);
 
       private final double height;
 
@@ -105,8 +105,10 @@ public final class Constants {
     public static final int kCoralSensorPort = 13;
     public static final int kAlgaeSensorPort = 22;
 
-    public static final MutDistance kCoralSensorThreshold = Centimeters.mutable(10);
-    public static final MutDistance kAlgaeSensorThreshold = Centimeters.mutable(2);
+    public static final Distance kArmLength = Inches.of(30); //real length is like 22 but this is accounting for the size of the grabber
+
+    public static final Distance kCoralSensorThreshold = Centimeters.of(10);
+    public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
 
     public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 3);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 5);
@@ -115,6 +117,7 @@ public final class Constants {
     public static enum GrabberPosition { //TODO update positions
       DOWN(Rotation2d.fromDegrees(-40)),//-65  was at - 40 
       OUT(Rotation2d.fromDegrees(5.0)),
+      PLACE(Rotation2d.fromDegrees(30.0)),
       UP(Rotation2d.kZero);//70
       
       private final Rotation2d angle;
@@ -224,7 +227,7 @@ public final class Constants {
       }
   }
 
-    /**
+  /**
    * Enum to represent branches of the reef.
    */
   public static enum ReefPoint {

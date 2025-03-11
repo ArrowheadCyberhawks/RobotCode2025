@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Meters;
 import static frc.robot.Constants.ElevatorConstants.*;
 
 import java.util.function.Supplier;
@@ -11,9 +12,7 @@ import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.util.sendable.Sendable;
-import edu.wpi.first.util.sendable.SendableBuilder;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
@@ -28,21 +27,14 @@ public class Elevator extends SubsystemBase {
     public Elevator() {
         elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
         elevatorEncoder = elevatorMotor.getEncoder();
-        elevatorController.setGoal(getPosition());
-
-        SmartDashboard.putData("Elevator", new Sendable() {
-            @Override
-            public void initSendable(SendableBuilder builder) {
-                builder.addDoubleProperty("Elevator Position", () -> getPosition(), null);
-            }
-        });
+        elevatorController.setGoal(getHeight().in(Meters));
     }
 
     @Override
     public void periodic() {
         updateConstants();
         elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
-        Logger.recordOutput(getName() + "/Position", getPosition());
+        Logger.recordOutput(getName() + "/Height", getHeight().in(Meters));
     }
 
     private void updateConstants() {
@@ -54,8 +46,8 @@ public class Elevator extends SubsystemBase {
         }
     }
 
-    public double getPosition() {
-        return elevatorEncoder.getPosition();
+    public Distance getHeight() {
+        return Meters.of(elevatorEncoder.getPosition());
     }
 
     /**
@@ -67,9 +59,12 @@ public class Elevator extends SubsystemBase {
 
     /**
      * Set the elevator PID to a specific position.
-     * @param height The position to set the elevator to IN ROTATIONS.
+     * @param height The position to set the elevator to IN METERS.
      */
     public void setHeight(double height) {
+        if (height < 0) {
+            height = 0;
+        }
         elevatorController.setGoal(height);
     }
 

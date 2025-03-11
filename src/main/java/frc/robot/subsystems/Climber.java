@@ -2,6 +2,8 @@ package frc.robot.subsystems;
 
 import static frc.robot.Constants.ClimberConstants.*;
 
+import java.util.function.Supplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.RelativeEncoder;
@@ -12,6 +14,7 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Climber extends SubsystemBase {
@@ -63,5 +66,9 @@ public class Climber extends SubsystemBase {
      */
     public void setClimberMotor(double speed) {
         climberMotor.set(speed);
+    }
+
+    public Command runClimbCommand(Supplier<Double> power) {
+        return runEnd(() -> setClimberMotor(power.get()), this::stop);
     }
 }
