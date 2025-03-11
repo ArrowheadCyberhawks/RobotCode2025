@@ -112,7 +112,10 @@ public class Grabber extends SubsystemBase {
     public Command setPivotPositionCommand(GrabberPosition position) {
         return runOnce(() -> setPivotPosition(position));
     }
-
+    public Command temp1(GrabberPosition position) {
+        System.out.println("Left Bumper Pressed!!!");
+        return runOnce(() -> setPivotPosition(position));
+    }
     /**
      * Runs the grabber motor at a given speed.
      * @param speed The speed to run the grabber motor at. Should be between -1 and 1.

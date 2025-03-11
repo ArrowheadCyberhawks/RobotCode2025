@@ -21,6 +21,7 @@ import frc.robot.Constants.PID;
 import frc.robot.Constants.PID.PointTrack;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
+import frc.robot.commands.AButtonPrintCommand;
 import frc.robot.Constants.ReefPoint;
 import frc.robot.Constants.SwerveConstants;
 
@@ -131,10 +132,10 @@ public class RobotContainer {
    */
   private void configureBindings() {
     driverController.a()
-        .onTrue(swerveSubsystem.runOnce(() -> {
+            .onTrue(swerveSubsystem.runOnce(() -> {
           swerveSubsystem.zeroHeading();
           swerveSubsystem.swerveDrive.synchronizeModuleEncoders();
-          System.out.println("zeroing");
+          //System.out.println("zeroing");
         })) // reset gyro to 0 degrees when A is pressed
         .debounce(2) // check if A is pressed for 2 seconds
         .onTrue(swerveSubsystem.runOnce(() -> {
@@ -157,6 +158,9 @@ public class RobotContainer {
 
     manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()));
 
+    driverController.a().onTrue(new AButtonPrintCommand(swerveSubsystem));
+
+    //System.out.println("button A was pressed!")
     driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,
       PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController,
       ()->Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
@@ -165,7 +169,8 @@ public class RobotContainer {
       SwerveConstants.kMaxAngularVelAuto)
     );
     driverController.y().whileTrue(new ToPointCommand(()->ReefPoint.kFarLeftL.getPose(), PointTrack.desiredDistance));
-    
+    driverController.leftBumper().onTrue(grabber.temp1(GrabberPosition.OUT));
+
     nearTriggers = new Trigger[]{keypadHID.button(22), keypadHID.button(23)};
     nearLeftTriggers = new Trigger[]{keypadHID.button(13), keypadHID.button(17)};
     nearRightTriggers = new Trigger[]{keypadHID.button(20), keypadHID.button(16)};
@@ -197,7 +202,6 @@ public class RobotContainer {
     );
     manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT));
     manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));
-
     /*keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
     keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
     keypadHID.button(6).onTrue(elevator.setLevelCommand(ElevatorLevel.L4).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
@@ -227,7 +231,7 @@ public class RobotContainer {
 
     //keypadHID.button(4).onTrue(grabber.setPivotAngleCommand(new Rotation2d(0)));
    // manipulatorController.leftBumper().onTrue(intake.runIntakeCommand(1)); //retract // ignore brokeafied code 
-    //manipulatorController.rightBumper().onTrue(intake.runIntakeCommand(1)); //retract
+    //manipulatorController.rightBumperTrue(intake.runIntakeCommand(1)); //retract
 //MONKEY CODE 
     keypadHID.button(11).whileTrue(intake.runIntakeCommand(1));
 
