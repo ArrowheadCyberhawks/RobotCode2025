@@ -56,6 +56,7 @@ public class Grabber extends SubsystemBase {
         pivotEncoder = pivotMotor.getEncoder();
 
         pivotController.setGoal(getPivotAngle().getRadians());
+        pivotController.setTolerance(Units.degreesToRadians(3));
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
@@ -71,7 +72,7 @@ public class Grabber extends SubsystemBase {
         updateConstants();
 
         // if the pivot has moved more than 30 degrees, we have left the starting position
-        if(!hasLeftStartingPosition && Math.abs(pivotEncoder.getPosition()) > Units.degreesToRotations(30)) {
+        if(!hasLeftStartingPosition && Math.abs(pivotEncoder.getPosition()) > kPivotLimit.getRadians()) {
             hasLeftStartingPosition = true;
         }
 
@@ -101,7 +102,7 @@ public class Grabber extends SubsystemBase {
      * @param angle The Rotation2d to set the pivot to. 0 is horizontal, positive is up.
      */
     public void setPivotAngle(Rotation2d angle) {
-        if (hasLeftStartingPosition && Math.abs(angle.getDegrees()) < 30) {
+        if (hasLeftStartingPosition && Math.abs(angle.getDegrees()) < kPivotLimit.getDegrees()) {
             return;
         }
         pivotController.setGoal(angle.getRadians());
@@ -202,6 +203,10 @@ public class Grabber extends SubsystemBase {
         pivotMotor.stopMotor();
     }
 
+    public boolean atPivotTarget() {
+        return pivotController.atGoal();
+    }
+
     /**
      * Command to set the pivot angle of the grabber.
      * @param angle The Rotation2d to set the pivot to. 0 is horizontal, positive is up.
@@ -246,7 +251,7 @@ public class Grabber extends SubsystemBase {
      * InstantCommand to simply set the grabber state.
      */
     private Command setGrabberStateCommand(GrabberState state) {
-        return new InstantCommand(() -> setGrabberState(state));
+        return this.runOnce(() -> setGrabberState(state));
     }
 
     /**
@@ -254,20 +259,16 @@ public class Grabber extends SubsystemBase {
      * @return
      */
     public Command intakeCommand() {
-        return setGrabberStateCommand(GrabberState.INTAKE).repeatedly().until(this::hasAlgae).finallyDo(() -> holdCommand().schedule());
+        return runEnd(() -> setGrabberState(GrabberState.INTAKE), () -> holdCommand().schedule()).until(this::hasAlgae);
         //make it so that run hold command after it finds algae
     }
 
-    /**
-     * Command to run the intake at a reduced power until coral is detected, then stops.
-     * @return
-     */
     public Command holdCommand() {
-        return setGrabberStateCommand(GrabberState.HOLD).repeatedly().until(this::hasCoral).finallyDo(() -> stopIntakeCommand().schedule());
+        return runEnd(() -> setGrabberState(GrabberState.HOLD), () -> setGrabberState(GrabberState.STOP)).until(this::hasCoral);
     }
 
     public Command outtakeCommand() {
-        return setGrabberStateCommand(GrabberState.OUTTAKE).repeatedly().finallyDo(() -> stopGrabberCommand().schedule());
+        return runEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP));
     }
 
     public Command stopIntakeCommand() {

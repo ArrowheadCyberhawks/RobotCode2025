@@ -74,16 +74,15 @@ public final class Constants {
 
     public static final int elevatorMotorID = 9;
 
-    public static enum ElevatorLevel { //TODO update positions
+    public static enum ElevatorLevel {
       LO(0.0),
-      L1(1.0),
-      L2(0.244), 
-      L3(0.64), 
-      L4(1.27),
-      HI(1.7),
-      DEF(1),
-      PICK(1),
-      CLEAR(1);
+      L1(0.444),
+      L2(0.269), 
+      L3(0.67), 
+      L4(1.389),
+      HI(1.69),
+      HUMAN(0.949),
+      CLEAR(0.7);
 
       private final double height;
 
@@ -105,20 +104,25 @@ public final class Constants {
     public static final int kCoralSensorPort = 13;
     public static final int kAlgaeSensorPort = 22;
 
+    public static final Rotation2d kPivotLimit = Rotation2d.fromDegrees(0);
+
     public static final Distance kArmLength = Inches.of(30); //real length is like 22 but this is accounting for the size of the grabber
 
     public static final Distance kCoralSensorThreshold = Centimeters.of(10);
     public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
 
     public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 3);
-    public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 5);
-    public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 15);
+    public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
+    public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
 
     public static enum GrabberPosition { //TODO update positions
-      DOWN(Rotation2d.fromDegrees(-40)),//-65  was at - 40 
+      DOWN(Rotation2d.kPi),//-65  was at - 40 
       OUT(Rotation2d.fromDegrees(5.0)),
       PLACE(Rotation2d.fromDegrees(30.0)),
-      UP(Rotation2d.kZero);//70
+      L1(Rotation2d.fromRadians(4.346)),
+      L4(Rotation2d.fromRadians(0.677)),
+      HUMAN(Rotation2d.fromRadians(3.957)),
+      HI(new Rotation2d(-0.33));//70
       
       private final Rotation2d angle;
 

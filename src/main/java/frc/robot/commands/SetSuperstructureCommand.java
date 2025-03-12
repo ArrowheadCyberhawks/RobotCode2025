@@ -40,16 +40,20 @@ public class SetSuperstructureCommand extends Command {
     Rotation2d angleLimit = Rotation2d.fromRadians(Math.acos(currentHeight / kArmLength.in(Meters)));
 
     // check if we're going to hit the bottom of the robot
-    if (Math.abs(desiredAngle.minus(currentAngle).getDegrees()) > 180 || (desiredAngle.getDegrees() > 90 && desiredAngle.getDegrees() < 270)) {
+    if (
+        (Math.abs(desiredAngle.minus(currentAngle).getDegrees()) > 180
+        || (desiredAngle.getDegrees() > 90 && desiredAngle.getDegrees() < 270))
+      && currentHeight < ElevatorLevel.CLEAR.getHeight() - 0.01) { //I HATE this formatting -nitin
       elevator.setLevelCommand(ElevatorLevel.CLEAR);
+      grabber.setPivotAngle(angleLimit);
     } else {
       elevator.setHeight(desiredHeight);
+      grabber.setPivotAngle(desiredAngle);
     }
-    grabber.setPivotAngle(desiredAngle);
   }
 
   @Override
   public boolean isFinished() {
-    return true;
+    return grabber.atPivotTarget() && elevator.atTarget();
   }
 }

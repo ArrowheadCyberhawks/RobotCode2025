@@ -199,11 +199,12 @@ public class RobotContainer {
 
     //Elevator Presets
     elevatorButtons(19, "LO");
-    elevatorButtons(7, "HI");
-    elevatorButtons(6, "L4");
+    keypadHID.button(7).whileTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.HI::getAngle, ElevatorLevel.HI::getHeight));
+    keypadHID.button(6).whileTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.L4::getAngle, ElevatorLevel.L4::getHeight));
     elevatorButtons(10, "L3");
     elevatorButtons(14, "L2");
-    elevatorButtons(18, "L1");
+    keypadHID.button(18).whileTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.L1::getAngle, ElevatorLevel.L1::getHeight));
+    keypadHID.button(21).whileTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight));
 
 
     //MANIPULATOR CONTROLLER
@@ -214,42 +215,13 @@ public class RobotContainer {
 
     //Pivot
     manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT)); //TODO debug
-    manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP)); //TODO debug
+    manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.HI)); //TODO debug
 
     //Intake/Outtake
     manipulatorController.pov(0).whileTrue(grabber.intakeCommand());
     manipulatorController.pov(180).whileTrue(grabber.outtakeCommand());
     manipulatorController.povRight().onTrue(new InstantCommand(() -> grabber.resetPivotTarget()).ignoringDisable(true));
 
-    /*keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(6).onTrue(elevator.setLevelCommand(ElevatorLevel.L4).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(10).onTrue(elevator.setLevelCommand(ElevatorLevel.L3).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(14).onTrue(elevator.setLevelCommand(ElevatorLevel.L2).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(18).onTrue(elevator.setLevelCommand(ElevatorLevel.L1).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP))); //12.75 inces 
-    */    
-
-
-    //keypadHID.button(1).onTrue(grabber.setpiv));
-    //keypadHID.button(15).onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));
-    //keypadHID.button(1).onTrue(grabber.runPivotCommand(0.4));
-
-    //keypadHID.button(4).onTrue(grabber.setPivotAngleCommand(new Rotation2d(0)));
-    //manipulatorController.leftBumper().onTrue(intake.runIntakeCommand(1)); //retract // ignore brokeafied code 
-    //manipulatorController.rightBumper().onTrue(intake.runIntakeCommand(1)); //retract
-
-    // keypadHID.button(15).onTrue(new SequentialCommandGroup(
-    //   elevator.DEF(),
-    //   new WaitCommand(0.9),
-    //   grabber.setPivotPositionCommand(GrabberPosition.DOWN)
-    // ));
-    
-    // keypadHID.button(11).onTrue(new ParallelCommandGroup(
-    //   grabber.runGrabberCommand(-1).withTimeout(2),
-    //   elevator.PICK()
-    // ));
-    
-    
     //free button 1, 4, 6, 15
 
     

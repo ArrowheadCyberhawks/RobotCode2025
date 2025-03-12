@@ -53,18 +53,11 @@ public class AutoCommandManager {
 
     public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) { //add more when more subsystems are made
         //NamedCommands.registerCommand("intakeOn", intakeSubsystem.autoIntake());
-        NamedCommands.registerCommand("armUp", grabberSubsystem.setPivotPositionCommand(GrabberPosition.UP));
+        NamedCommands.registerCommand("armUp", grabberSubsystem.setPivotPositionCommand(GrabberPosition.HI));
         NamedCommands.registerCommand("armDown", grabberSubsystem.setPivotPositionCommand(GrabberPosition.DOWN));
         NamedCommands.registerCommand("armOut", grabberSubsystem.setPivotPositionCommand(GrabberPosition.OUT));
 
         NamedCommands.registerCommand("dropCoral", grabberSubsystem.runGrabberCommand(1, 1).withTimeout(1));
-
-        NamedCommands.registerCommand("defaultArm", elevatorSubsystem.DEF().andThen(new WaitCommand(0.9)).andThen(grabberSubsystem.setPivotPositionCommand(GrabberPosition.DOWN)));
-        NamedCommands.registerCommand("pickup", 
-        grabberSubsystem.runGrabberCommand(-0.9)
-          .withTimeout(2)
-          .alongWith(elevatorSubsystem.PICK())
-        );
 
         elevatorCommands("L1", elevatorSubsystem, grabberSubsystem);
         elevatorCommands("L2", elevatorSubsystem, grabberSubsystem);
@@ -90,7 +83,7 @@ public class AutoCommandManager {
     private void elevatorCommands(String name, Elevator elevator, Grabber grabber) {
      NamedCommands.registerCommand(name, elevator.setLevelCommand(ElevatorLevel.valueOf(name))
         .andThen(new WaitCommand(0.3))
-        .andThen(grabber.setPivotPositionCommand(GrabberPosition.UP))
+        .andThen(grabber.setPivotPositionCommand(GrabberPosition.HI))
      );
     }
 }

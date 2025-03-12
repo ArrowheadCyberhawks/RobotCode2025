@@ -28,6 +28,7 @@ public class Elevator extends SubsystemBase {
         elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
         elevatorEncoder = elevatorMotor.getEncoder();
         elevatorController.setGoal(getHeight().in(Meters));
+        elevatorController.setTolerance(0.01);
     }
 
     @Override
@@ -55,6 +56,10 @@ public class Elevator extends SubsystemBase {
      */
     public double getTargetPosition() {
         return elevatorController.getGoal().position;
+    }
+
+    public boolean atTarget() {
+        return elevatorController.atGoal();
     }
 
     /**
@@ -96,19 +101,6 @@ public class Elevator extends SubsystemBase {
      */
     public Command L4() {
         return setLevelCommand(ElevatorLevel.L4);
-    }
-
-    /**
-     * 
-     * @return A command to bring the leevator to the default resting position of the robot.
-     */
-    public Command DEF() {
-        return setLevelCommand(ElevatorLevel.DEF);
-    }
-
-
-    public Command PICK() {
-        return setLevelCommand(ElevatorLevel.PICK);
     }
     
     /**
