@@ -31,6 +31,7 @@ import java.io.File;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
@@ -53,7 +54,7 @@ public class RobotContainer {
 
   public final SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
-  private final PhotonCameraWrapper cam0, cam1, cam2, cam3, cam4, cam5, cam6;
+  private final PhotonCameraWrapper cam1, cam2, cam3, cam4, cam5, cam6;
 
 
   private final Elevator elevator;
@@ -104,14 +105,14 @@ public class RobotContainer {
 
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(15.75), Inches.of(4.75), Inches.of(22.875)), new Rotation3d(0, 0, 0))); // left side 
-    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(14.5), Inches.of(1), Inches.of(22.875)), new Rotation3d(0,0, -Math.PI/2))); // left front
-    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(14.5), Inches.of(8), Inches.of(22.875)), new Rotation3d(0,0, Math.PI/2))); // left back
-    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(15.75), Inches.of(4.75), Inches.of(22.875)), new Rotation3d(0,0, 0))); // front
-    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(1), Inches.of(27.125)), new Rotation3d(0,0, -Math.PI/2))); //
-    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-15.75), Inches.of(4.75), Inches.of(27.125)), new Rotation3d(0,0, Math.PI))); //back
-    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-14.5), Inches.of(8), Inches.of(27.125)), new Rotation3d(0,0, Math.PI/2))); 
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam3, cam4, cam5);
+    // cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(15.75), Inches.of(4.75), Inches.of(22.875)), new Rotation3d(0, 0, 0))); // DOES NOT EXIST
+    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(6.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, Math.PI/2))); // front left
+    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new Rotation3d(0,0, 0))); // front forwards
+    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(2.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, -Math.PI/2))); // front right
+    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(2.75), Inches.of(30)), new Rotation3d(Units.degreesToRadians(8.3),0, -Math.PI/2))); // rear right
+    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-12.625), Inches.of(4.75), Inches.of(30)), new Rotation3d(0,0, Math.PI))); // rear backwards
+    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(6.75), Inches.of(30)), new Rotation3d(Units.degreesToRadians(8.3),0, Math.PI/2))); // rear left
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam3, cam4, cam5, cam6);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     // set up limelight
