@@ -14,11 +14,12 @@ public class AButtonPrintCommand extends Command{
     public AButtonPrintCommand(SwerveSubsystem swerveSubsystem) {
         this.swerveSubsystem = swerveSubsystem; 
         System.out.println("A Button Command Constructor");
+        int calledCount = 0;
     }
 
     @Override
     public void initialize(){
-        
+        self.calledCount = self.calledcount + 1;
         // int[] validAprilTags = {4};
         // LimelightHelpers.SetFiducialIDFiltersOverride("limelight-three",validAprilTags);
         double tx = LimelightHelpers.getTX("limelight-three");
@@ -55,7 +56,7 @@ public class AButtonPrintCommand extends Command{
                 xSpeed = (tx/50);
                 System.out.println("Loop TX = "  + (tx));
             }
-
+            System.out.println(self.calledcount);
     }
             
 
