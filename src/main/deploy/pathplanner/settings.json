@@ -6,21 +6,20 @@
     "BranchToStation",
     "Center",
     "Left",
-    "NetToBranch",
-    "WaypointToBranch",
     "Right",
     "StationToBranch",
-    "StationToNet"
+    "StationToNet",
+    "WaypointToBranch"
   ],
   "autoFolders": [
     "Center",
     "Left",
     "Right"
   ],
-  "defaultMaxVel": 3.0,
-  "defaultMaxAccel": 5.0,
-  "defaultMaxAngVel": 540.0,
-  "defaultMaxAngAccel": 720.0,
+  "defaultMaxVel": 1.0,
+  "defaultMaxAccel": 2.0,
+  "defaultMaxAngVel": 360.0,
+  "defaultMaxAngAccel": 570.0,
   "defaultNominalVoltage": 12.0,
   "robotMass": 50.0,
   "robotMOI": 6.883,

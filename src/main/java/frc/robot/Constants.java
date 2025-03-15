@@ -18,7 +18,6 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -82,7 +81,7 @@ public final class Constants {
       L4(1.389),
       HI(1.69),
       HUMAN(0.949),
-      CLEAR(0.7);
+      CLEAR(0.8);
 
       private final double height;
 
@@ -101,8 +100,8 @@ public final class Constants {
     public static final int kGrabberMotor2Port = 12;
     public static final int kPivotMotorPort = 11;
 
-    public static final int kCoralSensorPort = 13;
-    public static final int kAlgaeSensorPort = 22;
+    public static final int kCoralSensorPort = 22;
+    public static final int kAlgaeSensorPort = 13;
 
     public static final Rotation2d kPivotLimit = Rotation2d.fromDegrees(0);
 
@@ -122,6 +121,7 @@ public final class Constants {
       L1(Rotation2d.fromRadians(4.346)),
       L4(Rotation2d.fromRadians(0.677)),
       HUMAN(Rotation2d.fromRadians(3.957)),
+      ZERO(Rotation2d.kZero),
       HI(new Rotation2d(-0.33));//70
       
       private final Rotation2d angle;
@@ -174,7 +174,7 @@ public final class Constants {
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 6.5; //4.5
+      public static final double kPTranslation = 4.5; //6.5
       public static final double kITranslation = 0;
       public static final double kDTranslation = 0;
 

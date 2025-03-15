@@ -12,15 +12,15 @@
         "y": 4.0
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "FarCenterWaypoint"
     },
     {
       "anchor": {
-        "x": 5.853131815584162,
+        "x": 5.759772921047099,
         "y": 4.0
       },
       "prevControl": {
-        "x": 6.102526837395222,
+        "x": 6.009167942858158,
         "y": 3.9826183114784213
       },
       "nextControl": null,

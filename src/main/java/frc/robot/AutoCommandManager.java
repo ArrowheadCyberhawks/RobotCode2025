@@ -27,6 +27,7 @@ import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.Constants.GrabberConstants.GrabberPosition;
 import frc.robot.Constants.ReefPoint;
+import frc.robot.commands.SetSuperstructureCommand;
 import frc.robot.subsystems.*;
 
 
@@ -57,22 +58,16 @@ public class AutoCommandManager {
     }
 
     public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) { //add more when more subsystems are made
-        //NamedCommands.registerCommand("intakeOn", intakeSubsystem.autoIntake());
-        NamedCommands.registerCommand("armUp", grabberSubsystem.setPivotPositionCommand(GrabberPosition.HI));
-        NamedCommands.registerCommand("armDown", grabberSubsystem.setPivotPositionCommand(GrabberPosition.DOWN));
-        NamedCommands.registerCommand("armOut", grabberSubsystem.setPivotPositionCommand(GrabberPosition.OUT));
+        NamedCommands.registerCommand("INTAKE", grabberSubsystem.intakeCommand());
+        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand());
 
-        NamedCommands.registerCommand("dropCoral", grabberSubsystem.runGrabberCommand(1, 1).withTimeout(1));
+        NamedCommands.registerCommand("HUMAN", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight));
+        NamedCommands.registerCommand("DEF", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight));
 
-        elevatorCommands("L1", elevatorSubsystem, grabberSubsystem);
-        elevatorCommands("L2", elevatorSubsystem, grabberSubsystem);
-        elevatorCommands("L3", elevatorSubsystem, grabberSubsystem);
-        elevatorCommands("L4", elevatorSubsystem, grabberSubsystem);
-        elevatorCommands("LO", elevatorSubsystem, grabberSubsystem);
-        elevatorCommands("HI", elevatorSubsystem, grabberSubsystem);
-
-
-
+        NamedCommands.registerCommand("L1", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.L1::getAngle, ElevatorLevel.L1::getHeight));
+        NamedCommands.registerCommand("L2", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L2::getHeight));
+        NamedCommands.registerCommand("L3", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L3::getHeight));
+        NamedCommands.registerCommand("L4", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.L4::getAngle, ElevatorLevel.L4::getHeight));
     }
 
     public static Command pathfindToPoseCommand(Pose2d targetPose) {
@@ -136,7 +131,7 @@ public class AutoCommandManager {
             RadiansPerSecond.of(maxAngularVel.get()),
             RadiansPerSecondPerSecond.of(maxAngularAccel.get())
         );
-
+    
         return AutoBuilder.pathfindToPose(targetPose, constraints)
             .until(() -> RobotContainer.swerveSubsystem.getPose().getTranslation().getDistance(targetPose.getTranslation()) < 1)
             .andThen(new ToPointCommand(RobotContainer.swerveSubsystem, () -> targetPose)

@@ -11,45 +11,27 @@
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "raiseArm"
-          }
-        },
-        {
           "type": "path",
           "data": {
             "pathName": "CenterToFarLeftL"
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "L2"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "dropCoral"
-          }
-        },
-        {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "defaultArm"
+            "waitTime": 1.0
           }
         },
         {
           "type": "path",
           "data": {
             "pathName": "FarLeftLToStation"
+          }
+        },
+        {
+          "type": "wait",
+          "data": {
+            "waitTime": 1.0
           }
         },
         {
@@ -61,7 +43,7 @@
         {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 1.0
           }
         },
         {

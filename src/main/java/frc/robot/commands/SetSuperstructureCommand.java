@@ -45,7 +45,7 @@ public class SetSuperstructureCommand extends Command {
         || (currentAngle.getDegrees() > 85 && currentAngle.getDegrees() < 275))
       && currentHeight < ElevatorLevel.CLEAR.getHeight() - 0.01) { //I HATE this formatting -nitin
       elevator.setHeight(ElevatorLevel.CLEAR.getHeight());
-      grabber.setPivotAngle(angleLimit);
+      grabber.setPivotAngle(currentAngle);
     } else {
       elevator.setHeight(desiredHeight);
       grabber.setPivotAngle(desiredAngle);

@@ -54,7 +54,7 @@ public class RobotContainer {
 
   public static SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
-  private final PhotonCameraWrapper cam1, cam2, cam3, cam4, cam5, cam6;
+  private final PhotonCameraWrapper cam0, cam1, cam2, cam3, cam4, cam5, cam6;
 
 
   private final Elevator elevator;
@@ -105,14 +105,14 @@ public class RobotContainer {
 
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    // cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(15.75), Inches.of(4.75), Inches.of(22.875)), new Rotation3d(0, 0, 0))); // DOES NOT EXIST
+    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(-1.75), Inches.of(-4.75), Inches.of(5)), new Rotation3d(0, Units.degreesToRadians(-20), 0))); // reef
     cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(6.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, Math.PI/2))); // front left
     cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new Rotation3d(0,0, 0))); // front forwards
     cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(2.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, -Math.PI/2))); // front right
     cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(2.75), Inches.of(29)), new Rotation3d(Units.degreesToRadians(8.3),0, -Math.PI/2))); // rear right
     cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-12.625), Inches.of(4.75), Inches.of(29.75)), new Rotation3d(0,0, Math.PI))); // rear backwards
     cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(6.75), Inches.of(30.25)), new Rotation3d(Units.degreesToRadians(8.3),0, Math.PI/2))); // rear left
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam3, cam4, cam5, cam6);
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam0, cam1, cam2, cam3, cam4, cam5, cam6);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     // set up limelight
@@ -221,8 +221,8 @@ public class RobotContainer {
       System.out.println("resetting pivot angle");
     }).ignoringDisable(true));
 
-    manipulatorController.b().whileTrue(AutoCommandManager.pathfindThenPIDCommand(new Pose2d(12.07, 1.305, new Rotation2d())));
-
+    // manipulatorController.b().whileTrue(AutoCommandManager.pathfindThenPIDCommand(new Pose2d(12.07, 1.305, new Rotation2d())));
+    manipulatorController.b().whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.kFarLeftL.getPose()));
     //free button 1, 4, 6, 15
 
     
@@ -240,9 +240,9 @@ public class RobotContainer {
     // triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose()));
     // triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose()));
     // triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose()));
-    triggers[0].whileTrue(AutoCommandManager.pathfindToPathCommand(name + "L"));
-    triggers[1].whileTrue(AutoCommandManager.pathfindToPathCommand(name + "R"));
-    triggers[0].and(triggers[1]).whileTrue(AutoCommandManager.pathfindToPathCommand(name + "C"));
+    triggers[0].whileTrue(AutoCommandManager.pathfindToReefCommand(name + "L"));
+    triggers[1].whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.valueOf("k" + name + "R").getPose()));
+    triggers[0].and(triggers[1]).whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.valueOf("k" + name + "C").getPose()));
   }
 
   private void elevatorButtons(int buttonNum, String name) {
