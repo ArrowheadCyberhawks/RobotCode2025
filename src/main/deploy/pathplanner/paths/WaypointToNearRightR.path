@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 3.752151639344262,
-        "y": 2.41265368852459
+        "x": 3.6597134239612132,
+        "y": 2.5850024059321948
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.877151639344262,
-        "y": 2.6291600394706998
+        "x": 3.7847134239612132,
+        "y": 2.8015087568783046
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NearRightRWaypoint"
     },
     {
       "anchor": {
-        "x": 3.9319672131147536,
-        "y": 2.736321721311475
+        "x": 3.8607158263355785,
+        "y": 2.925745509556309
       },
       "prevControl": {
-        "x": 3.7712703106931187,
-        "y": 2.9278328320912195
+        "x": 3.7357158263355785,
+        "y": 2.7092391586102
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -48,7 +48,7 @@
   "folder": "WaypointToBranch",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 54.74364128703715
+    "rotation": 59.99999999999999
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

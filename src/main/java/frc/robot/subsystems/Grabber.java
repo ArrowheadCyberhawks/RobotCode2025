@@ -56,13 +56,12 @@ public class Grabber extends SubsystemBase {
         pivotEncoder = pivotMotor.getEncoder();
 
         pivotController.setGoal(getPivotAngle().getRadians());
-        pivotController.setTolerance(Units.degreesToRadians(3));
+        pivotController.setTolerance(Units.degreesToRadians(1));
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
         coralSensor.setRangingMode(RangingMode.Short, 100);
         algaeSensor.setRangingMode(RangingMode.Short, 100);
-        
         // pivotController.setGoal(GrabberPosition.UP.getAngle().getRotations());
         //pivotMotor.configure(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI)), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
@@ -205,6 +204,10 @@ public class Grabber extends SubsystemBase {
 
     public boolean atPivotTarget() {
         return pivotController.atGoal();
+    }
+
+    public void resetPivotAngle(Rotation2d angle) {
+        pivotEncoder.setPosition(angle.getRadians());
     }
 
     /**

@@ -10,18 +10,23 @@ import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathfindingCommand;
+import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
+import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import lib.frc706.cyberlib.LocalADStarAK;
+import lib.frc706.cyberlib.commands.ToPointCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.Constants.GrabberConstants.GrabberPosition;
+import frc.robot.Constants.ReefPoint;
 import frc.robot.subsystems.*;
 
 
@@ -70,7 +75,7 @@ public class AutoCommandManager {
 
     }
 
-    public static Command pathfindCommand(Pose2d targetPose) {
+    public static Command pathfindToPoseCommand(Pose2d targetPose) {
         PathConstraints constraints = new PathConstraints(
             MetersPerSecond.of(maxVel.get()),
             MetersPerSecondPerSecond.of(maxAccel.get()),
@@ -78,6 +83,50 @@ public class AutoCommandManager {
             RadiansPerSecondPerSecond.of(maxAngularAccel.get())
         );
         return AutoBuilder.pathfindToPose(targetPose, constraints);
+    }
+
+    public static Command pathfindToPathCommand(String pathName) {
+        PathConstraints constraints = new PathConstraints(
+            MetersPerSecond.of(maxVel.get()),
+            MetersPerSecondPerSecond.of(maxAccel.get()),
+            RadiansPerSecond.of(maxAngularVel.get()),
+            RadiansPerSecondPerSecond.of(maxAngularAccel.get())
+        );
+        try {
+            return AutoBuilder.pathfindThenFollowPath(
+                PathPlannerPath.fromPathFile("WaypointTo" + pathName),
+                constraints
+            );
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new WaitCommand(0);
+        }
+    }
+
+    public static Command pathfindToReefCommand (String reefPointName) {
+        PathConstraints constraints = new PathConstraints(
+            MetersPerSecond.of(maxVel.get()),
+            MetersPerSecondPerSecond.of(maxAccel.get()),
+            RadiansPerSecond.of(maxAngularVel.get()),
+            RadiansPerSecondPerSecond.of(maxAngularAccel.get())
+        );
+
+        Command pathfindCommand;
+
+        try {
+            pathfindCommand = AutoBuilder.pathfindToPose(
+            new Pose2d(PathPlannerPath.fromPathFile("WaypointTo" + reefPointName).getWaypoints().get(0).anchor(),
+                PathPlannerPath.fromPathFile("WaypointTo" + reefPointName).getIdealStartingState().rotation()),
+            constraints);
+            System.out.println("it works");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new WaitCommand(0);
+        }
+
+        return pathfindCommand.andThen(
+            new ToPointCommand(RobotContainer.swerveSubsystem, ReefPoint.valueOf("k" + reefPointName)::getPose)
+        );
     }
     
     private void elevatorCommands(String name, Elevator elevator, Grabber grabber) {

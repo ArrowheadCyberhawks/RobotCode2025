@@ -42,7 +42,7 @@ public class SetSuperstructureCommand extends Command {
     // check if we're going to hit the bottom of the robot
     if (
         (Math.abs(desiredAngle.minus(currentAngle).getDegrees()) > 180
-        || (desiredAngle.getDegrees() > 90 && desiredAngle.getDegrees() < 270))
+        || (currentAngle.getDegrees() > 85 && currentAngle.getDegrees() < 275))
       && currentHeight < ElevatorLevel.CLEAR.getHeight() - 0.01) { //I HATE this formatting -nitin
       elevator.setHeight(ElevatorLevel.CLEAR.getHeight());
       grabber.setPivotAngle(angleLimit);

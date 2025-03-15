@@ -12,16 +12,16 @@
         "y": 5.374806249962149
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "FarLeftRWaypoint"
     },
     {
       "anchor": {
-        "x": 5.036391867806297,
-        "y": 5.3023942923246645
+        "x": 4.981067756085208,
+        "y": 5.198745706574236
       },
       "prevControl": {
-        "x": 5.142046433241472,
-        "y": 5.528971239083827
+        "x": 5.086722321520383,
+        "y": 5.4253226533333985
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 3.0,
-    "maxAcceleration": 5.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -50,5 +50,5 @@
     "velocity": 0,
     "rotation": -119.99999999999999
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

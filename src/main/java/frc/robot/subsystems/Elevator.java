@@ -28,7 +28,7 @@ public class Elevator extends SubsystemBase {
         elevatorMotor = new SparkMax(elevatorMotorID, MotorType.kBrushless);
         elevatorEncoder = elevatorMotor.getEncoder();
         elevatorController.setGoal(getHeight().in(Meters));
-        elevatorController.setTolerance(0.01);
+        elevatorController.setTolerance(0.001);
     }
 
     @Override

@@ -52,7 +52,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-  public final SwerveSubsystem swerveSubsystem;
+  public static SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
   private final PhotonCameraWrapper cam1, cam2, cam3, cam4, cam5, cam6;
 
@@ -109,9 +109,9 @@ public class RobotContainer {
     cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(6.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, Math.PI/2))); // front left
     cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new Rotation3d(0,0, 0))); // front forwards
     cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(2.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, -Math.PI/2))); // front right
-    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(2.75), Inches.of(30)), new Rotation3d(Units.degreesToRadians(8.3),0, -Math.PI/2))); // rear right
-    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-12.625), Inches.of(4.75), Inches.of(30)), new Rotation3d(0,0, Math.PI))); // rear backwards
-    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(6.75), Inches.of(30)), new Rotation3d(Units.degreesToRadians(8.3),0, Math.PI/2))); // rear left
+    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(2.75), Inches.of(29)), new Rotation3d(Units.degreesToRadians(8.3),0, -Math.PI/2))); // rear right
+    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-12.625), Inches.of(4.75), Inches.of(29.75)), new Rotation3d(0,0, Math.PI))); // rear backwards
+    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(6.75), Inches.of(30.25)), new Rotation3d(Units.degreesToRadians(8.3),0, Math.PI/2))); // rear left
     swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam3, cam4, cam5, cam6);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -172,15 +172,17 @@ public class RobotContainer {
 
     driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftR.getPose())
     );
-
-    driverController.y().whileTrue(AutoCommandManager.pathfindCommand(ReefPoint.kFarLeftL.getPose())
-    );
   
     //TODO change to different keybind
     driverController.start().whileTrue(new ToTagCommand(swerveSubsystem, "limelight"));
     
     driverController.povUp().whileTrue(climber.runClimbCommand(() -> 0.8));
     driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.2));
+
+    manipulatorController.a().debounce(2).onTrue(new InstantCommand(() -> {
+      grabber.resetPivotAngle(new Rotation2d());
+      System.out.println("resetting pivot angle");
+    }).ignoringDisable(true));
 
     //X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[]{keypadHID.button(22), keypadHID.button(23)};
@@ -215,8 +217,8 @@ public class RobotContainer {
     manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()/8));
 
     //Pivot
-    manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT)); //TODO debug
-    manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.HI)); //TODO debug
+    // manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT)); //TODO debug
+    // manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.HI)); //TODO debug
 
     //Intake/Outtake
     manipulatorController.pov(0).whileTrue(grabber.intakeCommand());
@@ -237,9 +239,12 @@ public class RobotContainer {
   }
 
   private void poseButtons(Trigger[] triggers, String name) {
-    triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose()));
-    triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose()));
-    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose()));
+    // triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose()));
+    // triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose()));
+    // triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose()));
+    triggers[0].whileTrue(AutoCommandManager.pathfindToPathCommand(name + "L"));
+    triggers[1].whileTrue(AutoCommandManager.pathfindToPathCommand(name + "R"));
+    triggers[0].and(triggers[1]).whileTrue(AutoCommandManager.pathfindToPathCommand(name + "C"));
   }
 
   private void elevatorButtons(int buttonNum, String name) {
