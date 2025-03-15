@@ -7,101 +7,137 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 import java.lang.Thread;
 
-    public class AButtonPrintCommand extends Command{
+public class AButtonPrintCommand extends Command{
 
-        private final SwerveSubsystem swerveSubsystem;
+    private final SwerveSubsystem swerveSubsystem;
 
-        public AButtonPrintCommand(SwerveSubsystem swerveSubsystem) {
-            this.swerveSubsystem = swerveSubsystem; 
-            System.out.println("A Button Command Constructor");
-        }
+    public AButtonPrintCommand(SwerveSubsystem swerveSubsystem) {
+        this.swerveSubsystem = swerveSubsystem; 
+        System.out.println("A Button Command Constructor");
+    }
 
+    @Override
+    public void initialize(){
         
-        @Override
-        public void initialize(){
+        // int[] validAprilTags = {4};
+        // LimelightHelpers.SetFiducialIDFiltersOverride("limelight-three",validAprilTags);
+        double tx = LimelightHelpers.getTX("limelight-three");
+        System.out.println("Init TX = "  + (tx));
+        boolean tv = LimelightHelpers.getTV("limelight-three");
+        double xSpeed = (tx/75);
+        System.out.println(("xSpeed =") + (xSpeed));
+    
             
-            // int[] validAprilTags = {4};
-            // LimelightHelpers.SetFiducialIDFiltersOverride("limelight-three",validAprilTags);
-            double tx = LimelightHelpers.getTX("limelight-three");
-            boolean tv = LimelightHelpers.getTV("limelight-three");
-               
+        while (tv == true && Math.abs(tx) > 0.3) {
+            System.out.println("debug 0");
+            
+        
 
-            while (tv == true && tx > 0) {
-                
-
-                // try {
-                //    System.out.println("waiting for " + (100));
-                //     Thread.sleep(100);
-                // } catch (InterruptedException e) {
-                //     e.printStackTrace();
-                // }
-
-
-                        // start to drive
-                        this.swerveSubsystem.driveRobotOriented
-                        (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
-                            0.0,-0.5,0.0));
-                        try {
-                            // sleep to let it drive for a while
-                           long sleepTime = (long)(tx*tx/20);
-                           System.out.println("sleeping for " + (sleepTime));
-                            Thread.sleep(sleepTime);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                        this.swerveSubsystem.driveRobotOriented
-                        (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
-                            0.0,0.0,0.0));
-
-                    tx = LimelightHelpers.getTX("limelight-three");
-                    tv = LimelightHelpers.getTV("limelight-three");
-                    System.out.println("Loop TX = "  + (tx));
+            //If to the left of apriltag
+            if (tx > 0.3) {
+                System.out.println("debug l1");
+                // start to drive
+                this.swerveSubsystem.driveRobotOriented
+                (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
+                    0.0,-xSpeed,0.0));
+                System.out.println("debug l2");
+                try {
+                    // sleep to let it drive for a while
+                    long sleepTime = (long)(tx*tx/20);
+                    System.out.println("sleeping for " + (sleepTime));
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
-            
-                //if (loopbreak == true) {
-               System.out.println("TX value is negative! Loop TX = "  + (tx));
-                //}
+                this.swerveSubsystem.driveRobotOriented
+                (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
+                0.0,0.0,0.0));
+        
+        
+                tx = LimelightHelpers.getTX("limelight-three");
+                tv = LimelightHelpers.getTV("limelight-three");
+                xSpeed = (tx/75);
+                System.out.println("Loop TX = "  + (tx));
+            }
+
+            //if to the right of apriltag
+            if (tx < -0.3) {
+                System.out.println("debug r1");
 
 
-
-            
-                //else {
-                   // System.out.println("No valid apriltags");
-              //  }
-
-            // if  (tv == true) {
-                
-                //double aButtonGetTurnRate= this.swerveSubsystem.swerveDrive.getTurnRate();
-                //System.out.println(("RobotTurnRate = ") + (aButtonGetTurnRate));
-
-
-                // double aButtonRobotRelativeSpeeds = this.swerveSubsystem.getRobotRelativeSpeeds();
-                // System.out.println(("relativeSpeeds = ") + (aButtonRobotRelativeSpeeds));
-
-
-                // double tx = LimelightHelpers.getTX("limelight-three");
-                // double aButtonHeading = this.swerveSubsystem.getHeading();
-                // System.out.println(("TX Value =")+(tx));
-                // System.out.println(("Heading = ") + (aButtonHeading));
-                
-        //     }
-            
-        //     else {
-        //         System.out.println("No Valid AprilTags!");
-        //     }
-         }
-
-        @Override
-        public void execute() {
+                // start to drive
+                this.swerveSubsystem.driveRobotOriented
+                (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
+                    0.0,xSpeed,0.0));
+                System.out.println("debug r2");
+                try {
+                    // sleep to let it drive for a while
+                    long sleepTime = (long)(tx*tx/20);
+                    System.out.println("sleeping for " + (sleepTime));
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                this.swerveSubsystem.driveRobotOriented
+                (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
+                    0.0,0.0,0.0));
             
             
-        }
-
-        @Override
-        public boolean isFinished(){
-            return true;
+                tx = LimelightHelpers.getTX("limelight-three");
+                tv = LimelightHelpers.getTV("limelight-three");
+                 xSpeed = (tx/75);
+                System.out.println("Loop TX = "  + (tx));
+    
         }
     
+    
+    }
+            
+}
+        
+        
+
+    @Override
+    public void execute() {
+        
         
     }
 
+    @Override
+    public boolean isFinished(){
+        return true;
+    }
+
+    
+}
+            
+            //if (loopbreak == true) {
+            //}
+
+
+
+        
+            //else {
+                // System.out.println("No valid apriltags");
+            //  }
+
+        // if  (tv == true) {
+            
+            //double aButtonGetTurnRate= this.swerveSubsystem.swerveDrive.getTurnRate();
+            //System.out.println(("RobotTurnRate = ") + (aButtonGetTurnRate));
+
+
+            // double aButtonRobotRelativeSpeeds = this.swerveSubsystem.getRobotRelativeSpeeds();
+            // System.out.println(("relativeSpeeds = ") + (aButtonRobotRelativeSpeeds));
+
+
+            // double tx = LimelightHelpers.getTX("limelight-three");
+            // double aButtonHeading = this.swerveSubsystem.getHeading();
+            // System.out.println(("TX Value =")+(tx));
+            // System.out.println(("Heading = ") + (aButtonHeading));
+            
+    //     }
+        
+    //     else {
+    //         System.out.println("No Valid AprilTags!");
+    //     }
