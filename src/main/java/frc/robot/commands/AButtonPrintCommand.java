@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.*;
 import java.lang.Thread;
 
-//getRobotVelocity getYaw
     public class AButtonPrintCommand extends Command{
 
         private final SwerveSubsystem swerveSubsystem;
@@ -17,7 +16,6 @@ import java.lang.Thread;
             System.out.println("A Button Command Constructor");
         }
 
-    boolean loopbreak;
         
         @Override
         public void initialize(){
@@ -30,34 +28,43 @@ import java.lang.Thread;
 
             while (tv == true && tx > 0) {
                 
-                     tx = LimelightHelpers.getTX("limelight-three");
-                     tv = LimelightHelpers.getTV("limelight-three");
-                    // if (tx > 0) {
-                    //     loopbreak = false;
-                    //     break;
-                    // }
-                        this.swerveSubsystem.driveRobotOriented(this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
-                         0.0,-0.5,0.0));
+
+                // try {
+                //    System.out.println("waiting for " + (100));
+                //     Thread.sleep(100);
+                // } catch (InterruptedException e) {
+                //     e.printStackTrace();
+                // }
+
+
+                        // start to drive
+                        this.swerveSubsystem.driveRobotOriented
+                        (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
+                            0.0,-0.5,0.0));
                         try {
-                           long sleepTime = (long)(tx+1*10);
+                            // sleep to let it drive for a while
+                           long sleepTime = (long)(tx*tx/20);
                            System.out.println("sleeping for " + (sleepTime));
-                        Thread.sleep(sleepTime);
+                            Thread.sleep(sleepTime);
                         } catch (InterruptedException e) {
-                     e.printStackTrace();
-                    }
-                    // if (tx < 0) {
-                    //     loopbreak = true;
-                    //     break;
-                    // }
-               }
+                            e.printStackTrace();
+                        }
+                        this.swerveSubsystem.driveRobotOriented
+                        (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
+                            0.0,0.0,0.0));
+
+                    tx = LimelightHelpers.getTX("limelight-three");
+                    tv = LimelightHelpers.getTV("limelight-three");
+                    System.out.println("Loop TX = "  + (tx));
+                }
             
                 //if (loopbreak == true) {
-                    System.out.println("TX value is negative! Loop TX = "  + (tx));
+               System.out.println("TX value is negative! Loop TX = "  + (tx));
                 //}
 
 
 
-            }
+            
                 //else {
                    // System.out.println("No valid apriltags");
               //  }

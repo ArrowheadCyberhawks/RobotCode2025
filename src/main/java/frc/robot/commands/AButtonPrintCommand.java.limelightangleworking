@@ -1,0 +1,47 @@
+package frc.robot.commands;
+
+import java.util.function.DoubleSupplier;
+import lib.frc706.cyberlib.subsystems.LimelightHelpers;
+import edu.wpi.first.wpilibj2.command.Command;
+//import frc.robot.subsystems.*;
+
+    public class AButtonPrintCommand extends Command{
+
+        public AButtonPrintCommand(){
+            System.out.println("A Button Command Constructor");
+        }
+        @Override
+        public void initialize(){
+
+
+            // int[] validAprilTags = {4};
+            // LimelightHelpers.SetFiducialIDFiltersOverride("limelight-three",validAprilTags);
+
+            boolean tv = LimelightHelpers.getTV("limelight-three");
+                System.out.println(tv);//Temporary line for testing tv.
+            
+            if  (tv == true) {
+                
+                double tx = LimelightHelpers.getTX("limelight-three");
+                System.out.println(("TX Value =")+(tx));
+            }
+            
+            else {
+                System.out.println("No Valid AprilTags!");
+            }
+        }
+
+        @Override
+        public void execute() {
+            
+            
+        }
+
+        @Override
+        public boolean isFinished(){
+            return true;
+        }
+    
+        
+    }
+
