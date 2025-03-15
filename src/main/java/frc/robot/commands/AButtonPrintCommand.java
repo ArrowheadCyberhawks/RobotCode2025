@@ -28,13 +28,13 @@ public class AButtonPrintCommand extends Command{
         System.out.println(("xSpeed =") + (xSpeed));
     
             
-        while (tv == true && Math.abs(tx) > 0.3) {
+        while (tv == true && Math.abs(tx) > 0.1) {
             System.out.println("debug 0");
             
         
 
             //If to the left of apriltag
-            if (tx > 0.3) {
+            if (tx > 0.1) {
                 System.out.println("debug l1");
                 // start to drive
                 this.swerveSubsystem.driveRobotOriented
@@ -61,14 +61,14 @@ public class AButtonPrintCommand extends Command{
             }
 
             //if to the right of apriltag
-            if (tx < -0.3) {
+            if (tx < -0.1) {
                 System.out.println("debug r1");
 
 
                 // start to drive
                 this.swerveSubsystem.driveRobotOriented
                 (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
-                    0.0,xSpeed,0.0));
+                    0.0,-xSpeed,0.0));
                 System.out.println("debug r2");
                 try {
                     // sleep to let it drive for a while
