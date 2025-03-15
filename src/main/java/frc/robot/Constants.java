@@ -174,11 +174,11 @@ public final class Constants {
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 4.5; //4.5
+      public static final double kPTranslation = 6.5; //4.5
       public static final double kITranslation = 0;
       public static final double kDTranslation = 0;
 
-      public static final double kPTheta = 1.95;
+      public static final double kPTheta = 2.95;
       public static final double kITheta = 0.7;
       public static final double kDTheta = 0.0;
       
@@ -195,17 +195,19 @@ public final class Constants {
     }
 
     public static class ToPoint {
-      public static final LoggedNetworkNumber kPDrive = new LoggedNetworkNumber("ToPoint/kPDrive", 5);
-      public static final LoggedNetworkNumber kPTheta = new LoggedNetworkNumber("ToPoint/kPTheta", 5);
+      // public static final LoggedNetworkNumber kPDrive = new LoggedNetworkNumber("ToPoint/kPDrive", 5);
+      // public static final LoggedNetworkNumber kPTheta = new LoggedNetworkNumber("ToPoint/kPTheta", 5);
+    
+      // public static final LoggedNetworkNumber kIDrive = new LoggedNetworkNumber("ToPoint/kIDrive", 0.001);
 
-      public static final LoggedNetworkNumber kDriveMaxVel = new LoggedNetworkNumber("ToPoint/kDriveMaxVel", 1);
-      public static final LoggedNetworkNumber kDriveMaxAccel = new LoggedNetworkNumber("ToPoint/kDriveMaxAccel", 1);
+      // public static final LoggedNetworkNumber kDriveMaxVel = new LoggedNetworkNumber("ToPoint/kDriveMaxVel", 1);
+      // public static final LoggedNetworkNumber kDriveMaxAccel = new LoggedNetworkNumber("ToPoint/kDriveMaxAccel", 1);
 
-      public static final LoggedNetworkNumber kThetaMaxVel = new LoggedNetworkNumber("ToPoint/kThetaMaxVel", Math.PI);
-      public static final LoggedNetworkNumber kThetaMaxAccel = new LoggedNetworkNumber("ToPoint/kThetaMaxAccel", 2 * Math.PI);
+      // public static final LoggedNetworkNumber kThetaMaxVel = new LoggedNetworkNumber("ToPoint/kThetaMaxVel", Math.PI);
+      // public static final LoggedNetworkNumber kThetaMaxAccel = new LoggedNetworkNumber("ToPoint/kThetaMaxAccel", 2 * Math.PI);
 
-      public static final LoggedNetworkNumber kDriveTolerance = new LoggedNetworkNumber("ToPoint/kDriveTolerance", 0.005);
-      public static final LoggedNetworkNumber kThetaTolerance = new LoggedNetworkNumber("ToPoint/kThetaTolerance", 0.001);
+      // public static final LoggedNetworkNumber kDriveTolerance = new LoggedNetworkNumber("ToPoint/kDriveTolerance", 0.005);
+      // public static final LoggedNetworkNumber kThetaTolerance = new LoggedNetworkNumber("ToPoint/kThetaTolerance", 0.001);
     }
   }
 

@@ -128,6 +128,20 @@ public class AutoCommandManager {
             new ToPointCommand(RobotContainer.swerveSubsystem, ReefPoint.valueOf("k" + reefPointName)::getPose)
         );
     }
+
+    public static Command pathfindThenPIDCommand (Pose2d targetPose) {
+        PathConstraints constraints = new PathConstraints(
+            MetersPerSecond.of(maxVel.get()),
+            MetersPerSecondPerSecond.of(maxAccel.get()),
+            RadiansPerSecond.of(maxAngularVel.get()),
+            RadiansPerSecondPerSecond.of(maxAngularAccel.get())
+        );
+
+        return AutoBuilder.pathfindToPose(targetPose, constraints)
+            .until(() -> RobotContainer.swerveSubsystem.getPose().getTranslation().getDistance(targetPose.getTranslation()) < 1)
+            .andThen(new ToPointCommand(RobotContainer.swerveSubsystem, () -> targetPose)
+        );
+    }
     
     private void elevatorCommands(String name, Elevator elevator, Grabber grabber) {
      NamedCommands.registerCommand(name, elevator.setLevelCommand(ElevatorLevel.valueOf(name))

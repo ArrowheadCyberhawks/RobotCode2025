@@ -87,8 +87,8 @@ public class RobotContainer {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortBT, IOConstants.kDriverControllerDeadband, 0.15) {
         @Override
         public double interpolate(double value) {
-        return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
-    }
+          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+        }
       };
     } else {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortUSB, IOConstants.kDriverControllerDeadband, 0.15);
@@ -179,11 +179,6 @@ public class RobotContainer {
     driverController.povUp().whileTrue(climber.runClimbCommand(() -> 0.8));
     driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.2));
 
-    manipulatorController.a().debounce(2).onTrue(new InstantCommand(() -> {
-      grabber.resetPivotAngle(new Rotation2d());
-      System.out.println("resetting pivot angle");
-    }).ignoringDisable(true));
-
     //X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[]{keypadHID.button(22), keypadHID.button(23)};
     nearLeftTriggers = new Trigger[]{keypadHID.button(13), keypadHID.button(17)};
@@ -216,14 +211,17 @@ public class RobotContainer {
     manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator, () -> -manipulatorController.getLeftY()/50));
     manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()/8));
 
-    //Pivot
-    // manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT)); //TODO debug
-    // manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.HI)); //TODO debug
-
     //Intake/Outtake
     manipulatorController.pov(0).whileTrue(grabber.intakeCommand());
     manipulatorController.pov(180).whileTrue(grabber.outtakeCommand());
     manipulatorController.povRight().onTrue(new InstantCommand(() -> grabber.resetPivotTarget()).ignoringDisable(true));
+
+    manipulatorController.a().debounce(2).onTrue(new InstantCommand(() -> {
+      grabber.resetPivotAngle(new Rotation2d());
+      System.out.println("resetting pivot angle");
+    }).ignoringDisable(true));
+
+    manipulatorController.b().whileTrue(AutoCommandManager.pathfindThenPIDCommand(new Pose2d(12.07, 1.305, new Rotation2d())));
 
     //free button 1, 4, 6, 15
 
