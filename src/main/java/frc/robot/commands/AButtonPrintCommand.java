@@ -24,26 +24,22 @@ public class AButtonPrintCommand extends Command{
         double tx = LimelightHelpers.getTX("limelight-three");
         System.out.println("Init TX = "  + (tx));
         boolean tv = LimelightHelpers.getTV("limelight-three");
-        double xSpeed = (tx/75);
+        double xSpeed = (tx/50);
         System.out.println(("xSpeed =") + (xSpeed));
     
             
         while (tv == true && Math.abs(tx) > 0.1) {
             System.out.println("debug 0");
             
-        
-
-            //If to the left of apriltag
-            if (tx > 0.1) {
-                System.out.println("debug l1");
+                System.out.println("debug 1");
                 // start to drive
                 this.swerveSubsystem.driveRobotOriented
                 (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
                     0.0,-xSpeed,0.0));
-                System.out.println("debug l2");
+                System.out.println("debug 2");
                 try {
                     // sleep to let it drive for a while
-                    long sleepTime = (long)(tx*tx/20);
+                    long sleepTime = (long)(tx*tx/5);
                     System.out.println("sleeping for " + (sleepTime));
                     Thread.sleep(sleepTime);
                 } catch (InterruptedException e) {
@@ -56,44 +52,13 @@ public class AButtonPrintCommand extends Command{
         
                 tx = LimelightHelpers.getTX("limelight-three");
                 tv = LimelightHelpers.getTV("limelight-three");
-                xSpeed = (tx/75);
+                xSpeed = (tx/50);
                 System.out.println("Loop TX = "  + (tx));
             }
 
-            //if to the right of apriltag
-            if (tx < -0.1) {
-                System.out.println("debug r1");
-
-
-                // start to drive
-                this.swerveSubsystem.driveRobotOriented
-                (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
-                    0.0,-xSpeed,0.0));
-                System.out.println("debug r2");
-                try {
-                    // sleep to let it drive for a while
-                    long sleepTime = (long)(tx*tx/20);
-                    System.out.println("sleeping for " + (sleepTime));
-                    Thread.sleep(sleepTime);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                this.swerveSubsystem.driveRobotOriented
-                (this.swerveSubsystem.swerveDrive.swerveController.getRawTargetSpeeds(
-                    0.0,0.0,0.0));
-            
-            
-                tx = LimelightHelpers.getTX("limelight-three");
-                tv = LimelightHelpers.getTV("limelight-three");
-                 xSpeed = (tx/75);
-                System.out.println("Loop TX = "  + (tx));
-    
-        }
-    
-    
     }
             
-}
+
         
         
 
