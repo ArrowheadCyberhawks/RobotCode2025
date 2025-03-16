@@ -29,6 +29,8 @@ import frc.robot.Constants.SwerveConstants;
 
 import java.io.File;
 
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
@@ -60,7 +62,7 @@ public class RobotContainer {
   private final Elevator elevator;
   final Grabber grabber;
   private final Climber climber;
-  // private final Intake intake;
+  // private final eintake;
 
   
   private Command teleopCommand;
@@ -105,13 +107,16 @@ public class RobotContainer {
 
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(-1.75), Inches.of(-4.75), Inches.of(5)), new Rotation3d(0, Units.degreesToRadians(-20), 0))); // reef
+    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(-1.75), Inches.of(-3.1875), Inches.of(5)), new Rotation3d(0, Units.degreesToRadians(-20), 0))); // reef
     cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(6.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, Math.PI/2))); // front left
     cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new Rotation3d(0,0, 0))); // front forwards
     cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(2.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, -Math.PI/2))); // front right
     cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(2.75), Inches.of(29)), new Rotation3d(Units.degreesToRadians(8.3),0, -Math.PI/2))); // rear right
     cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-12.625), Inches.of(4.75), Inches.of(29.75)), new Rotation3d(0,0, Math.PI))); // rear backwards
     cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(6.75), Inches.of(30.25)), new Rotation3d(Units.degreesToRadians(8.3),0, Math.PI/2))); // rear left
+
+    cam0.photonPoseEstimator.setPrimaryStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
     swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam0, cam1, cam2, cam3, cam4, cam5, cam6);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
@@ -237,16 +242,18 @@ public class RobotContainer {
   }
 
   private void poseButtons(Trigger[] triggers, String name) {
-    // triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose()));
-    // triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose()));
-    // triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose()));
-    triggers[0].whileTrue(AutoCommandManager.pathfindToReefCommand(name + "L"));
-    triggers[1].whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.valueOf("k" + name + "R").getPose()));
-    triggers[0].and(triggers[1]).whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.valueOf("k" + name + "C").getPose()));
+    triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose()));
+    triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose()));
+    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose()));
+    // triggers[0].whileTrue(AutoCommandManager.pathfindToReefCommand(name + "L"));
+    // triggers[1].whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.valueOf("k" + name + "R").getPose()));
+    // triggers[0].and(triggers[1]).whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.valueOf("k" + name + "C").getPose()));
   }
 
   private void elevatorButtons(int buttonNum, String name) {
-    keypadHID.button(buttonNum).onTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.PLACE::getAngle, ElevatorLevel.valueOf(name)::getHeight));
+    keypadHID.button(buttonNum).onTrue(
+      new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.L4::getHeight).withTimeout(0.5)
+      .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.PLACE::getAngle, ElevatorLevel.valueOf(name)::getHeight)));
   }
   
 

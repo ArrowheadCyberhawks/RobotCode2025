@@ -9,6 +9,8 @@ import org.littletonrobotics.junction.Logger;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -69,7 +71,7 @@ public class Grabber extends SubsystemBase {
             hasLeftStartingPosition = true;
         }
 
-        setPivotMotor(pivotController.calculate(pivotEncoder.getPosition()));
+        setPivotMotor(MathUtil.clamp(pivotController.calculate(pivotEncoder.getPosition()), -kMaxPivotPower, kMaxPivotPower));
         setGrabberMotors(grabberState.getSpeed());
 
         // logging
@@ -92,7 +94,7 @@ public class Grabber extends SubsystemBase {
 
     /**
      * Sets the pivot angle of the grabber.
-     * @param angle The Rotation2d to set the pivot to. 0 is horizontal, positive is up.
+     * @param angle The Rotation2d to set the pivot to. 0 is up, positive is clockwise looking at the front of the r.
      */
     public void setPivotAngle(Rotation2d angle) {
         if (hasLeftStartingPosition && Math.abs(angle.getDegrees()) < kPivotLimit.getDegrees()) {

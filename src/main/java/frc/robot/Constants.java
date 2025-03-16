@@ -103,6 +103,8 @@ public final class Constants {
     public static final int kCoralSensorPort = 22;
     public static final int kAlgaeSensorPort = 13;
 
+    public static final double kMaxPivotPower = 0.5;
+
     public static final Rotation2d kPivotLimit = Rotation2d.fromDegrees(0);
 
     public static final Distance kArmLength = Inches.of(30); //real length is like 22 but this is accounting for the size of the grabber

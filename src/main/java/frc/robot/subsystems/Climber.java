@@ -25,7 +25,7 @@ public class Climber extends SubsystemBase {
     public Climber() {
         climberMotor = new SparkMax(kClimberMotorPort, MotorType.kBrushless);
         climberEncoder = climberMotor.getEncoder();
-        climbController.setGoal(getPosition());
+        // climbController.setGoal(getPosition());
     }
 
     private void updateConstants() {
@@ -43,7 +43,7 @@ public class Climber extends SubsystemBase {
     @Override
     public void periodic() {
         updateConstants();
-        climberMotor.set(climbController.calculate(climberEncoder.getPosition()));
+        // climberMotor.set(climbController.calculate(climberEncoder.getPosition()));
         Logger.recordOutput(getName() + "/Position", getPosition());
     }
 
