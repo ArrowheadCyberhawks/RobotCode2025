@@ -78,9 +78,9 @@ public final class Constants {
       L1(0.444),
       L2(0.269), 
       L3(0.67), 
-      L4(1.389),
+      L4(1.354), //1.389
       HI(1.69),
-      HUMAN(0.949),
+      HUMAN(0.972),
       CLEAR(0.8);
 
       private final double height;
@@ -121,8 +121,8 @@ public final class Constants {
       OUT(Rotation2d.fromDegrees(5.0)),
       PLACE(Rotation2d.fromDegrees(30.0)),
       L1(Rotation2d.fromRadians(4.346)),
-      L4(Rotation2d.fromRadians(0.677)),
-      HUMAN(Rotation2d.fromRadians(3.957)),
+      L4(Rotation2d.fromRadians(0.625)),
+      HUMAN(Rotation2d.fromRadians(4.075)),
       ZERO(Rotation2d.kZero),
       HI(new Rotation2d(-0.33));//70
       
