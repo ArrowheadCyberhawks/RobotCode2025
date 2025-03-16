@@ -52,7 +52,7 @@ public class Grabber extends SubsystemBase {
         pivotEncoder = pivotMotor.getEncoder();
 
         pivotController.setGoal(getPivotAngle().getRadians());
-        pivotController.setTolerance(Units.degreesToRadians(1));
+        pivotController.setTolerance(Units.degreesToRadians(3));
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
