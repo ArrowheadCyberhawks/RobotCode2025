@@ -265,7 +265,7 @@ public class Grabber extends SubsystemBase {
     }
 
     public Command outtakeCommand() {
-        return runEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP));
+        return runEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP)).onlyWhile(this::hasAlgae);
     }
 
     public Command stopIntakeCommand() {
