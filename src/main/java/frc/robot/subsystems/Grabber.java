@@ -64,7 +64,7 @@ public class Grabber extends SubsystemBase {
 
 
     public void periodic() {
-        updateConstants();
+        // updateConstants();
 
         // if the pivot has moved more than 30 degrees, we have left the starting position
         if(!hasLeftStartingPosition && Math.abs(pivotEncoder.getPosition()) > kPivotLimit.getRadians()) {
@@ -77,11 +77,9 @@ public class Grabber extends SubsystemBase {
         // logging
         Logger.recordOutput(getName() + "/Has Coral", hasCoral());
         Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
-        Logger.recordOutput(getName() + "/Coral Range", getCoralRange().in(Meters));
-        Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Meters));
         Logger.recordOutput(getName() + "/Pivot Angle", getPivotAngle().getRadians());
+        Logger.recordOutput(getName() + "/Pivot Angle Degrees", getPivotAngle().getDegrees());
         Logger.recordOutput(getName() + "/Pivot Target", pivotController.getGoal().position);
-        Logger.recordOutput(getName() + "/Grabber State", grabberState);
     }
 
     private void updateConstants() {

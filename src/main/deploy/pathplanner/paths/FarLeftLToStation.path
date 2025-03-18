@@ -16,12 +16,12 @@
     },
     {
       "anchor": {
-        "x": 1.70625,
-        "y": 7.34975
+        "x": 1.482,
+        "y": 7.42775
       },
       "prevControl": {
-        "x": 3.043278688524591,
-        "y": 6.866805327868853
+        "x": 2.819028688524591,
+        "y": 6.944805327868853
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 0.5,
+    "maxAcceleration": 1.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 570.0,
     "nominalVoltage": 12.0,
@@ -42,7 +42,7 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -55.0
+    "rotation": -52.90716270295848
   },
   "reversed": false,
   "folder": "BranchToStation",

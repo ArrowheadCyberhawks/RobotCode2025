@@ -42,7 +42,7 @@ public class Climber extends SubsystemBase {
     
     @Override
     public void periodic() {
-        updateConstants();
+        // updateConstants();
         // climberMotor.set(climbController.calculate(climberEncoder.getPosition()));
         Logger.recordOutput(getName() + "/Position", getPosition());
     }

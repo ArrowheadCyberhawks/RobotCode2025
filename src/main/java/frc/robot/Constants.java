@@ -81,7 +81,7 @@ public final class Constants {
       L4(1.354), //1.389
       HI(1.69),
       HUMAN(0.972),
-      CLEAR(0.8);
+      CLEAR(1.1);
 
       private final double height;
 
@@ -176,7 +176,7 @@ public final class Constants {
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 4.5; //6.5
+      public static final double kPTranslation = 2.7; //6.5
       public static final double kITranslation = 0;
       public static final double kDTranslation = 0;
 

@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.1975000000000002,
-        "y": 0.8152436490538904
+        "x": 1.1975000000000005,
+        "y": 0.8152436490538901
       },
       "isLocked": false,
       "linkedName": "RightStation"
     },
     {
       "anchor": {
-        "x": 3.9336182687237704,
-        "y": 5.163133364479327
+        "x": 3.7941698602904155,
+        "y": 5.101993078676594
       },
       "prevControl": {
-        "x": 3.8086182687237704,
-        "y": 5.379639715425437
+        "x": 3.6691698602904155,
+        "y": 5.318499429622705
       },
       "nextControl": null,
       "isLocked": false,
@@ -48,7 +48,7 @@
   "folder": "WaypointToBranch",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -36.027373385103566
+    "rotation": -36.02737338510357
   },
   "useDefaultConstraints": false
 }

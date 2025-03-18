@@ -33,7 +33,7 @@ public class Elevator extends SubsystemBase {
 
     @Override
     public void periodic() {
-        updateConstants();
+        // updateConstants();
         elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
         Logger.recordOutput(getName() + "/Height", getHeight().in(Meters));
     }
