@@ -13,6 +13,7 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
@@ -35,7 +36,8 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         // updateConstants();
         elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
-        Logger.recordOutput(getName() + "/Height", getHeight().in(Meters));
+        SmartDashboard.putNumber("Elevator Height", elevatorEncoder.getPosition());
+        // Logger.recordOutput(getName() + "/Height", getHeight().in(Meters));
     }
 
     private void updateConstants() {

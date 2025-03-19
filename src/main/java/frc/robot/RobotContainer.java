@@ -201,11 +201,21 @@ public class RobotContainer {
     poseButtons(farRightTriggers, "FarRight");
 
     //Elevator Presets
-    elevatorButtons(18, "LO");
+    // elevatorButtons(18, "LO");
     keypadHID.button(7).onTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.HI::getAngle, ElevatorLevel.HI::getHeight));
     keypadHID.button(6).onTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.L4::getAngle, ElevatorLevel.L4::getHeight));
+    
+    keypadHID.button(18).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+		.withTimeout(0.5)
+		.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ZERO::getAngle, ElevatorLevel.CLEAR::getHeight))
+    	.withTimeout(2)
+		.onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.LO.getHeight())
+    	.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight)));
+
     elevatorButtons(10, "L3");
     // elevatorButtons(14, "L2");
+
+    //L2
     keypadHID.button(14).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
 		.withTimeout(0.5)
 		.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.PLACE::getAngle, ElevatorLevel.CLEAR::getHeight))
@@ -219,6 +229,30 @@ public class RobotContainer {
     	.withTimeout(2)
 		.onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
     	.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight)));
+
+    keypadHID.button(19).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+		.withTimeout(0.5)
+		.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGPICK::getAngle, ElevatorLevel.CLEAR::getHeight))
+    	.withTimeout(2)
+		.onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
+    	.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGPICK::getAngle, ElevatorLevel.LO::getHeight)));
+
+    keypadHID.button(15).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+     .withTimeout(0.5)
+     .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGREEF::getAngle, ElevatorLevel.ALG2::getHeight))
+       .withTimeout(2)
+     .onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
+       .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGREEF::getAngle, ElevatorLevel.ALG2::getHeight)));
+
+    keypadHID.button(11).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+      .withTimeout(0.5)
+      .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGREEF::getAngle, ElevatorLevel.ALG3::getHeight))
+        .withTimeout(2)
+      .onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
+        .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGREEF::getAngle, ElevatorLevel.ALG3::getHeight)));
+
+
+  
 
 
     //MANIPULATOR CONTROLLER

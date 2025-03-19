@@ -76,12 +76,14 @@ public final class Constants {
     public static enum ElevatorLevel {
       LO(0.0),
       L1(0.444),
-      L2(0.269), 
-      L3(0.67), 
-      L4(1.354), //1.389
-      HI(1.69),
-      HUMAN(0.972),
-      CLEAR(1.1);
+      L2(0.237), //0.269 
+      L3(0.68), 
+      L4(1.29), //1.354
+      HI(1.65),
+      HUMAN(0.96),
+      CLEAR(1.1),
+      ALG3(0.71),
+      ALG2(0.38);
 
       private final double height;
 
@@ -122,9 +124,12 @@ public final class Constants {
       PLACE(Rotation2d.fromDegrees(30.0)),
       L1(Rotation2d.fromRadians(4.346)),
       L4(Rotation2d.fromRadians(0.625)),
-      HUMAN(Rotation2d.fromRadians(4.075)),
+      HUMAN(Rotation2d.fromRadians(4.28)),
       ZERO(Rotation2d.kZero),
-      HI(new Rotation2d(-0.33));//70
+      ALGPICK(Rotation2d.fromRadians(1.01)),
+      ALGREEF(Rotation2d.fromRadians(0.48)),
+      PROC(Rotation2d.fromRadians(0.75)),
+      HI(new Rotation2d(0));//70
       
       private final Rotation2d angle;
 
@@ -176,7 +181,7 @@ public final class Constants {
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 2.7; //6.5
+      public static final double kPTranslation = 2.8; //6.5
       public static final double kITranslation = 0;
       public static final double kDTranslation = 0;
 

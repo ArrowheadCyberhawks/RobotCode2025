@@ -58,8 +58,8 @@ public class AutoCommandManager {
     }
 
     public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) { //add more when more subsystems are made
-        NamedCommands.registerCommand("INTAKE", grabberSubsystem.intakeCommand().withTimeout(2));
-        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand());
+        NamedCommands.registerCommand("INTAKE", grabberSubsystem.runGrabberCommand(0.75).until(grabberSubsystem::hasCoral).withTimeout(2));
+        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(2));
 
         NamedCommands.registerCommand("HUMAN", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight));
         NamedCommands.registerCommand("DEF", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight));

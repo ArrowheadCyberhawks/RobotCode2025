@@ -33,15 +33,15 @@ public class Robot extends LoggedRobot {
    */
   @Override
   public void robotInit() {
-    Logger.recordMetadata("ProjectName", "RobotCode2025");
-    if (isReal()) {
-      Logger.addDataReceiver(new NT4Publisher());
-      Logger.addDataReceiver(new WPILOGWriter());
-      LoggedPowerDistribution.getInstance(32, ModuleType.kRev);
-      // DataLogManager.logNetworkTables(false);
-    }
-    AutoLogOutputManager.addPackage("lib.frc706");
-    Logger.start();
+    // Logger.recordMetadata("ProjectName", "RobotCode2025");
+    // if (isReal()) {
+    //   Logger.addDataReceiver(new NT4Publisher());
+    //   Logger.addDataReceiver(new WPILOGWriter());
+    //   LoggedPowerDistribution.getInstance(32, ModuleType.kRev);
+    //   // DataLogManager.logNetworkTables(false);
+    // }
+    // AutoLogOutputManager.addPackage("lib.frc706");
+    // Logger.start();
     // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
     // autonomous chooser on the dashboard.
     m_robotContainer = new RobotContainer();

@@ -16,6 +16,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -74,12 +75,15 @@ public class Grabber extends SubsystemBase {
         setPivotMotor(MathUtil.clamp(pivotController.calculate(pivotEncoder.getPosition()), -kMaxPivotPower, kMaxPivotPower));
         setGrabberMotors(grabberState.getSpeed());
 
+
+        SmartDashboard.putNumber("Pivot Angle", getPivotAngle().getRadians());
+        SmartDashboard.putNumber("Pivot Target", pivotController.getGoal().position);
         // logging
-        Logger.recordOutput(getName() + "/Has Coral", hasCoral());
-        Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
-        Logger.recordOutput(getName() + "/Pivot Angle", getPivotAngle().getRadians());
-        Logger.recordOutput(getName() + "/Pivot Angle Degrees", getPivotAngle().getDegrees());
-        Logger.recordOutput(getName() + "/Pivot Target", pivotController.getGoal().position);
+        // Logger.recordOutput(getName() + "/Has Coral", hasCoral());
+        // Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
+        // Logger.recordOutput(getName() + "/Pivot Angle", getPivotAngle().getRadians());
+        // Logger.recordOutput(getName() + "/Pivot Angle Degrees", getPivotAngle().getDegrees());
+        // Logger.recordOutput(getName() + "/Pivot Target", pivotController.getGoal().position);
     }
 
     private void updateConstants() {
