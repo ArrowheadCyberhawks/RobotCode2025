@@ -60,6 +60,9 @@ public final class Constants {
 
     public static final LoggedNetworkNumber kClimbP = new LoggedNetworkNumber("Climb/kPivotP", 0.1); //change later 
     public static final LoggedNetworkNumber kClimbI = new LoggedNetworkNumber("Climb/kPivotI", 0);
+
+    public static final LoggedNetworkNumber kClimbOutAngle = new LoggedNetworkNumber("Climb/kClimbOutAngle", -30);
+    public static final LoggedNetworkNumber kClimbInAngle = new LoggedNetworkNumber("Climb/kClimbInAngle", 330);
     
     public static final LoggedNetworkNumber kClimbMaxVel = new LoggedNetworkNumber("Climb/kElevatorMaxVel", 100);
     public static final LoggedNetworkNumber kClimbMaxAccel = new LoggedNetworkNumber("Climb/kElevatorMaxAccel", 100);
@@ -76,14 +79,14 @@ public final class Constants {
     public static enum ElevatorLevel {
       LO(0.0),
       L1(0.444),
-      L2(0.237), //0.269 
-      L3(0.68), 
-      L4(1.29), //1.354
+      L2(0.285), //0.269 
+      L3(0.642), 
+      L4(1.37), //1.354
       HI(1.65),
-      HUMAN(0.96),
+      HUMAN(0.85),
       CLEAR(1.1),
-      ALG3(0.71),
-      ALG2(0.38);
+      ALG3(0.77),
+      ALG2(0.39);
 
       private final double height;
 
@@ -121,13 +124,14 @@ public final class Constants {
     public static enum GrabberPosition { //TODO update positions
       DOWN(Rotation2d.kPi),//-65  was at - 40 
       OUT(Rotation2d.fromDegrees(5.0)),
-      PLACE(Rotation2d.fromDegrees(30.0)),
+      PLACE(Rotation2d.fromRadians(0.56)),
       L1(Rotation2d.fromRadians(4.346)),
-      L4(Rotation2d.fromRadians(0.625)),
-      HUMAN(Rotation2d.fromRadians(4.28)),
+      L4(Rotation2d.fromRadians(0.76)),
+      HUMAN(Rotation2d.fromRadians(4.08)),
       ZERO(Rotation2d.kZero),
+
       ALGPICK(Rotation2d.fromRadians(1.01)),
-      ALGREEF(Rotation2d.fromRadians(0.48)),
+      ALGREEF(Rotation2d.fromRadians(0.41)),
       PROC(Rotation2d.fromRadians(0.75)),
       HI(new Rotation2d(0));//70
       
@@ -145,7 +149,7 @@ public final class Constants {
     public static enum GrabberState {
       INTAKE(0.75),
       OUTTAKE(-0.75),
-      HOLD(0.05),
+      HOLD(0.07),
       STOP(0.0);
 
       private final double speed;

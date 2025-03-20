@@ -40,8 +40,8 @@ public class AutoCommandManager {
     private static final LoggedNetworkNumber maxAngularVel = new LoggedNetworkNumber("AutoCommandManager/maxAngularVel", 2*Math.PI);
     private static final LoggedNetworkNumber maxAngularAccel = new LoggedNetworkNumber("AutoCommandManager/maxAngularAccel", 4*Math.PI);
 
-    public AutoCommandManager(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) {
-        configureNamedCommands(swerveSubsystem, elevatorSubsystem, grabberSubsystem);
+    public AutoCommandManager(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem, Climber climberSubsystem) {
+        configureNamedCommands(swerveSubsystem, elevatorSubsystem, grabberSubsystem, climberSubsystem);
         Pathfinding.setPathfinder(new LocalADStarAK());
         //all pathplanner autos
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -57,7 +57,7 @@ public class AutoCommandManager {
         return autoChooser.getSelected();
     }
 
-    public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem) { //add more when more subsystems are made
+    public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem, Climber climberSubsystem) { //add more when more subsystems are made
         NamedCommands.registerCommand("INTAKE", grabberSubsystem.runGrabberCommand(0.75).until(grabberSubsystem::hasCoral).withTimeout(2));
         NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(2));
 
@@ -68,6 +68,8 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("L2", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L2::getHeight).withTimeout(2));
         NamedCommands.registerCommand("L3", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L3::getHeight).withTimeout(2));
         NamedCommands.registerCommand("L4", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.L4::getAngle, ElevatorLevel.L4::getHeight).withTimeout(2));
+
+        NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.climbOutCommand());
     }
 
     public static Command pathfindToPoseCommand(Pose2d targetPose) {

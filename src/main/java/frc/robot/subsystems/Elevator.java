@@ -37,7 +37,7 @@ public class Elevator extends SubsystemBase {
         // updateConstants();
         elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
         SmartDashboard.putNumber("Elevator Height", elevatorEncoder.getPosition());
-        // Logger.recordOutput(getName() + "/Height", getHeight().in(Meters));
+        Logger.recordOutput(getName() + "/Height", getHeight().in(Meters));
     }
 
     private void updateConstants() {

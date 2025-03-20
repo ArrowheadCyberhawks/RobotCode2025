@@ -127,7 +127,7 @@ public class RobotContainer {
     // intake = new Intake();
 
     // commands and stuff
-    autoManager = new AutoCommandManager(swerveSubsystem, elevator, grabber);
+    autoManager = new AutoCommandManager(swerveSubsystem, elevator, grabber, climber);
     
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,

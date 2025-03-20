@@ -71,4 +71,12 @@ public class Climber extends SubsystemBase {
     public Command runClimbCommand(Supplier<Double> power) {
         return runEnd(() -> setClimberMotor(power.get()), this::stop);
     }
+
+    public Command climbOutCommand() {
+        return runClimbCommand(() -> -0.2).withTimeout(4);
+    }
+
+    public Command climbInCommand() {
+        return runClimbCommand(() -> 0.8).withTimeout(4);
+    }
 }
