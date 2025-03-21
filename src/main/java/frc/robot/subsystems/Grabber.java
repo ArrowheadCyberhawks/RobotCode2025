@@ -146,7 +146,7 @@ public class Grabber extends SubsystemBase {
      */
     public boolean hasCoral() {
         double coralRange = getCoralRange().in(Meters);
-        return coralRange > 0 && coralRange < 0.1;
+        return coralRange > 0 && coralRange < 0.05;
         //return getCoralRange().compareTo(kCoralSensorThreshold) < 0;
     }
 
@@ -156,7 +156,7 @@ public class Grabber extends SubsystemBase {
      */
     public boolean hasAlgae() {
         double algaeRange = getAlgaeRange().in(Meters);
-        return algaeRange > 0 && algaeRange < 0.1;
+        return algaeRange > 0 && algaeRange < 0.05;
     }
     
     /**
@@ -261,13 +261,13 @@ public class Grabber extends SubsystemBase {
      * @return
      */
     public Command intakeCommand() {
-        return Commands.runEnd(() -> setGrabberState(GrabberState.INTAKE), () -> holdCommand().schedule()).until(this::hasAlgae);
+        return runEnd(() -> setGrabberState(GrabberState.INTAKE), stopIntakeCommand()::schedule).until(this::hasCoral);//.until(()->this.grabberMotor1.getEncoder().getVelocity() < 10);
         //make it so that run hold command after it finds algae
     }
 
-    public Command holdCommand() {
-        return Commands.runEnd(() -> setGrabberState(GrabberState.HOLD), () -> setGrabberState(GrabberState.STOP)).until(this::hasCoral);
-    }
+    // public Command holdCommand() {
+    //     return Commands.runEnd(() -> setGrabberState(GrabberState.HOLD), () -> setGrabberState(GrabberState.STOP)).until(this::hasCoral);
+    // }
 
     public Command outtakeCommand() {
         return Commands.runEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP)).onlyWhile(this::hasAlgae);

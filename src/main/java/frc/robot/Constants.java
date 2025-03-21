@@ -82,7 +82,7 @@ public final class Constants {
       L2(0.285), //0.269 
       L3(0.642), 
       L4(1.37), //1.354
-      HI(1.65),
+      HI(1.7),
       HUMAN(0.85),
       CLEAR(1.1),
       ALG3(0.77),

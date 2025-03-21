@@ -55,7 +55,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 public class RobotContainer {
 
   public static SwerveSubsystem swerveSubsystem;
-  private final LimelightSubsystem limelightSubsystem;
+  // private final LimelightSubsystem limelightSubsystem;
   private final PhotonCameraWrapper cam0, cam1, cam2, cam3, cam4, cam5, cam6;
 
 
@@ -122,7 +122,7 @@ public class RobotContainer {
 
     // set up limelight
     //limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false, "limelight","limelight-three");
-    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false);
+    // limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false);
     
     // intake = new Intake();
 
