@@ -23,7 +23,7 @@ public class ManualPivotCommand extends Command{
 
     public void execute() {
         //Moves up to certain heights and applies different power values based on the enum :)
-        grabberSubsystem.setPivotAngle(Rotation2d.fromRotations(grabberSubsystem.getPivotAngle() + m_power.getAsDouble()));
+        grabberSubsystem.setPivotAngle(Rotation2d.fromRadians(grabberSubsystem.getPivotAngle().getRadians() + m_power.getAsDouble()));
     }
 
     public boolean isFinished(){

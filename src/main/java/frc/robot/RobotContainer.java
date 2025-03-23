@@ -22,20 +22,25 @@ import frc.robot.Constants.PID;
 import frc.robot.Constants.PID.PointTrack;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
+import frc.robot.commands.SetSuperstructureCommand;
+// import frc.robot.subsystems.Intake;
 import frc.robot.Constants.ReefPoint;
 import frc.robot.Constants.SwerveConstants;
 
 import java.io.File;
 
+import org.photonvision.PhotonPoseEstimator.PoseStrategy;
+
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -49,14 +54,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  */
 public class RobotContainer {
 
-  public final SwerveSubsystem swerveSubsystem;
+  public static SwerveSubsystem swerveSubsystem;
   private final LimelightSubsystem limelightSubsystem;
   private final PhotonCameraWrapper cam0, cam1, cam2, cam3, cam4, cam5, cam6;
 
 
   private final Elevator elevator;
-  private final Grabber grabber;
-  private final Intake intake;
+  final Grabber grabber;
+  private final Climber climber;
+  // private final eintake;
 
   
   private Command teleopCommand;
@@ -72,12 +78,25 @@ public class RobotContainer {
   public RobotContainer() {
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
+    // set up subsystems
+    // these should be down below swervesubsystem but i need the elevator
+    elevator = new Elevator();
+    grabber = new Grabber();
+    climber = new Climber();
+
     // set up controllers
     if (DriverStation.isJoystickConnected(IOConstants.kDriverControllerPortBT)) {
-      driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortBT, IOConstants.kDriverControllerDeadband, 0.15);
+      driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortBT, IOConstants.kDriverControllerDeadband, 0.15) {
+        @Override
+        public double interpolate(double value) {
+          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+        }
+      };
     } else {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortUSB, IOConstants.kDriverControllerDeadband, 0.15);
     }
+
+    
     if (DriverStation.isJoystickConnected(IOConstants.kManipulatorControllerPortBT)) {
       manipulatorController = new CommandXboxController(IOConstants.kManipulatorControllerPortBT);
     } else {
@@ -88,38 +107,38 @@ public class RobotContainer {
 
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
-    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(-4.75), Inches.of(15.75), Inches.of(22.875)), new Rotation3d(0,0, Math.PI/2))); // left side 
-    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(-1), Inches.of(14.5), Inches.of(22.875)), new Rotation3d(0,0,0))); // left front
-    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(-8), Inches.of(14.5), Inches.of(22.875)), new Rotation3d(0,0,Math.PI))); // left back
-    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(9.25), Inches.of(14.5), Inches.of(27.5)), new Rotation3d(0,0,Math.PI)));
-    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-1), Inches.of(-15.5), Inches.of(27.125)), new Rotation3d(0,0,0))); //right front
-    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-4.75), Inches.of(-15.75), Inches.of(27.125)), new Rotation3d(0,0,-Math.PI/2))); //right side
-    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-8), Inches.of(-13.75), Inches.of(27.125)), new Rotation3d(0,0,-Math.PI))); // right back 
-    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele, PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam1, cam2, cam4, cam5);
+    cam0 = new PhotonCameraWrapper("cam0", new Transform3d(new Translation3d(Inches.of(-1.75), Inches.of(-3.1875), Inches.of(5)), new Rotation3d(0, Units.degreesToRadians(-20), 0))); // reef
+    cam1 = new PhotonCameraWrapper("cam1", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(6.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, Math.PI/2))); // front left
+    cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new Rotation3d(0,0, 0))); // front forwards
+    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(2.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, -Math.PI/2))); // front right
+    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(2.75), Inches.of(29)), new Rotation3d(Units.degreesToRadians(8.3),0, -Math.PI/2))); // rear right
+    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-12.625), Inches.of(4.75), Inches.of(29.75)), new Rotation3d(0,0, Math.PI))); // rear backwards
+    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(6.75), Inches.of(30.25)), new Rotation3d(Units.degreesToRadians(8.3),0, Math.PI/2))); // rear left
+
+    cam0.photonPoseEstimator.setPrimaryStrategy(PoseStrategy.LOWEST_AMBIGUITY);
+
+    swerveSubsystem = new SwerveSubsystem(swerveJsonDirectory, SwerveConstants.kMaxVelTele.in(MetersPerSecond), PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants, cam0, cam1, cam2, cam3, cam4, cam5, cam6);
     SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
     // set up limelight
     //limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false, "limelight","limelight-three");
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false);
     
-    // set up subsystems
-    elevator = new Elevator();
-    grabber = new Grabber();
-    intake = new Intake();
+    // intake = new Intake();
 
     // commands and stuff
-    autoManager = new AutoCommandManager(swerveSubsystem, intake, elevator, grabber);
+    autoManager = new AutoCommandManager(swerveSubsystem, elevator, grabber, climber);
     
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
         () -> true,
         IOConstants.kDriverControllerDeadband,
-        SwerveConstants.kMaxVelTele,
-        SwerveConstants.kMaxAccelTele,
-        SwerveConstants.kMaxAngularVelTele,
-        SwerveConstants.kMaxAngularAccelTele).withInterruptBehavior(InterruptionBehavior.kCancelSelf);
+        SwerveConstants.kMaxVelTele.in(MetersPerSecond),
+        SwerveConstants.kMaxAccelTele.in(MetersPerSecondPerSecond),
+        SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond),
+        SwerveConstants.kMaxAngularAccelTele.in(RadiansPerSecondPerSecond))
+        .withInterruptBehavior(InterruptionBehavior.kCancelSelf);
         swerveSubsystem.setDefaultCommand(getTeleopCommand());
-
     configureBindings();
   }   
 
@@ -146,30 +165,26 @@ public class RobotContainer {
           System.out.println("resetting robot pose");
         })); // zero heading and reset position to (0,0) if A is pressed for 2 seconds
     
+    
     driverController.x().whileTrue(new TrackPointCommand(swerveSubsystem,
         PointTrack.kThetaController,
         () -> ReefPoint.kCenter.getPose(),
         () -> driverController.getLeftX(),
         () -> driverController.getLeftY(),
         () -> driverController.getRightTriggerAxis(),
-        SwerveConstants.kMaxVelTele, SwerveConstants.kMaxAngularVelTele)
+        SwerveConstants.kMaxVelTele.in(MetersPerSecond), SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond))
     );
 
-    driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,
-      PointTrack.kXController, PointTrack.kYController, PointTrack.kThetaController,
-      () -> Utils.getClosestReefPoint(swerveSubsystem.getPose()).getPose(),
-      PointTrack.desiredDistance,
-      SwerveConstants.kMaxVelAuto,
-      SwerveConstants.kMaxAngularVelAuto)
+    driverController.b().whileTrue(new ToPointCommand(swerveSubsystem,() -> ReefPoint.kFarLeftR.getPose())
     );
-
-    driverController.y().whileTrue(new ToPointCommand(() -> ReefPoint.kFarLeftL.getPose(), PointTrack.desiredDistance));
   
     //TODO change to different keybind
     driverController.start().whileTrue(new ToTagCommand(swerveSubsystem, "limelight"));
     
+    driverController.povUp().whileTrue(climber.runClimbCommand(() -> 0.8));
+    driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.2));
 
-    //X-Keys Lightboard
+    //X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[]{keypadHID.button(22), keypadHID.button(23)};
     nearLeftTriggers = new Trigger[]{keypadHID.button(13), keypadHID.button(17)};
     nearRightTriggers = new Trigger[]{keypadHID.button(20), keypadHID.button(16)};
@@ -177,6 +192,7 @@ public class RobotContainer {
     farLeftTriggers = new Trigger[]{keypadHID.button(5), keypadHID.button(9)};
     farRightTriggers = new Trigger[]{keypadHID.button(12), keypadHID.button(8)};
 
+    //Move to Pose
     poseButtons(nearTriggers, "Near");
     poseButtons(nearLeftTriggers, "NearLeft");
     poseButtons(nearRightTriggers, "NearRight");
@@ -184,78 +200,105 @@ public class RobotContainer {
     poseButtons(farLeftTriggers, "FarLeft");
     poseButtons(farRightTriggers, "FarRight");
 
-    elevatorButtons(19, "LO");
-    elevatorButtons(7, "HI");
-    elevatorButtons(6, "L4");
+    //Elevator Presets
+    // elevatorButtons(18, "LO");
+    keypadHID.button(7).onTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.HI::getAngle, ElevatorLevel.HI::getHeight));
+    keypadHID.button(6).onTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.L4::getAngle, ElevatorLevel.L4::getHeight));
+    
+    keypadHID.button(18).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+		.withTimeout(0.5)
+		.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ZERO::getAngle, ElevatorLevel.CLEAR::getHeight))
+    	.withTimeout(2)
+		.onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.LO.getHeight())
+    	.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight)));
+
     elevatorButtons(10, "L3");
-    elevatorButtons(14, "L2");
-    elevatorButtons(18, "L1");
+    // elevatorButtons(14, "L2");
 
-    keypadHID.button(15).onTrue(new SequentialCommandGroup(
-      elevator.DEF(),
-      new WaitCommand(0.9),
-      grabber.setPivotPositionCommand(GrabberPosition.DOWN)
-    ));
+    //L2
+    keypadHID.button(14).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+		.withTimeout(0.5)
+		.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.PLACE::getAngle, ElevatorLevel.CLEAR::getHeight))
+    	.withTimeout(2)
+		.onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
+    	.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.PLACE::getAngle, ElevatorLevel.L2::getHeight)));
+    // keypadHID.button(18).whileTrue(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.L1::getAngle, ElevatorLevel.L1::getHeight));
+    keypadHID.button(21).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+		.withTimeout(0.5)
+		.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.PLACE::getAngle, ElevatorLevel.CLEAR::getHeight))
+    	.withTimeout(2)
+		.onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
+    	.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight)));
+
+    keypadHID.button(19).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+		.withTimeout(0.5)
+		.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGPICK::getAngle, ElevatorLevel.CLEAR::getHeight))
+    	.withTimeout(2)
+		.onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
+    	.andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGPICK::getAngle, ElevatorLevel.LO::getHeight)));
+
+    keypadHID.button(15).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+     .withTimeout(0.5)
+     .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGREEF::getAngle, ElevatorLevel.ALG2::getHeight))
+       .withTimeout(2)
+     .onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
+       .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGREEF::getAngle, ElevatorLevel.ALG2::getHeight)));
+
+    keypadHID.button(11).onTrue(new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
+      .withTimeout(0.5)
+      .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGREEF::getAngle, ElevatorLevel.ALG3::getHeight))
+        .withTimeout(2)
+      .onlyIf(() -> elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight())
+        .andThen(new SetSuperstructureCommand(grabber, elevator, GrabberPosition.ALGREEF::getAngle, ElevatorLevel.ALG3::getHeight)));
+
+
+  
+
+
+    //MANIPULATOR CONTROLLER
+
+    //Manual Elevator control
+    manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator, () -> -manipulatorController.getLeftY()/50));
+    manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()/8));
+
+    //Intake/Outtake
+    manipulatorController.pov(0).whileTrue(grabber.intakeCommand());
+    manipulatorController.pov(180).whileTrue(grabber.outtakeCommand());
+    manipulatorController.povRight().onTrue(new InstantCommand(() -> grabber.resetPivotTarget()).ignoringDisable(true));
+
+    manipulatorController.a().debounce(2).onTrue(new InstantCommand(() -> {
+      grabber.resetPivotAngle(new Rotation2d());
+      System.out.println("resetting pivot angle");
+    }).ignoringDisable(true));
+
+    // manipulatorController.b().whileTrue(AutoCommandManager.pathfindThenPIDCommand(new Pose2d(12.07, 1.305, new Rotation2d())));
+    manipulatorController.b().whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.kFarLeftL.getPose()));
+    //free button 1, 4, 6, 15
+
     
-    keypadHID.button(11).onTrue(new ParallelCommandGroup(
-      grabber.runGrabberCommand(-1).withTimeout(2),
-      elevator.PICK()
-    ));
-
-    //Manipulator Controller
-    manipulatorController.leftStick().whileTrue(new ManualElevatorCommand(elevator,
-      () -> -manipulatorController.getLeftY())
-    );
-
-    manipulatorController.rightStick().whileTrue(new ManualPivotCommand(grabber, () -> -manipulatorController.getRightY()));
-    manipulatorController.a().onTrue(grabber.setPivotPositionCommand(GrabberPosition.OUT)); //TODO debug
-    manipulatorController.y().onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP)); //TODO debug
-
-    /*keypadHID.button(19).onTrue(elevator.setLevelCommand(ElevatorLevel.LO).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(7).onTrue(elevator.setLevelCommand(ElevatorLevel.HI).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(6).onTrue(elevator.setLevelCommand(ElevatorLevel.L4).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(10).onTrue(elevator.setLevelCommand(ElevatorLevel.L3).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(14).onTrue(elevator.setLevelCommand(ElevatorLevel.L2).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP)));
-    keypadHID.button(18).onTrue(elevator.setLevelCommand(ElevatorLevel.L1).alongWith(grabber.setPivotPositionCommand(GrabberPosition.UP))); //12.75 inces 
-    */
-
+    // keypadHID.button(1).whileTrue(intake.runIntakeCommand(0.1));
+    // keypadHID.button(4).whileTrue(intake.runIntakeCommand(-0.1));
     
+    //IM FIRED
 
-    //turn on intake
-    //keypadHID.button(11).onTrue(intake.toggleIntakeCommand(true));
-
-
-    //temp, not as many things
-    manipulatorController.pov(0).whileTrue(grabber.runGrabberCommand(-0.25)); //was 0.25
-    manipulatorController.pov(180).whileTrue(grabber.runGrabberCommand(0.25));
-
-    //keypadHID.button(1).onTrue(grabber.setpiv));
-    //keypadHID.button(15).onTrue(grabber.setPivotPositionCommand(GrabberPosition.UP));
-    //keypadHID.button(1).onTrue(grabber.runPivotCommand(0.4));
-
-    //keypadHID.button(4).onTrue(grabber.setPivotAngleCommand(new Rotation2d(0)));
-   // manipulatorController.leftBumper().onTrue(intake.runIntakeCommand(1)); //retract // ignore brokeafied code 
-    //manipulatorController.rightBumper().onTrue(intake.runIntakeCommand(1)); //retract
-//MONKEY CODE 
-    keypadHID.button(11).whileTrue(intake.runIntakeCommand(1));
-
-   // keypadHID.button(4).onTrue(intake.runRetractCommand(1)); //maybe fix code   MAYBE TEST LATER 
-  //  keypadHID.button(15).onTrue(intake.runRetractCommand(-1));  MAYBE TEST LATER
-
+    // keypadHID.button(6).whileTrue(intake.runRetractCommand(0.1));
+    // keypadHID.button(15).whileTrue(intake.runExtendCommand(0.1));
+  
   }
 
   private void poseButtons(Trigger[] triggers, String name) {
-    triggers[0].whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "L").getPose(),  PointTrack.desiredDistance));
-    triggers[1].whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "R").getPose(),  PointTrack.desiredDistance));
-    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(() -> ReefPoint.valueOf("k" + name + "C").getPose(), PointTrack.desiredDistance));
+    triggers[0].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "L").getPose()));
+    triggers[1].whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "R").getPose()));
+    triggers[0].and(triggers[1]).whileTrue(new ToPointCommand(swerveSubsystem, () -> ReefPoint.valueOf("k" + name + "C").getPose()));
+    // triggers[0].whileTrue(AutoCommandManager.pathfindToReefCommand(name + "L"));
+    // triggers[1].whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.valueOf("k" + name + "R").getPose()));
+    // triggers[0].and(triggers[1]).whileTrue(AutoCommandManager.pathfindThenPIDCommand(ReefPoint.valueOf("k" + name + "C").getPose()));
   }
 
   private void elevatorButtons(int buttonNum, String name) {
     keypadHID.button(buttonNum).onTrue(
-      elevator.setLevelCommand(ElevatorLevel.valueOf(name))
-      .andThen(new WaitCommand(0.3))
-      .andThen(grabber.setPivotPositionCommand(GrabberPosition.UP))
-    );
+      // new SetSuperstructureCommand(grabber, elevator, grabber::getPivotAngle, ElevatorLevel.L4::getHeight).withTimeout(0.5)
+      (new SetSuperstructureCommand(grabber, elevator, GrabberPosition.PLACE::getAngle, ElevatorLevel.valueOf(name)::getHeight)));
   }
   
 

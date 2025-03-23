@@ -1,27 +1,35 @@
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+import static frc.robot.Constants.*;
+
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import edu.wpi.first.math.util.Units;
 import frc.robot.Constants.ReefPoint;
 
 public class Utils {
     private static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-    private static final Transform2d leftReefTransform = new Transform2d(Units.inchesToMeters(0), Units.inchesToMeters(-6.5), new Rotation2d(90)); //was 0 before robot change
-    private static final Transform2d rightReefTransform = new Transform2d(Units.inchesToMeters(0), Units.inchesToMeters(6.5), new Rotation2d(90));
+    private static final Transform2d leftReefTransform = new Transform2d(Inches.of(18), Inches.of(-13), new Rotation2d(Math.PI)); //-6.5
+    private static final Transform2d centerReefTransform = new Transform2d(Inches.of(18), Inches.of(-5), new Rotation2d(Math.PI));
+    private static final Transform2d rightReefTransform = new Transform2d(Inches.of(18), Inches.of(1.5), new Rotation2d(Math.PI));//6.5
     
 
     public static Pose2d getTagPose(int tagId) {
-        // field.setOrigin(OriginPosition.kBlueAllianceWallRightSide); this shouldn't be necessary
+        field.setOrigin(OriginPosition.kBlueAllianceWallRightSide); //this shouldn't be necessary
         return field.getTagPose(tagId).orElse(new Pose3d()).toPose2d();
     }
 
     public static Pose2d getOffsetRightAprilTag(int tagId) {
         return getTagPose(tagId).transformBy(rightReefTransform);
+    }
+
+    public static Pose2d getOffsetCenterAprilTag(int tagId) {
+        return getTagPose(tagId).transformBy(centerReefTransform);
     }
 
     public static Pose2d getOffsetLeftAprilTag(int tagId) {

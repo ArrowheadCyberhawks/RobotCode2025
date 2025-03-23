@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 2.0,
-        "y": 7.0
+        "x": 3.758637552220705,
+        "y": 5.639385818345576
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.0,
-        "y": 7.0
+        "x": 3.9088430643189196,
+        "y": 5.379222239814567
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NearLeftLWaypoint"
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 4.123665662822776,
+        "y": 5.295670266224477
       },
       "prevControl": {
-        "x": 3.0,
-        "y": 6.0
+        "x": 3.998665662822776,
+        "y": 5.512176617170586
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NearLeftL"
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
-    "maxAcceleration": 1.2,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -59.99999999999999
   },
   "reversed": false,
-  "folder": "NetToBranch",
+  "folder": "WaypointToBranch",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -59.99999999999999
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }

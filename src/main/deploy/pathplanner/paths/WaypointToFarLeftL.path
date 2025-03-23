@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.686595881246068,
+        "y": 5.323380099266033
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.5436619942193115,
+        "y": 5.075811344812381
+      },
+      "isLocked": false,
+      "linkedName": "FarLeftLWaypoint"
+    },
+    {
+      "anchor": {
+        "x": 5.476322694310502,
+        "y": 4.921161195152809
+      },
+      "prevControl": {
+        "x": 5.62764732960825,
+        "y": 5.183263151925339
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "FarLeftL"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.0,
+    "maxAcceleration": 1.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": -119.99999999999999
+  },
+  "reversed": false,
+  "folder": "WaypointToBranch",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -119.99999999999999
+  },
+  "useDefaultConstraints": false
+}

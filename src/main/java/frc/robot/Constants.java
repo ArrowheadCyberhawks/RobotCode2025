@@ -4,14 +4,20 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.*;
+
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+
 import com.pathplanner.lib.config.PIDConstants;
 
-import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Transform3d;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.AngularAcceleration;
+import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
@@ -23,6 +29,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
  * <p>It is advised to statically import this class (or one of its inner classes) wherever the
  * constants are needed, to reduce verbosity.
  */
+
+
+
 public final class Constants {
   public static class IOConstants {
     public static final int kDriverControllerPortUSB = 0;
@@ -36,29 +45,48 @@ public final class Constants {
     public static final double kDriverControllerDeadband = 0.07;
   }
 
-  public static class IntakeConstants {
-    public static final int kIntakeMotorPort = 13;
-    public static final int kExtendMotorPort = 12;
+  // public static class IntakeConstants {
+  //   public static final int kIntakeMotorPort = 13;
+  //   public static final int kExtendMotorPort = 14;
+
+  //   public static enum intakeState {
+  //       In(0.0),
+  //       Out(1.0);
+  //   }
+  // }
+
+  public static class ClimberConstants {
+    public static final int kClimberMotorPort = 14; // change later 
+
+    public static final LoggedNetworkNumber kClimbP = new LoggedNetworkNumber("Climb/kPivotP", 0.1); //change later 
+    public static final LoggedNetworkNumber kClimbI = new LoggedNetworkNumber("Climb/kPivotI", 0);
+
+    public static final LoggedNetworkNumber kClimbOutAngle = new LoggedNetworkNumber("Climb/kClimbOutAngle", -30);
+    public static final LoggedNetworkNumber kClimbInAngle = new LoggedNetworkNumber("Climb/kClimbInAngle", 330);
+    
+    public static final LoggedNetworkNumber kClimbMaxVel = new LoggedNetworkNumber("Climb/kElevatorMaxVel", 100);
+    public static final LoggedNetworkNumber kClimbMaxAccel = new LoggedNetworkNumber("Climb/kElevatorMaxAccel", 100);
+
   }
 
   public static class ElevatorConstants {
-    public static final double kElevatorP = 0.08;
-    public static final double kElevatorI = 0.0;
-    public static final double kElevatorD = 0.0;
-
-    public static final double kElevatorMaxVel = 2000;
-    public static final double kElevatorMaxAccel = 5000;
+    public static final LoggedNetworkNumber kElevatorP = new LoggedNetworkNumber("Elevator/kElevatorP", 3.5);
+    public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 5);
+    public static final LoggedNetworkNumber kElevatorMaxAccel = new LoggedNetworkNumber("Elevator/kElevatorMaxAccel", 10);
 
     public static final int elevatorMotorID = 9;
-    public static enum ElevatorLevel { //TODO update positions
-      LO(0.0),  //x is about 1.143 cm //0
-      L1(10.0), //40 // 22
-      L2(40.0), //60 //50 / 22 
-      L3(80.0), //80
-      L4(120.0), //100
-      HI(148.0),
-      DEF(60), // 155
-      PICK(40);
+
+    public static enum ElevatorLevel {
+      LO(0.0),
+      L1(0.444),
+      L2(0.285), //0.269 
+      L3(0.642), 
+      L4(1.37), //1.354
+      HI(1.65),
+      HUMAN(0.85),
+      CLEAR(1.1),
+      ALG3(0.77),
+      ALG2(0.39);
 
       private final double height;
 
@@ -73,16 +101,39 @@ public final class Constants {
   }
 
   public static class GrabberConstants {
-    public static final int kGrabberMotorPort = 10;
+    public static final int kGrabberMotor1Port = 10;
+    public static final int kGrabberMotor2Port = 12;
     public static final int kPivotMotorPort = 11;
 
-    public static final double kPivotMaxVel = 150;
-    public static final double kPivotMaxAccel = 120;
+    public static final int kCoralSensorPort = 22;
+    public static final int kAlgaeSensorPort = 13;
+
+    public static final double kMaxPivotPower = 0.5;
+
+    public static final Rotation2d kPivotLimit = Rotation2d.fromDegrees(0);
+
+    public static final Distance kArmLength = Inches.of(30); //real length is like 22 but this is accounting for the size of the grabber
+
+    public static final Distance kCoralSensorThreshold = Centimeters.of(10);
+    public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
+
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 3);
+    public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
+    public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
 
     public static enum GrabberPosition { //TODO update positions
-      DOWN(new Rotation2d(-40.0)),//-65  was at - 40 
-      OUT(new Rotation2d(5.0)),
-      UP(new Rotation2d(70.0));//70
+      DOWN(Rotation2d.kPi),//-65  was at - 40 
+      OUT(Rotation2d.fromDegrees(5.0)),
+      PLACE(Rotation2d.fromRadians(0.56)),
+      L1(Rotation2d.fromRadians(4.346)),
+      L4(Rotation2d.fromRadians(0.76)),
+      HUMAN(Rotation2d.fromRadians(4.08)),
+      ZERO(Rotation2d.kZero),
+
+      ALGPICK(Rotation2d.fromRadians(1.01)),
+      ALGREEF(Rotation2d.fromRadians(0.41)),
+      PROC(Rotation2d.fromRadians(0.75)),
+      HI(new Rotation2d(0));//70
       
       private final Rotation2d angle;
 
@@ -94,39 +145,51 @@ public final class Constants {
           return angle;
       }
     }
+
+    public static enum GrabberState {
+      INTAKE(0.75),
+      OUTTAKE(-0.75),
+      HOLD(0.07),
+      STOP(0.0);
+
+      private final double speed;
+
+      private GrabberState(double speed) {
+          this.speed = speed;
+      }
+
+      public double getSpeed() {
+          return speed;
+      }
+    }
   }
+
 
   public static class SwerveConstants {
-    public static final double wheelBase = Units.inchesToMeters(29);
-    public static final double driveBaseRadius = Math.sqrt(wheelBase * wheelBase * 2) / 2;
+    public static final Distance wheelBase = Inches.of(29);
+    public static final Distance driveBaseRadius = Meters.of(Math.sqrt(wheelBase.in(Meters) * wheelBase.in(Meters) * 2) / 2);
 
-    public static final double kMaxVelTele = Units.feetToMeters(19);
-    public static final double kMaxAccelTele = kMaxVelTele * 5; //idk what this should be
-    public static final double kMaxAngularVelTele = 2 * 2 * Math.PI; //idk 2 radians per second whatever
-    public static final double kMaxAngularAccelTele = kMaxAngularVelTele * 3;
+    public static final Distance robotLength = Meters.of(0.927);
+    public static final Distance robotWidth = Meters.of(0.927);
 
-    public static final double kMaxVelAuto = 1;
-    public static final double kMaxAccelAuto = SwerveConstants.kMaxAccelTele/10;
-    public static final double  kMaxAngularVelAuto = SwerveConstants.kMaxAngularVelTele/5;
-    public static final double kMaxAngularAccelAuto = SwerveConstants.kMaxAngularAccelTele/5;
+    public static final LinearVelocity kMaxVelTele = FeetPerSecond.of(19);
+    public static final LinearAcceleration kMaxAccelTele = kMaxVelTele.per(Second).times(5); //idk what this should be
+    public static final AngularVelocity kMaxAngularVelTele = RadiansPerSecond.of(2 * Math.PI); //idk 2 radians per second whatever
+    public static final AngularAcceleration kMaxAngularAccelTele = kMaxAngularVelTele.per(Second).times(5);
 
-    public static final Transform3d frontCamRobotToCam = new Transform3d(Units.inchesToMeters(15), Units.inchesToMeters(0), Units.inchesToMeters(6.5), new Rotation3d(Math.PI,Math.PI/6,0));
-    public static final Transform3d backCamRobotToCam = new Transform3d(Units.inchesToMeters(-10), Units.inchesToMeters(-1), Units.inchesToMeters(18), new Rotation3d(0, 0, Math.PI));
-   
-    public static final double maxTrackingAngularVel = 4;
-  }
-
-  public static class SensorConstants {
-    public static final int kTimeOfFlightPort = 12;
+    public static final LinearVelocity kMaxVelAuto = MetersPerSecond.of(1);
+    public static final LinearAcceleration kMaxAccelAuto = kMaxVelAuto.per(Second).times(5);
+    public static final AngularVelocity  kMaxAngularVelAuto = RadiansPerSecond.of(Math.PI);
+    public static final AngularAcceleration kMaxAngularAccelAuto = kMaxAngularVelAuto.per(Second).times(5);
   }
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 4.5; //4.5
+      public static final double kPTranslation = 2.8; //6.5
       public static final double kITranslation = 0;
       public static final double kDTranslation = 0;
 
-      public static final double kPTheta = 1.95;
+      public static final double kPTheta = 2.95;
       public static final double kITheta = 0.7;
       public static final double kDTheta = 0.0;
       
@@ -139,21 +202,23 @@ public final class Constants {
       public static final double kIAutoTurning = 0; 
       public static final double kDAutoTurning = 0;
 
-      // how fast the robot revolves around the tag when moving to a point
-      public static final double kPX = 2;//1.4
-      public static final double kIX = 0;
-      public static final double kDX = 0;
-
-      // how fast the robot moves towards the tag when moving to a point
-      public static final double kPY = 3;
-      public static final double kIY = 0;
-      public static final double kDY = 0;
-
-      public static final PIDController kXController = new PIDController(kPX, kIX, kDX);
-      public static final PIDController kYController = new PIDController(kPY, kIY, kDY);
       public static final PIDController kThetaController = new PIDController(kPAutoTurning, kIAutoTurning, kDAutoTurning);
+    }
 
-      public static final double desiredDistance = 0.4;
+    public static class ToPoint {
+      // public static final LoggedNetworkNumber kPDrive = new LoggedNetworkNumber("ToPoint/kPDrive", 5);
+      // public static final LoggedNetworkNumber kPTheta = new LoggedNetworkNumber("ToPoint/kPTheta", 5);
+    
+      // public static final LoggedNetworkNumber kIDrive = new LoggedNetworkNumber("ToPoint/kIDrive", 0.001);
+
+      // public static final LoggedNetworkNumber kDriveMaxVel = new LoggedNetworkNumber("ToPoint/kDriveMaxVel", 1);
+      // public static final LoggedNetworkNumber kDriveMaxAccel = new LoggedNetworkNumber("ToPoint/kDriveMaxAccel", 1);
+
+      // public static final LoggedNetworkNumber kThetaMaxVel = new LoggedNetworkNumber("ToPoint/kThetaMaxVel", Math.PI);
+      // public static final LoggedNetworkNumber kThetaMaxAccel = new LoggedNetworkNumber("ToPoint/kThetaMaxAccel", 2 * Math.PI);
+
+      // public static final LoggedNetworkNumber kDriveTolerance = new LoggedNetworkNumber("ToPoint/kDriveTolerance", 0.005);
+      // public static final LoggedNetworkNumber kThetaTolerance = new LoggedNetworkNumber("ToPoint/kThetaTolerance", 0.001);
     }
   }
 
@@ -179,28 +244,28 @@ public final class Constants {
       }
   }
 
-    /**
+  /**
    * Enum to represent branches of the reef.
    */
   public static enum ReefPoint {
       kCenter(new Pose2d(13, 4, new Rotation2d()), new Pose2d(4.5, 4, new Rotation2d())),
       kFarR(Utils.getOffsetRightAprilTag(10), Utils.getOffsetRightAprilTag(21)),
-      kFarC(Utils.getTagPose(10), Utils.getTagPose(21)),
+      kFarC(Utils.getOffsetCenterAprilTag(10), Utils.getOffsetCenterAprilTag(21)),
       kFarL(Utils.getOffsetLeftAprilTag(10), Utils.getOffsetLeftAprilTag(21)),
       kNearR(Utils.getOffsetRightAprilTag(7), Utils.getOffsetRightAprilTag(18)),
-      kNearC(Utils.getTagPose(7), Utils.getTagPose(18)),
+      kNearC(Utils.getOffsetCenterAprilTag(7), Utils.getOffsetCenterAprilTag(18)),
       kNearL(Utils.getOffsetLeftAprilTag(7), Utils.getOffsetLeftAprilTag(18)),
       kFarRightR(Utils.getOffsetRightAprilTag(9), Utils.getOffsetRightAprilTag(22)),
-      kFarRightC(Utils.getTagPose(9), Utils.getTagPose(22)),
+      kFarRightC(Utils.getOffsetCenterAprilTag(9), Utils.getOffsetCenterAprilTag(22)),
       kFarRightL(Utils.getOffsetLeftAprilTag(9), Utils.getOffsetLeftAprilTag(22)),
       kNearRightR(Utils.getOffsetRightAprilTag(8), Utils.getOffsetRightAprilTag(17)),
-      kNearRightC(Utils.getTagPose(8), Utils.getTagPose(17)),
+      kNearRightC(Utils.getOffsetCenterAprilTag(8), Utils.getOffsetCenterAprilTag(17)),
       kNearRightL(Utils.getOffsetLeftAprilTag(8), Utils.getOffsetLeftAprilTag(17)),
       kFarLeftR(Utils.getOffsetRightAprilTag(11), Utils.getOffsetRightAprilTag(20)),
-      kFarLeftC(Utils.getTagPose(11), Utils.getTagPose(20)),
+      kFarLeftC(Utils.getOffsetCenterAprilTag(11), Utils.getOffsetCenterAprilTag(20)),
       kFarLeftL(Utils.getOffsetLeftAprilTag(11), Utils.getOffsetLeftAprilTag(20)),
       kNearLeftR(Utils.getOffsetRightAprilTag(6), Utils.getOffsetRightAprilTag(19)),
-      kNearLeftC(Utils.getTagPose(6), Utils.getTagPose(19)),
+      kNearLeftC(Utils.getOffsetCenterAprilTag(6), Utils.getOffsetCenterAprilTag(19)),
       kNearLeftL(Utils.getOffsetLeftAprilTag(6), Utils.getOffsetLeftAprilTag(19));
 
       public final Pose2d redPose, bluePose;
@@ -211,7 +276,7 @@ public final class Constants {
       }
 
       public Pose2d getPose() {
-          return DriverStation.getAlliance().orElse(Alliance.Blue) == Alliance.Red ? redPose : bluePose;
+          return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red) ? redPose : bluePose;
       }
   }
 }
