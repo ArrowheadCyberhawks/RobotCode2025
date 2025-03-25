@@ -24,10 +24,10 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import lib.frc706.cyberlib.LocalADStarAK;
 import lib.frc706.cyberlib.commands.ToPointCommand;
 import lib.frc706.cyberlib.subsystems.*;
-import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
-import frc.robot.Constants.GrabberConstants.GrabberPosition;
-import frc.robot.Constants.ReefPoint;
 import frc.robot.commands.SetSuperstructureCommand;
+import frc.robot.constants.Constants.ReefPoint;
+import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
+import frc.robot.constants.Constants.GrabberConstants.GrabberPosition;
 import frc.robot.subsystems.*;
 
 
@@ -40,8 +40,8 @@ public class AutoCommandManager {
     private static final LoggedNetworkNumber maxAngularVel = new LoggedNetworkNumber("AutoCommandManager/maxAngularVel", 2*Math.PI);
     private static final LoggedNetworkNumber maxAngularAccel = new LoggedNetworkNumber("AutoCommandManager/maxAngularAccel", 4*Math.PI);
 
-    public AutoCommandManager(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem, Climber climberSubsystem) {
-        configureNamedCommands(swerveSubsystem, elevatorSubsystem, grabberSubsystem, climberSubsystem);
+    public AutoCommandManager(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Pivot pivotSubsystem, Grabber grabberSubsystem, Climber climberSubsystem) {
+        configureNamedCommands(swerveSubsystem, elevatorSubsystem, pivotSubsystem, grabberSubsystem, climberSubsystem);
         Pathfinding.setPathfinder(new LocalADStarAK());
         //all pathplanner autos
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -57,17 +57,17 @@ public class AutoCommandManager {
         return autoChooser.getSelected();
     }
 
-    public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Grabber grabberSubsystem, Climber climberSubsystem) { //add more when more subsystems are made
+    public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Elevator elevatorSubsystem, Pivot pivotSubsystem, Grabber grabberSubsystem, Climber climberSubsystem) { //add more when more subsystems are made
         NamedCommands.registerCommand("INTAKE", grabberSubsystem.runGrabberCommand(0.75).until(grabberSubsystem::hasCoral).withTimeout(2));
         NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(2));
 
-        NamedCommands.registerCommand("HUMAN", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight));
-        NamedCommands.registerCommand("DEF", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight));
+        NamedCommands.registerCommand("HUMAN", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight));
+        NamedCommands.registerCommand("DEF", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight));
 
-        NamedCommands.registerCommand("L1", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.L1::getAngle, ElevatorLevel.L1::getHeight).withTimeout(2));
-        NamedCommands.registerCommand("L2", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L2::getHeight).withTimeout(2));
-        NamedCommands.registerCommand("L3", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L3::getHeight).withTimeout(2));
-        NamedCommands.registerCommand("L4", new SetSuperstructureCommand(grabberSubsystem, elevatorSubsystem, GrabberPosition.L4::getAngle, ElevatorLevel.L4::getHeight).withTimeout(2));
+        NamedCommands.registerCommand("L1", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.L1::getAngle, ElevatorLevel.L1::getHeight).withTimeout(2));
+        NamedCommands.registerCommand("L2", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L2::getHeight).withTimeout(2));
+        NamedCommands.registerCommand("L3", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L3::getHeight).withTimeout(2));
+        NamedCommands.registerCommand("L4", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.L4::getAngle, ElevatorLevel.L4::getHeight).withTimeout(2));
 
         NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.climbOutCommand());
     }
@@ -140,10 +140,10 @@ public class AutoCommandManager {
         );
     }
     
-    private void elevatorCommands(String name, Elevator elevator, Grabber grabber) {
+    private void elevatorCommands(String name, Elevator elevator, Pivot pivot) {
      NamedCommands.registerCommand(name, elevator.setLevelCommand(ElevatorLevel.valueOf(name))
         .andThen(new WaitCommand(0.3))
-        .andThen(grabber.setPivotPositionCommand(GrabberPosition.HI))
+        .andThen(pivot.setPivotPositionCommand(GrabberPosition.HI))
      );
     }
 }

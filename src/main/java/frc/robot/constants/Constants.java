@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot;
+package frc.robot.constants;
 
 import static edu.wpi.first.units.Units.*;
 
@@ -13,6 +13,10 @@ import com.pathplanner.lib.config.PIDConstants;
 import edu.wpi.first.math.controller.*;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
+import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
@@ -20,6 +24,9 @@ import edu.wpi.first.units.measure.LinearAcceleration;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DriverStation.Alliance;
+import frc.robot.commons.TagUtils;
+
+
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide numerical or boolean
@@ -33,6 +40,9 @@ import edu.wpi.first.wpilibj.DriverStation.Alliance;
 
 
 public final class Constants {
+
+  public static final boolean tuningMode = false; //change this to tune
+
   public static class IOConstants {
     public static final int kDriverControllerPortUSB = 0;
     public static final int kManipulatorControllerPortUSB = 1;
@@ -43,6 +53,7 @@ public final class Constants {
 
     public static final double kManipulatorJoystickDeadband = 0.05;
     public static final double kDriverControllerDeadband = 0.07;
+
   }
 
   // public static class IntakeConstants {
@@ -197,6 +208,19 @@ public final class Constants {
       public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
     }
 
+    public static class Auto {
+      public static final double kPTranslation = 2.8; //6.5
+      public static final double kITranslation = 0;
+      public static final double kDTranslation = 0;
+
+      public static final double kPTheta = 2.95;
+      public static final double kITheta = 0.7;
+      public static final double kDTheta = 0.0;
+      
+      public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
+      public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
+    }
+
     public static class PointTrack {
       public static final double kPAutoTurning = 8;
       public static final double kIAutoTurning = 0; 
@@ -248,35 +272,69 @@ public final class Constants {
    * Enum to represent branches of the reef.
    */
   public static enum ReefPoint {
-      kCenter(new Pose2d(13, 4, new Rotation2d()), new Pose2d(4.5, 4, new Rotation2d())),
-      kFarR(Utils.getOffsetRightAprilTag(10), Utils.getOffsetRightAprilTag(21)),
-      kFarC(Utils.getOffsetCenterAprilTag(10), Utils.getOffsetCenterAprilTag(21)),
-      kFarL(Utils.getOffsetLeftAprilTag(10), Utils.getOffsetLeftAprilTag(21)),
-      kNearR(Utils.getOffsetRightAprilTag(7), Utils.getOffsetRightAprilTag(18)),
-      kNearC(Utils.getOffsetCenterAprilTag(7), Utils.getOffsetCenterAprilTag(18)),
-      kNearL(Utils.getOffsetLeftAprilTag(7), Utils.getOffsetLeftAprilTag(18)),
-      kFarRightR(Utils.getOffsetRightAprilTag(9), Utils.getOffsetRightAprilTag(22)),
-      kFarRightC(Utils.getOffsetCenterAprilTag(9), Utils.getOffsetCenterAprilTag(22)),
-      kFarRightL(Utils.getOffsetLeftAprilTag(9), Utils.getOffsetLeftAprilTag(22)),
-      kNearRightR(Utils.getOffsetRightAprilTag(8), Utils.getOffsetRightAprilTag(17)),
-      kNearRightC(Utils.getOffsetCenterAprilTag(8), Utils.getOffsetCenterAprilTag(17)),
-      kNearRightL(Utils.getOffsetLeftAprilTag(8), Utils.getOffsetLeftAprilTag(17)),
-      kFarLeftR(Utils.getOffsetRightAprilTag(11), Utils.getOffsetRightAprilTag(20)),
-      kFarLeftC(Utils.getOffsetCenterAprilTag(11), Utils.getOffsetCenterAprilTag(20)),
-      kFarLeftL(Utils.getOffsetLeftAprilTag(11), Utils.getOffsetLeftAprilTag(20)),
-      kNearLeftR(Utils.getOffsetRightAprilTag(6), Utils.getOffsetRightAprilTag(19)),
-      kNearLeftC(Utils.getOffsetCenterAprilTag(6), Utils.getOffsetCenterAprilTag(19)),
-      kNearLeftL(Utils.getOffsetLeftAprilTag(6), Utils.getOffsetLeftAprilTag(19));
+      kCenter(new Pose2d(13, 4, new Rotation2d()), new Pose2d(4.5, 4, new Rotation2d()), -1, -1),
+      kFarR(TagUtils.getOffsetRightAprilTag(10), TagUtils.getOffsetRightAprilTag(21), 10, 21),
+      kFarC(TagUtils.getOffsetCenterAprilTag(10), TagUtils.getOffsetCenterAprilTag(21), 10, 21),
+      kFarL(TagUtils.getOffsetLeftAprilTag(10), TagUtils.getOffsetLeftAprilTag(21), 10, 21),
+      kNearR(TagUtils.getOffsetRightAprilTag(7), TagUtils.getOffsetRightAprilTag(18), 7, 18),
+      kNearC(TagUtils.getOffsetCenterAprilTag(7), TagUtils.getOffsetCenterAprilTag(18), 7, 18),
+      kNearL(TagUtils.getOffsetLeftAprilTag(7), TagUtils.getOffsetLeftAprilTag(18), 7, 18),
+      kFarRightR(TagUtils.getOffsetRightAprilTag(9), TagUtils.getOffsetRightAprilTag(22), 9 ,22),
+      kFarRightC(TagUtils.getOffsetCenterAprilTag(9), TagUtils.getOffsetCenterAprilTag(22),9 ,22),
+      kFarRightL(TagUtils.getOffsetLeftAprilTag(9), TagUtils.getOffsetLeftAprilTag(22), 9 ,22),
+      kNearRightR(TagUtils.getOffsetRightAprilTag(8), TagUtils.getOffsetRightAprilTag(17), 8 ,17),
+      kNearRightC(TagUtils.getOffsetCenterAprilTag(8), TagUtils.getOffsetCenterAprilTag(17), 8 ,17),
+      kNearRightL(TagUtils.getOffsetLeftAprilTag(8), TagUtils.getOffsetLeftAprilTag(17), 8 ,17),
+      kFarLeftR(TagUtils.getOffsetRightAprilTag(11), TagUtils.getOffsetRightAprilTag(20), 11, 20),
+      kFarLeftC(TagUtils.getOffsetCenterAprilTag(11), TagUtils.getOffsetCenterAprilTag(20), 11, 20),
+      kFarLeftL(TagUtils.getOffsetLeftAprilTag(11), TagUtils.getOffsetLeftAprilTag(20), 11, 20),
+      kNearLeftR(TagUtils.getOffsetRightAprilTag(6), TagUtils.getOffsetRightAprilTag(19), 6, 19),
+      kNearLeftC(TagUtils.getOffsetCenterAprilTag(6), TagUtils.getOffsetCenterAprilTag(19), 6, 19),
+      kNearLeftL(TagUtils.getOffsetLeftAprilTag(6), TagUtils.getOffsetLeftAprilTag(19), 6, 19);
 
       public final Pose2d redPose, bluePose;
+      public final int redTag, blueTag;
 
-      private ReefPoint(Pose2d redPose, Pose2d bluePose) {
+      private ReefPoint(Pose2d redPose, Pose2d bluePose, int redTag, int blueTag) {
           this.redPose = redPose;
           this.bluePose = bluePose;
+          this.redTag = redTag;
+          this.blueTag = blueTag;
       }
 
       public Pose2d getPose() {
           return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red) ? redPose : bluePose;
       }
+
+      public int getTag() {
+        return DriverStation.getAlliance().orElse(Alliance.Blue).equals(Alliance.Red) ? redTag : blueTag;
+      }
   }
+
+  public static final class LEDConstants {
+    public static final int LED_PWM = 0; //port of LEDs on robot
+  }
+
+  public static class CameraConstants {
+    public static class cam0 {
+      public static final String name = "cam0";
+      public static final Translation3d translation = new Translation3d(Inches.of(-1.75), Inches.of(-3.1875), Inches.of(5));
+      public static final Rotation3d rotation = new Rotation3d(0, Units.degreesToRadians(-20), 0);
+      public static final Transform3d offset = new Transform3d(translation, rotation);
+    }
+    public static class cam1 {
+      public static final String name = "cam1";
+      public static final Translation3d translation = new Translation3d(Inches.of(13.625), Inches.of(6.75), Inches.of(30.5));
+      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(-8.3),0, Math.PI/2);
+      public static final Transform3d offset = new Transform3d(translation, rotation);
+    }
+
+    /*cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new Rotation3d(0,0, 0))); // front forwards
+    cam3 = new PhotonCameraWrapper("cam3", new Transform3d(new Translation3d(Inches.of(13.625), Inches.of(2.75), Inches.of(30.5)), new Rotation3d(Units.degreesToRadians(-8.3),0, -Math.PI/2))); // front right
+    cam4 = new PhotonCameraWrapper("cam4", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(2.75), Inches.of(29)), new Rotation3d(Units.degreesToRadians(8.3),0, -Math.PI/2))); // rear right
+    cam5 = new PhotonCameraWrapper("cam5", new Transform3d(new Translation3d(Inches.of(-12.625), Inches.of(4.75), Inches.of(29.75)), new Rotation3d(0,0, Math.PI))); // rear backwards
+    cam6 = new PhotonCameraWrapper("cam6", new Transform3d(new Translation3d(Inches.of(-13.625), Inches.of(6.75), Inches.of(30.25)), new Rotation3d(Units.degreesToRadians(8.3),0, Math.PI/2))); // rear left*/
+
+  }
+
 }

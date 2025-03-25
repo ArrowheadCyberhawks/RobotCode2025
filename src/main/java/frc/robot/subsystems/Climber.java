@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.ClimberConstants.*;
+import static frc.robot.constants.Constants.ClimberConstants.*;
 
 import java.util.function.Supplier;
 

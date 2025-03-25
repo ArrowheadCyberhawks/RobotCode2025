@@ -1,7 +1,7 @@
 package frc.robot.subsystems;
 
 import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.Constants.ElevatorConstants.*;
+import static frc.robot.constants.Constants.ElevatorConstants.*;
 
 import java.util.function.Supplier;
 
@@ -16,7 +16,7 @@ import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.ElevatorConstants.ElevatorLevel;
+import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 
 import org.littletonrobotics.junction.Logger;
 
@@ -36,6 +36,7 @@ public class Elevator extends SubsystemBase {
     public void periodic() {
         // updateConstants();
         elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
+        
         SmartDashboard.putNumber("Elevator Height", elevatorEncoder.getPosition());
         Logger.recordOutput(getName() + "/Height", getHeight().in(Meters));
     }
