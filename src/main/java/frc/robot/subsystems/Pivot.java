@@ -21,7 +21,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants.GrabberConstants.GrabberPosition;
+import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
+import frc.robot.constants.Constants.GrabberConstants.GrabberState;
+import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 
 /**
  * The Grabber subsystem covers the motors that manipulate the game piece
@@ -77,7 +79,7 @@ public class Pivot extends SubsystemBase {
         pivotController.setGoal(angle.getRadians());
     }
     
-    public void setPivotPosition(GrabberPosition position) {
+    public void setPivotPosition(PivotPosition position) {
         setPivotAngle(position.getAngle());
     }
 
@@ -126,7 +128,7 @@ public class Pivot extends SubsystemBase {
         return runOnce(() -> setPivotAngle(angle));
     }
 
-    public Command setPivotPositionCommand(GrabberPosition position) {
+    public Command setPivotPositionCommand(PivotPosition position) {
         return runOnce(() -> setPivotPosition(position));
     }
 

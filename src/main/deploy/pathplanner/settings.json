@@ -3,9 +3,11 @@
   "robotLength": 0.9525,
   "holonomicMode": true,
   "pathFolders": [
+    "BranchToAlgae",
     "BranchToStation",
     "Center",
     "Left",
+    "BranchToNet",
     "Right",
     "StationToBranch",
     "StationToNet",

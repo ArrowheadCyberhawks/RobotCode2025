@@ -26,7 +26,7 @@ public class DriveToPose extends Command {
 
   //init pid controllers
   //TODO Tune DriveToPose PID
-  private final ProfiledPIDController driveController =  new ProfiledPIDController(Constants.PID.Auto.kPTranslation, Constants.PID.Auto.kITranslation, Constants.PID.Auto.kDTranslation, new Constraints(3, 1));
+  private final ProfiledPIDController driveController =  new ProfiledPIDController(Constants.PID.Auto.kPTranslation, Constants.PID.Auto.kITranslation, Constants.PID.Auto.kDTranslation, new Constraints(2.5, 1.5));
   private final PIDController headingController = new PIDController(Constants.PID.Auto.kThetaPIDConstants.kP, Constants.PID.Auto.kThetaPIDConstants.kI, Constants.PID.Auto.kThetaPIDConstants.kD);
 
   private double driveErrorAbs;
@@ -68,7 +68,7 @@ public class DriveToPose extends Command {
         currentPose.getTranslation().getDistance(targetPose.get().getTranslation()),
         Math.min(
             0.0,
-            -new Translation2d(swerveSubsystem.getRobotRelativeSpeeds().vxMetersPerSecond,
+            new Translation2d(swerveSubsystem.getRobotRelativeSpeeds().vxMetersPerSecond,
                 swerveSubsystem.getRobotRelativeSpeeds().vyMetersPerSecond)
                 .rotateBy(
                     targetPose.get().getTranslation().

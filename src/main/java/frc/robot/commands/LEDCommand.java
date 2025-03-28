@@ -20,21 +20,12 @@ public class LEDCommand extends Command{
 
     public void execute(){
         setLEDMode(LEDState.OFF, LEDMode.OFF);
-        setLEDMode(LEDState.IN, LEDMode.IN);
-        setLEDMode(LEDState.OUT, LEDMode.OUT);
-
-        // if(LEDSubsystem.ledState == LEDState.OFF){
-        //     ledSubsystem.setLEDMode(LEDMode.OFF);
-        // }
-        // if(LEDSubsystem.ledState == LEDState.INTAKE){
-        //     ledSubsystem.setLEDMode(LEDMode.INTAKE);
-        // }
-        //  if(LEDSubsystem.ledState == LEDState.RING){
-        //     ledSubsystem.setLEDMode(LEDMode.RING);
-        // }
-        //  if(LEDSubsystem.ledState == LEDState.SHOOT){
-        //     ledSubsystem.setLEDMode(LEDMode.SHOOT);
-        // }
+        setLEDMode(LEDState.IN, LEDMode.VIOLET);
+        setLEDMode(LEDState.OUT, LEDMode.RED);
+        setLEDMode(LEDState.ALIGN, LEDMode.BLUE);
+        setLEDMode(LEDState.READY, LEDMode.GREEN);
+        setLEDMode(LEDState.ERROR, LEDMode.STROBERED);
+        setLEDMode(LEDState.DEF, LEDMode.PINK);
     }    
 
     public boolean isFinished(){
@@ -42,9 +33,15 @@ public class LEDCommand extends Command{
     }
 
     public void periodic() {
+        //might have to change to a different color idrk
         ledSubsystem.setLEDPWM(0.93);
     }
 
+    /**
+     * If the LEDs are set to a certain state, it will change the color to the corresponding color
+     * @param state The LED State of the robot
+     * @param mode The desired LED Mode/Color
+     */
     public void setLEDMode(LEDState state, LEDMode mode) {
         if(LEDSubsystem.ledState == state){
             ledSubsystem.setLEDMode(mode);

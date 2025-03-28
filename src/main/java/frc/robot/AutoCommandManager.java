@@ -27,7 +27,8 @@ import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.commands.SetSuperstructureCommand;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
-import frc.robot.constants.Constants.GrabberConstants.GrabberPosition;
+import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
+import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.subsystems.*;
 
 
@@ -61,13 +62,13 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("INTAKE", grabberSubsystem.runGrabberCommand(0.75).until(grabberSubsystem::hasCoral).withTimeout(2));
         NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(2));
 
-        NamedCommands.registerCommand("HUMAN", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight));
-        NamedCommands.registerCommand("DEF", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight));
+        NamedCommands.registerCommand("HUMAN", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, PivotPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight));
+        NamedCommands.registerCommand("DEF", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, PivotPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight));
 
-        NamedCommands.registerCommand("L1", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.L1::getAngle, ElevatorLevel.L1::getHeight).withTimeout(2));
-        NamedCommands.registerCommand("L2", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L2::getHeight).withTimeout(2));
-        NamedCommands.registerCommand("L3", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.PLACE::getAngle, ElevatorLevel.L3::getHeight).withTimeout(2));
-        NamedCommands.registerCommand("L4", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, GrabberPosition.L4::getAngle, ElevatorLevel.L4::getHeight).withTimeout(2));
+        NamedCommands.registerCommand("L1", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, PivotPosition.L1::getAngle, ElevatorLevel.L1::getHeight).withTimeout(2));
+        NamedCommands.registerCommand("L2", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, PivotPosition.PLACE::getAngle, ElevatorLevel.L2::getHeight).withTimeout(2));
+        NamedCommands.registerCommand("L3", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, PivotPosition.PLACE::getAngle, ElevatorLevel.L3::getHeight).withTimeout(2));
+        NamedCommands.registerCommand("L4", new SetSuperstructureCommand(pivotSubsystem, elevatorSubsystem, PivotPosition.L4::getAngle, ElevatorLevel.L4::getHeight).withTimeout(2));
 
         NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.climbOutCommand());
     }
@@ -143,7 +144,7 @@ public class AutoCommandManager {
     private void elevatorCommands(String name, Elevator elevator, Pivot pivot) {
      NamedCommands.registerCommand(name, elevator.setLevelCommand(ElevatorLevel.valueOf(name))
         .andThen(new WaitCommand(0.3))
-        .andThen(pivot.setPivotPositionCommand(GrabberPosition.HI))
+        .andThen(pivot.setPivotPositionCommand(PivotPosition.HI))
      );
     }
 }

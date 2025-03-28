@@ -132,7 +132,7 @@ public final class Constants {
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
     public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
 
-    public static enum GrabberPosition { //TODO update positions
+    public static enum PivotPosition { //TODO update positions
       DOWN(Rotation2d.kPi),//-65  was at - 40 
       OUT(Rotation2d.fromDegrees(5.0)),
       PLACE(Rotation2d.fromRadians(0.56)),
@@ -148,7 +148,7 @@ public final class Constants {
       
       private final Rotation2d angle;
 
-      private GrabberPosition(Rotation2d angle) {
+      private PivotPosition(Rotation2d angle) {
           this.angle = angle;
       }
 
@@ -183,6 +183,7 @@ public final class Constants {
     public static final Distance robotLength = Meters.of(0.927);
     public static final Distance robotWidth = Meters.of(0.927);
 
+    //TODO Tune to be slower
     public static final LinearVelocity kMaxVelTele = FeetPerSecond.of(19);
     public static final LinearAcceleration kMaxAccelTele = kMaxVelTele.per(Second).times(5); //idk what this should be
     public static final AngularVelocity kMaxAngularVelTele = RadiansPerSecond.of(2 * Math.PI); //idk 2 radians per second whatever
@@ -209,13 +210,13 @@ public final class Constants {
     }
 
     public static class Auto {
-      public static final double kPTranslation = 2.8; //6.5
-      public static final double kITranslation = 0;
-      public static final double kDTranslation = 0;
+      public static final double kPTranslation = 7; //6.5
+      public static final double kITranslation = 0.5;
+      public static final double kDTranslation = 0.1;
 
-      public static final double kPTheta = 2.95;
-      public static final double kITheta = 0.7;
-      public static final double kDTheta = 0.0;
+      public static final double kPTheta = 10;
+      public static final double kITheta = 0.2;
+      public static final double kDTheta = 0.01;
       
       public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
       public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
@@ -272,7 +273,7 @@ public final class Constants {
    * Enum to represent branches of the reef.
    */
   public static enum ReefPoint {
-      kCenter(new Pose2d(13, 4, new Rotation2d()), new Pose2d(4.5, 4, new Rotation2d()), -1, -1),
+    //TODO Change all "get offset" to use FieldConstants instead of parsing the json data
       kFarR(TagUtils.getOffsetRightAprilTag(10), TagUtils.getOffsetRightAprilTag(21), 10, 21),
       kFarC(TagUtils.getOffsetCenterAprilTag(10), TagUtils.getOffsetCenterAprilTag(21), 10, 21),
       kFarL(TagUtils.getOffsetLeftAprilTag(10), TagUtils.getOffsetLeftAprilTag(21), 10, 21),
@@ -290,7 +291,8 @@ public final class Constants {
       kFarLeftL(TagUtils.getOffsetLeftAprilTag(11), TagUtils.getOffsetLeftAprilTag(20), 11, 20),
       kNearLeftR(TagUtils.getOffsetRightAprilTag(6), TagUtils.getOffsetRightAprilTag(19), 6, 19),
       kNearLeftC(TagUtils.getOffsetCenterAprilTag(6), TagUtils.getOffsetCenterAprilTag(19), 6, 19),
-      kNearLeftL(TagUtils.getOffsetLeftAprilTag(6), TagUtils.getOffsetLeftAprilTag(19), 6, 19);
+      kNearLeftL(TagUtils.getOffsetLeftAprilTag(6), TagUtils.getOffsetLeftAprilTag(19), 6, 19),
+      kCenter(new Pose2d(13, 4, new Rotation2d()), new Pose2d(4.5, 4, new Rotation2d()), -1, -1);
 
       public final Pose2d redPose, bluePose;
       public final int redTag, blueTag;
@@ -324,8 +326,8 @@ public final class Constants {
     }
     public static class cam1 {
       public static final String name = "cam1";
-      public static final Translation3d translation = new Translation3d(Inches.of(13.625), Inches.of(6.75), Inches.of(30.5));
-      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(-8.3),0, Math.PI/2);
+      public static final Translation3d translation = new Translation3d(Inches.of(-1.00), Inches.of(-10.50), Inches.of(9));
+      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(0),0, Units.degreesToRadians(-4));
       public static final Transform3d offset = new Transform3d(translation, rotation);
     }
 

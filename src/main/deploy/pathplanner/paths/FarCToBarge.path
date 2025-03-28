@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.380387963590047,
-        "y": 7.415500518043575
+        "x": 5.759772921047099,
+        "y": 4.0
       },
       "prevControl": null,
       "nextControl": {
-        "x": 3.7023354113656968,
-        "y": 7.117235744317583
+        "x": 6.735197368421052,
+        "y": 4.198190789473684
       },
       "isLocked": false,
-      "linkedName": "LeftStation"
+      "linkedName": "FarC"
     },
     {
       "anchor": {
-        "x": 7.649259868421052,
-        "y": 6.2476151315789465
+        "x": 7.581907894736841,
+        "y": 5.025657894736842
       },
       "prevControl": {
-        "x": 6.208498422562829,
-        "y": 6.441962130843342
+        "x": 6.850657894736842,
+        "y": 4.496463815789474
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "CenterNet"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 17.35402463626135
   },
   "reversed": false,
-  "folder": "StationToNet",
+  "folder": "BranchToNet",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -53.074775138026936
+    "rotation": 180.0
   },
   "useDefaultConstraints": true
 }

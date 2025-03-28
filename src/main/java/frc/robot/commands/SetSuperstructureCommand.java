@@ -1,17 +1,9 @@
 package frc.robot.commands;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.Meters;
-import static frc.robot.constants.Constants.GrabberConstants.*;
-
 import java.util.function.Supplier;
 
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.*;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
-
 import frc.robot.subsystems.Elevator;
 import frc.robot.subsystems.Pivot;
 
@@ -32,13 +24,14 @@ public class SetSuperstructureCommand extends Command {
 
 	@Override
 	public void initialize() {
+		
 	}
 
 	@Override
 	public void execute() {
-		Rotation2d currentAngle = pivot.getPivotAngle();
+		//Rotation2d currentAngle = pivot.getPivotAngle();
 		Rotation2d desiredAngle = angleSupplier.get();
-		double currentHeight = elevator.getHeight().in(Meters);
+		//double currentHeight = elevator.getHeight().in(Meters);
 		double desiredHeight = heightSupplier.get();
 				
 		elevator.setHeight(desiredHeight);

@@ -41,14 +41,14 @@ public class Elevator extends SubsystemBase {
         Logger.recordOutput(getName() + "/Height", getHeight().in(Meters));
     }
 
-    private void updateConstants() {
-        if (kElevatorP.get() != elevatorController.getP()
-            || kElevatorMaxVel.get() != elevatorController.getConstraints().maxVelocity
-            || kElevatorMaxAccel.get() != elevatorController.getConstraints().maxAcceleration) {
-            elevatorController.setP(kElevatorP.get());
-            elevatorController.setConstraints(new Constraints(kElevatorMaxVel.get(), kElevatorMaxAccel.get()));
-        }
-    }
+    // private void updateConstants() {
+    //     if (kElevatorP.get() != elevatorController.getP()
+    //         || kElevatorMaxVel.get() != elevatorController.getConstraints().maxVelocity
+    //         || kElevatorMaxAccel.get() != elevatorController.getConstraints().maxAcceleration) {
+    //         elevatorController.setP(kElevatorP.get());
+    //         elevatorController.setConstraints(new Constraints(kElevatorMaxVel.get(), kElevatorMaxAccel.get()));
+    //     }
+    // }
 
     public Distance getHeight() {
         return Meters.of(elevatorEncoder.getPosition());
