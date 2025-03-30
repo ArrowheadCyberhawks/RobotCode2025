@@ -198,8 +198,7 @@ public class AlignToReef {
     public Command getSuperStructure(Pose2d waypoint) {
         final double distance;
         if (Superstructure.nextSuperStructureState.equals(SuperStructureState.L4)) {
-            distance = .5;
-            System.out.println("3!!");
+            distance = 2.5;
         } else { //add more later
             distance = 1.5;
         }

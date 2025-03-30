@@ -72,7 +72,7 @@ public class Superstructure extends SubsystemBase{
         return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
     }
 
-    public Command PICKUP() {
+    public Command Pickup() {
         superStructureState = SuperStructureState.LO;
         Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight);
         return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
@@ -154,7 +154,7 @@ public class Superstructure extends SubsystemBase{
             case INTAKE:
                 return Intake();
             case PICKUP:
-                return PICKUP();
+                return Pickup();
             default:
                 return LO();
         }
