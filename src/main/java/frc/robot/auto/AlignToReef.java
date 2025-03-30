@@ -49,7 +49,7 @@ public class AlignToReef {
     LEDSubsystem leds;
 
     //private final ReefPoint reef;
-    private final double modeVal = 0.3;
+    private final double modeVal = 0.5;
 
     public AlignToReef(SwerveSubsystem swerveSubsystem, Superstructure superstructure, Grabber grabber) {
         this.swerveSubsystem = swerveSubsystem;
@@ -121,7 +121,7 @@ public class AlignToReef {
         //         swerveSubsystem.swerveDrive.getMaximumChassisVelocity(), 0.5,
         //         swerveSubsystem.swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(180));
 
-        PathConstraints constraints = new PathConstraints(1, 0.5,
+        PathConstraints constraints = new PathConstraints(1.75, 1.25,
             360, Units.degreesToRadians(180));
 
         PathPlannerPath path = new PathPlannerPath(
@@ -137,15 +137,17 @@ public class AlignToReef {
         //Follows the path using pathplanner, brings the superstructure up, and then uses PID to get to the pose
         //return AutoBuilder.followPath(path).andThen(superstructureExists ? autoScore(waypoint) : autoDrive(waypoint));
 
-
-        if (usePathplanner) {
-            return AutoBuilder.followPath(path).alongWith(getSuperStructure(waypoint)).andThen(autoDrive(waypoint));
-        } else {
-            return autoDrive(waypoint).alongWith(getSuperStructure(waypoint));
-        }
+        //return AutoBuilder.followPath(path).alongWith(getSuperStructure(waypoint)).andThen(autoDrive(waypoint));
+        return autoDrive(waypoint).alongWith(getSuperStructure(waypoint));
 
 
-            
+        //return AutoBuilder.followPath(path).alongWith(Commands.runOnce(() -> superstructure.getNextSuperStructure(Superstructure.nextSuperStructureState)));
+
+        // if (usePathplanner) {
+        //     return AutoBuilder.followPath(path).alongWith(getSuperStructure(waypoint)).andThen(autoDrive(waypoint));
+        // } else {
+        //     return autoDrive(waypoint).alongWith(getSuperStructure(waypoint));
+        // }    
     
     }
 
@@ -181,7 +183,7 @@ public class AlignToReef {
 
     private Command autoDrive(Pose2d waypoint) {
         return Commands.sequence(
-            Commands.print("start position PID loop"),
+            Commands.print("start position PID loop to x: " + waypoint.getX() + "and y: " + waypoint.getY()),
             new DriveToPose(swerveSubsystem, waypoint),
             Commands.print("end position PID loop"));
     }
@@ -193,9 +195,17 @@ public class AlignToReef {
         return Commands.none();
     }
 
-    public Command getSuperStructure(Pose2d waypoint) { 
-        Command structure = Commands.waitUntil(() -> swerveSubsystem.getPose().getTranslation().getDistance(waypoint.getTranslation()) < 1.0)
-                            .andThen(Commands.runOnce(() -> superstructure.getNextSuperStructure(Superstructure.nextSuperStructureState)));
+    public Command getSuperStructure(Pose2d waypoint) {
+        final double distance;
+        if (Superstructure.nextSuperStructureState.equals(SuperStructureState.L4)) {
+            distance = .5;
+            System.out.println("3!!");
+        } else { //add more later
+            distance = 1.5;
+        }
+
+        Command structure = Commands.waitUntil(() -> swerveSubsystem.getPose().getTranslation().getDistance(waypoint.getTranslation()) < distance)
+                            .andThen(superstructure.getNextSuperStructure(Superstructure.nextSuperStructureState));
         return structure;
     }
 

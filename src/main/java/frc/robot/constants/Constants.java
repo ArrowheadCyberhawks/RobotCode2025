@@ -7,6 +7,7 @@ package frc.robot.constants;
 import static edu.wpi.first.units.Units.*;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import com.pathplanner.lib.config.PIDConstants;
 
@@ -82,7 +83,7 @@ public final class Constants {
 
   public static class ElevatorConstants {
     public static final LoggedNetworkNumber kElevatorP = new LoggedNetworkNumber("Elevator/kElevatorP", 3.5);
-    public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 5);
+    public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 6);
     public static final LoggedNetworkNumber kElevatorMaxAccel = new LoggedNetworkNumber("Elevator/kElevatorMaxAccel", 10);
 
     public static final int elevatorMotorID = 9;
@@ -158,8 +159,8 @@ public final class Constants {
     }
 
     public static enum GrabberState {
-      INTAKE(0.75),
-      OUTTAKE(-0.75),
+      INTAKE(0.25),
+      OUTTAKE(-0.50),
       HOLD(0.07),
       STOP(0.0);
 
@@ -197,24 +198,24 @@ public final class Constants {
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 2.8; //6.5
-      public static final double kITranslation = 0;
-      public static final double kDTranslation = 0;
+      public static final double kPTranslation = 5.5; //2.8
+      public static final double kITranslation = 0.2; //0.2
+      public static final double kDTranslation = 0.0; //0.2
 
-      public static final double kPTheta = 2.95;
-      public static final double kITheta = 0.7;
-      public static final double kDTheta = 0.0;
+      public static final double kPTheta = 5; //2.95
+      public static final double kITheta = 0.1; //0.7
+      public static final double kDTheta = 0.1;
       
       public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
       public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
     }
 
     public static class Auto {
-      public static final double kPTranslation = 7; //6.5
-      public static final double kITranslation = 0.5;
-      public static final double kDTranslation = 0.1;
+      public static final double kPTranslation = 9.4; //6.5
+      public static final double kITranslation = 0.62;
+      public static final double kDTranslation = 0.02;
 
-      public static final double kPTheta = 10;
+      public static final double kPTheta = 9;
       public static final double kITheta = 0.2;
       public static final double kDTheta = 0.01;
       

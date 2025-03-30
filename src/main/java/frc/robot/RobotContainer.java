@@ -89,12 +89,18 @@ public class RobotContainer {
 
   //Automation CommandFactories
   private final AlignToReef alignmentCommandFactory;
-  private final AutoCycle autoCycleCommandFactory;
+  //private final AutoCycle autoCycleCommandFactory;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
   public RobotContainer() {
+  
+    SmartDashboard.putNumber("DriveToPose/rp", 100);
+    SmartDashboard.putNumber("DriveToPose/ri", 0.2);
+    SmartDashboard.putNumber("DriveToPose/rd", 0.01);
+
+
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
     // Init Subsystems
@@ -173,11 +179,13 @@ public class RobotContainer {
     // set up limelight
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false);
 
-    // commands and stuff
-    autoManager = new AutoCommandManager(swerveSubsystem, elevator, pivot, grabber, climber);
-    // alignmentCommandFactory = new AlignToReef(swerveSubsystem);
     alignmentCommandFactory = new AlignToReef(swerveSubsystem, superstructure, grabber);
-    autoCycleCommandFactory = new AutoCycle(swerveSubsystem, superstructure, grabber);
+
+    // commands and stuff
+    autoManager = new AutoCommandManager(swerveSubsystem, superstructure, grabber, climber, alignmentCommandFactory);
+    // alignmentCommandFactory = new AlignToReef(swerveSubsystem);
+
+    //autoCycleCommandFactory = new AutoCycle(swerveSubsystem, superstructure, grabber);
     // alignmentCommandFactory = new AlignToReef(swerveSubsystem, elevator, pivot,
     // grabber);
 
@@ -244,10 +252,10 @@ public class RobotContainer {
     driverController.start().onTrue(alignmentCommandFactory.switchMode());
 
     //TEMP
-    driverController.b().whileTrue(autoCycleCommandFactory.run());
+    //driverController.b().whileTrue(autoCycleCommandFactory.run());
 
-    driverController.leftTrigger().whileTrue(climber.runClimbCommand(() -> 0.8));
-    driverController.rightTrigger().whileTrue(climber.runClimbCommand(() -> -0.2));
+    driverController.leftBumper().whileTrue(climber.runClimbCommand(() -> 0.8));
+    driverController.rightBumper().whileTrue(climber.runClimbCommand(() -> -0.2));
 
     // X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[] { keypadHID.button(22), keypadHID.button(23) };
@@ -265,27 +273,18 @@ public class RobotContainer {
     poseButtons(farLeftTriggers, "FarLeft");
     poseButtons(farRightTriggers, "FarRight");
 
-    // // Elevator Presets
-    // keypadHID.button(7).onTrue(superstructure.Barge());
-    // keypadHID.button(11).onTrue(superstructure.Algae3());
-    // keypadHID.button(15).onTrue(superstructure.Algae2());
-    // keypadHID.button(21).onTrue(superstructure.Processor());
-    // // TODO add algae pickup to superstructure subsystem (button 19)
+    //ADD HUMAN PLAYER STATIONS, IN FIELDCONSTANTS :)
 
-    // keypadHID.button(18).onTrue(superstructure.LO());
-    // // keypadHID.button(18).onTrue(superstructure.L1());
-    // keypadHID.button(14).onTrue(superstructure.L2());
-    // keypadHID.button(10).onTrue(superstructure.L3());
-    // keypadHID.button(6).onTrue(superstructure.L4());
+    keypadHID.button(1).onTrue(grabber.intakeCommand());
+    keypadHID.button(4).onTrue(grabber.outtakeCommand());
+    keypadHID.button(2).onTrue(superstructure.LO()); //switch to human intake
 
-    // keypadHID.button(21).onTrue(superstructure.Intake());
-
-    //TODO EDIT ONCE SUPERSTRUCTURE WORKS
     keypadHID.button(7).onTrue(superstructure.setNextSuperStructure(SuperStructureState.BARGE));
     keypadHID.button(11).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG3));
     keypadHID.button(15).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG2));
-    keypadHID.button(21).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PROCESSOR));
-    // TODO: Add algae pickup to superstructure subsystem (button 19)
+    keypadHID.button(19).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PROCESSOR));
+    keypadHID.button(24).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PICKUP));
+    // TODO: Add algae pickup to superstructure subsystem (button 24)
 
     keypadHID.button(18).onTrue(superstructure.setNextSuperStructure(SuperStructureState.LO));
     // keypadHID.button(18).onTrue(setNextSuperStructure(SuperStructureState.L1));
@@ -294,6 +293,8 @@ public class RobotContainer {
     keypadHID.button(6).onTrue(superstructure.setNextSuperStructure(SuperStructureState.L4));
 
     keypadHID.button(21).onTrue(superstructure.setNextSuperStructure(SuperStructureState.INTAKE));
+
+
     
     //MANIPULATOR CONTROLLER
 
@@ -334,7 +335,7 @@ public class RobotContainer {
   private void poseButtons(Trigger[] triggers, String name) {
     triggers[0].whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "L")));
     triggers[1].whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "R")));
-    triggers[0].whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "C")));
+    triggers[0].and(triggers[1]).whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "C")));
   }
 
   public Command getTeleopCommand() {

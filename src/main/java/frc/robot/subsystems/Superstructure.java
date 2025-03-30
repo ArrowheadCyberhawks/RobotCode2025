@@ -38,11 +38,12 @@ public class Superstructure extends SubsystemBase{
         ALG3,
         BARGE,
         PROCESSOR,
+        PICKUP,
         INTAKE
     }
 
-    public static SuperStructureState superStructureState = SuperStructureState.DEF;
-    public static SuperStructureState nextSuperStructureState = SuperStructureState.LO;
+    public static SuperStructureState superStructureState = SuperStructureState.LO;
+    public static SuperStructureState nextSuperStructureState = SuperStructureState.L3;
 
     public Superstructure(Elevator elevator, Pivot pivot) {
         Superstructure.elevator = elevator;
@@ -66,6 +67,12 @@ public class Superstructure extends SubsystemBase{
     }
 
     public Command LO() {
+        superStructureState = SuperStructureState.LO;
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight);
+        return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
+    }
+
+    public Command PICKUP() {
         superStructureState = SuperStructureState.LO;
         Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight);
         return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
@@ -146,6 +153,8 @@ public class Superstructure extends SubsystemBase{
                 return Processor();
             case INTAKE:
                 return Intake();
+            case PICKUP:
+                return PICKUP();
             default:
                 return LO();
         }

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.075050706225927,
-        "y": 5.14842948658568
+        "x": 5.067130979632734,
+        "y": 5.1485643546733755
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.4304303278688515,
-        "y": 6.464497950819672
+        "x": 5.4225106012756585,
+        "y": 6.464632818907367
       },
       "isLocked": false,
       "linkedName": "FarLeftR"
@@ -33,10 +33,10 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 1.5,
     "maxAcceleration": 0.75,
     "maxAngularVelocity": 360.0,
-    "maxAngularAcceleration": 570.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

@@ -58,6 +58,7 @@ public class Grabber extends SubsystemBase {
         grabberMotor1Config.smartCurrentLimit(5);
         grabberMotor2Config.smartCurrentLimit(5);
         grabberMotor1Config.inverted(true);
+ 
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
@@ -182,7 +183,7 @@ public class Grabber extends SubsystemBase {
     public Command intakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(5);
-        return Commands.run(() -> setGrabberState(GrabberState.INTAKE));
+        return Commands.runEnd(() -> setGrabberState(GrabberState.INTAKE), stopIntakeCommand()::schedule).until(this::hasCoral);
         //make it so that run hold command after it finds algae
     }
 
@@ -199,5 +200,8 @@ public class Grabber extends SubsystemBase {
 
     public Command stopIntakeCommand() {
         return setGrabberStateCommand(GrabberState.STOP);
+    }
+    public Command getGamePieceCommand() {
+        return (hasAlgae()) ? outtakeCommand() : intakeCommand();
     }
 }
