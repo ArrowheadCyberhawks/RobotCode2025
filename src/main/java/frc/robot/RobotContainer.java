@@ -96,9 +96,9 @@ public class RobotContainer {
    */
   public RobotContainer() {
   
-    SmartDashboard.putNumber("DriveToPose/rp", 100);
-    SmartDashboard.putNumber("DriveToPose/ri", 0.2);
-    SmartDashboard.putNumber("DriveToPose/rd", 0.01);
+    // SmartDashboard.putNumber("DriveToPose/tp", 9.45);
+    // SmartDashboard.putNumber("DriveToPose/ti", 0.62);
+    // SmartDashboard.putNumber("DriveToPose/td", 0.02);
 
 
     WebServer.start(5800, Filesystem.getDeployDirectory().getPath());

@@ -50,7 +50,8 @@ public class Superstructure extends SubsystemBase{
         Superstructure.pivot = pivot;
     }
 
-    //NOTE: This ONLY WORKS if manual controls don't put it in a dangerous position
+    //NOTE: This ONLY WORKS if manual controls don't put it in a dangerous position, so just have height checks for each one seperately
+    //and maybe demonkey it at some point this is horrid
 
 
     public Command Intake() {
@@ -170,6 +171,4 @@ public class Superstructure extends SubsystemBase{
         nextSuperStructureState = state;
     }
 
-}    
-
-
+}

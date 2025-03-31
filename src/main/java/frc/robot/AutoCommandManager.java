@@ -67,7 +67,7 @@ public class AutoCommandManager {
                                                                                                        // subsystems are
                                                                                                        // made
         NamedCommands.registerCommand("INTAKE",
-                grabberSubsystem.runGrabberCommand(0.25).until(grabberSubsystem::hasCoral).withTimeout(2));
+                grabberSubsystem.runGrabberCommand(0.25).until(grabberSubsystem::hasCoral));
         NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(1));
 
         NamedCommands.registerCommand("HUMAN", superstructure.Intake());
@@ -77,6 +77,9 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("L2", superstructure.L2().withTimeout(2));
         NamedCommands.registerCommand("L3", superstructure.L3().withTimeout(2));
         NamedCommands.registerCommand("L4", superstructure.L4().withTimeout(2.5));
+
+        NamedCommands.registerCommand("BARGE", superstructure.Barge().withTimeout(3));
+        NamedCommands.registerCommand("ALG2", superstructure.Algae2().withTimeout(2));
 
         NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.climbOutCommand());
 

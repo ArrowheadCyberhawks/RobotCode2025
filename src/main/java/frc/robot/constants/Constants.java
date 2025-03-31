@@ -211,7 +211,7 @@ public final class Constants {
     }
 
     public static class Auto {
-      public static final double kPTranslation = 9.4; //6.5
+      public static final double kPTranslation = 9.45; //6.5
       public static final double kITranslation = 0.62;
       public static final double kDTranslation = 0.02;
 

@@ -48,7 +48,7 @@
   "folder": "WaypointToBranch",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -36.02737338510357
+    "rotation": 54.041338873892904
   },
   "useDefaultConstraints": false
 }

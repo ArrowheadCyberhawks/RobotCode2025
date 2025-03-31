@@ -34,7 +34,7 @@ public class DriveToPose extends Command {
   // ri.get(), rd.get());
 
   private final ProfiledPIDController driveController = new ProfiledPIDController(Constants.PID.Auto.kPTranslation,
-      Constants.PID.Auto.kITranslation, Constants.PID.Auto.kDTranslation, new Constraints(2, 1.5));
+      Constants.PID.Auto.kITranslation, Constants.PID.Auto.kDTranslation, new Constraints(1, .75));
   private final PIDController headingController = new PIDController(Constants.PID.Auto.kThetaPIDConstants.kP,
       Constants.PID.Auto.kThetaPIDConstants.kI, Constants.PID.Auto.kThetaPIDConstants.kD);
 
@@ -46,7 +46,7 @@ public class DriveToPose extends Command {
 
   // Different constructors
   public DriveToPose(SwerveSubsystem swerveSubsystem, Supplier<Pose2d> targetPose) {
-    //updateConstants();
+    updateConstants();
     this.swerveSubsystem = swerveSubsystem;
     this.targetPose = targetPose;
     addRequirements(swerveSubsystem);
@@ -74,7 +74,7 @@ public class DriveToPose extends Command {
     driveController.setTolerance(Units.inchesToMeters(0.25));
     headingController.setTolerance(2);
     headingController.enableContinuousInput(-Math.PI, Math.PI);
-    //updateConstants();
+    updateConstants();
 
     // reset drive controller with current vel and distance
     // by getting the current velocity it makes it smoother
@@ -82,7 +82,7 @@ public class DriveToPose extends Command {
         currentPose.getTranslation().getDistance(targetPose.get().getTranslation()),
         Math.min(
             0.0,
-            -new Translation2d(swerveSubsystem.getRobotRelativeSpeeds().vxMetersPerSecond,
+            new Translation2d(swerveSubsystem.getRobotRelativeSpeeds().vxMetersPerSecond,
                 swerveSubsystem.getRobotRelativeSpeeds().vyMetersPerSecond)
                 .rotateBy(
                     targetPose.get().getTranslation().minus(swerveSubsystem.getPose().getTranslation()).getAngle()
@@ -97,7 +97,7 @@ public class DriveToPose extends Command {
   @Override
   public void execute() {
     // sets current and target pose values
-    //updateConstants();
+    updateConstants();
     Pose2d currentPose = swerveSubsystem.getPose();
     Pose2d targetPose = this.targetPose.get();
 
@@ -152,36 +152,36 @@ public class DriveToPose extends Command {
     return driveController.atGoal() && headingController.atSetpoint();
   }
 
-  // private void updateConstants() {
-  //   // driveController.setPID(SmartDashboard.getNumber("DriveToPose/tp", 1),
-  //   // SmartDashboard.getNumber("DriveToPose/ti", 0),
-  //   // SmartDashboard.getNumber("DriveToPose/td", 0));
-  //   // driveController.setConstraints(new
-  //   // Constraints(SmartDashboard.getNumber("DriveToPose/maxVel", 1),
-  //   // SmartDashboard.getNumber("DriveToPose/maxAccel", 0.75)));
+  private void updateConstants() {
+    // driveController.setPID(SmartDashboard.getNumber("DriveToPose/tp", 1),
+    //   SmartDashboard.getNumber("DriveToPose/ti", 0),
+    //   SmartDashboard.getNumber("DriveToPose/td", 0));
+    // driveController.setConstraints(new
+    // Constraints(SmartDashboard.getNumber("DriveToPose/maxVel", 1),
+    // SmartDashboard.getNumber("DriveToPose/maxAccel", 0.75)));
 
-  //   // SmartDashboard.putNumber("DriveToPose/tp", driveController.getP());
-  //   // SmartDashboard.putNumber("DriveToPose/ti", driveController.getI());
-  //   // SmartDashboard.putNumber("DriveToPose/td", driveController.getD());
-  //   // SmartDashboard.putNumber("DriveToPose/maxVel",
-  //   // driveController.getConstraints().maxVelocity);
-  //   // SmartDashboard.putNumber("DriveToPose/maxAccel",
-  //   // driveController.getConstraints().maxAcceleration);
+    // SmartDashboard.putNumber("DriveToPose/tp", driveController.getP());
+    // SmartDashboard.putNumber("DriveToPose/ti", driveController.getI());
+    // SmartDashboard.putNumber("DriveToPose/td", driveController.getD());
+    // SmartDashboard.putNumber("DriveToPose/maxVel",
+    // driveController.getConstraints().maxVelocity);
+    // SmartDashboard.putNumber("DriveToPose/maxAccel",
+    // driveController.getConstraints().maxAcceleration);
 
-  //   // SmartDashboard.putNumber("DriveToPose/tp", 10);
-  //   // SmartDashboard.putNumber("DriveToPose/ti", 0.2);
-  //   // SmartDashboard.putNumber("DriveToPose/td", 0.01);
+    // SmartDashboard.putNumber("DriveToPose/tp", 10);
+    // SmartDashboard.putNumber("DriveToPose/ti", 0.2);
+    // SmartDashboard.putNumber("DriveToPose/td", 0.01);
 
-  //   // if (tp.get() != driveController.getP()
-  //   // || ti.get() != driveController.getI()
-  //   // || td.get() != driveController.getD()
-  //   // || maxVel.get() != driveController.getConstraints().maxVelocity
-  //   // || maxAccel.get() != driveController.getConstraints().maxAcceleration) {
-  //   // driveController.setP(tp.get());
-  //   // driveController.setI(ti.get());
-  //   // driveController.setD(td.get());
-  //   // driveController.setConstraints(new Constraints(maxVel.get(),
-  //   // maxAccel.get()));
-  //   // }
-  // }
+    // if (tp.get() != driveController.getP()
+    // || ti.get() != driveController.getI()
+    // || td.get() != driveController.getD()
+    // || maxVel.get() != driveController.getConstraints().maxVelocity
+    // || maxAccel.get() != driveController.getConstraints().maxAcceleration) {
+    // driveController.setP(tp.get());
+    // driveController.setI(ti.get());
+    // driveController.setD(td.get());
+    // driveController.setConstraints(new Constraints(maxVel.get(),
+    // maxAccel.get()));
+    // }
+  }
 }

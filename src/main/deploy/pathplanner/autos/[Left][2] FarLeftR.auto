@@ -43,15 +43,29 @@
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "FarLeftR"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "FarLeftR"
+                }
+              }
+            ]
           }
         },
         {
-          "type": "named",
+          "type": "parallel",
           "data": {
-            "name": "OUTTAKE"
+            "commands": [
+              {
+                "type": "named",
+                "data": {
+                  "name": "OUTTAKE"
+                }
+              }
+            ]
           }
         },
         {
@@ -79,23 +93,17 @@
                       "data": {
                         "name": "DEF"
                       }
+                    },
+                    {
+                      "type": "named",
+                      "data": {
+                        "name": "INTAKE"
+                      }
                     }
                   ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "INTAKE"
           }
         },
         {
