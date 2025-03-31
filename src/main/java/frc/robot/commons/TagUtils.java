@@ -1,7 +1,7 @@
-package frc.robot;
+package frc.robot.commons;
 
 import static edu.wpi.first.units.Units.Inches;
-import static frc.robot.Constants.*;
+import static frc.robot.constants.Constants.*;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
@@ -10,11 +10,11 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Transform2d;
-import frc.robot.Constants.ReefPoint;
+import frc.robot.constants.Constants.ReefPoint;
 
-public class Utils {
+public class TagUtils {
     private static final AprilTagFieldLayout field = AprilTagFieldLayout.loadField(AprilTagFields.kDefaultField);
-    private static final Transform2d leftReefTransform = new Transform2d(Inches.of(18), Inches.of(-13), new Rotation2d(Math.PI)); //-6.5
+    private static final Transform2d leftReefTransform = new Transform2d(Inches.of(18), Inches.of(-12), new Rotation2d(Math.PI)); //-6.5
     private static final Transform2d centerReefTransform = new Transform2d(Inches.of(18), Inches.of(-5), new Rotation2d(Math.PI));
     private static final Transform2d rightReefTransform = new Transform2d(Inches.of(18), Inches.of(1.5), new Rotation2d(Math.PI));//6.5
     

@@ -1,6 +1,6 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.ClimberConstants.*;
+import static frc.robot.constants.Constants.ClimberConstants.*;
 
 import java.util.function.Supplier;
 
@@ -28,17 +28,17 @@ public class Climber extends SubsystemBase {
         // climbController.setGoal(getPosition());
     }
 
-    private void updateConstants() {
-        if (kClimbP.get() != climbController.getP() // did the operator change the constants?
-            || kClimbI.get() != climbController.getI()
-            || kClimbMaxVel.get() != climbController.getConstraints().maxVelocity
-            || kClimbMaxAccel.get() != climbController.getConstraints().maxAcceleration) {
-            // FIX IT THEN
-            climbController.setP(kClimbP.get());
-            climbController.setI(kClimbI.get());
-            climbController.setConstraints(new Constraints(kClimbMaxVel.get(), kClimbMaxAccel.get()));
-        }
-    }
+    // private void updateConstants() {
+    //     if (kClimbP.get() != climbController.getP() // did the operator change the constants?
+    //         || kClimbI.get() != climbController.getI()
+    //         || kClimbMaxVel.get() != climbController.getConstraints().maxVelocity
+    //         || kClimbMaxAccel.get() != climbController.getConstraints().maxAcceleration) {
+    //         // FIX IT THEN
+    //         climbController.setP(kClimbP.get());
+    //         climbController.setI(kClimbI.get());
+    //         climbController.setConstraints(new Constraints(kClimbMaxVel.get(), kClimbMaxAccel.get()));
+    //     }
+    // }
     
     @Override
     public void periodic() {
@@ -73,7 +73,7 @@ public class Climber extends SubsystemBase {
     }
 
     public Command climbOutCommand() {
-        return runClimbCommand(() -> -0.2).withTimeout(4);
+        return runClimbCommand(() -> -0.8).withTimeout(1);
     }
 
     public Command climbInCommand() {
