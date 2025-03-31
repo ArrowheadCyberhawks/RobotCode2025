@@ -8,13 +8,13 @@ import frc.robot.subsystems.*;
 
 public class ManualPivotCommand extends Command{
 
-    private final Grabber grabberSubsystem;
+    private final Pivot pivotSubsystem;
     private final DoubleSupplier m_power;
 
-    public ManualPivotCommand(Grabber grabberSubsystem, DoubleSupplier power){
-        this.grabberSubsystem = grabberSubsystem;
+    public ManualPivotCommand(Pivot pivotSubsystem, DoubleSupplier power){
+        this.pivotSubsystem = pivotSubsystem;
         m_power = power;
-        addRequirements(grabberSubsystem);
+        addRequirements(pivotSubsystem);
     }
 
     public void initialize(){
@@ -23,7 +23,7 @@ public class ManualPivotCommand extends Command{
 
     public void execute() {
         //Moves up to certain heights and applies different power values based on the enum :)
-        grabberSubsystem.setPivotAngle(Rotation2d.fromRadians(grabberSubsystem.getPivotAngle().getRadians() + m_power.getAsDouble()));
+        pivotSubsystem.setPivotAngle(Rotation2d.fromRadians(pivotSubsystem.getPivotAngle().getRadians() + m_power.getAsDouble()));
     }
 
     public boolean isFinished(){
