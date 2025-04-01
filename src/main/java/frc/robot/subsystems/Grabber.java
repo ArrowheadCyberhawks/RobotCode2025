@@ -7,28 +7,17 @@ import static frc.robot.constants.Constants.GrabberConstants.*;
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.spark.SparkMax;
-import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkBaseConfig;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Distance;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
-import frc.robot.subsystems.LEDSubsystem.LEDState;
-
 import com.playingwithfusion.TimeOfFlight;
 import com.playingwithfusion.TimeOfFlight.RangingMode;
 
@@ -89,6 +78,10 @@ public class Grabber extends SubsystemBase {
         return Millimeters.of(coralSensor.getRange());
     }
 
+    public GrabberState getGrabberState() {
+        return grabberState;
+    }
+
     /**
      * Returns the current distance measured by the algae sensor.
      * @return The distance measured by the algae sensor in millimeters.
@@ -141,8 +134,8 @@ public class Grabber extends SubsystemBase {
     public void setCurrentLimit(int amps) {
         grabberMotor1Config.smartCurrentLimit(amps);
         grabberMotor2Config.smartCurrentLimit(amps);
-        grabberMotor1.configure(grabberMotor1Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        grabberMotor2.configure(grabberMotor2Config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        grabberMotor1.configure(grabberMotor1Config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        grabberMotor2.configure(grabberMotor2Config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
    
 
@@ -173,7 +166,7 @@ public class Grabber extends SubsystemBase {
      * InstantCommand to simply set the grabber state.
      */
     private Command setGrabberStateCommand(GrabberState state) {
-        return this.runOnce(() -> setGrabberState(state));
+        return runOnce(() -> setGrabberState(state));
     }
 
     /**
@@ -183,19 +176,18 @@ public class Grabber extends SubsystemBase {
     public Command intakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(5);
-        return Commands.runEnd(() -> setGrabberState(GrabberState.INTAKE), stopIntakeCommand()::schedule).until(this::hasCoral);
-        //make it so that run hold command after it finds algae
+        return runEnd(() -> setGrabberState(GrabberState.INTAKE), holdCommand()::schedule).until(this::hasAlgae);
     }
 
     public Command holdCommand() {
         setCurrentLimit(5);
-        return Commands.runEnd(() -> setGrabberState(GrabberState.HOLD), () -> setGrabberState(GrabberState.STOP)).until(this::hasCoral);
+        return runEnd(() -> setGrabberState(GrabberState.HOLD), stopIntakeCommand()::schedule).until(this::hasCoral);
     }
 
     public Command outtakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(40);
-        return Commands.runEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP)).onlyWhile(this::hasAlgae);
+        return runEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP)).onlyWhile(this::hasAlgae);
     }
 
     public Command stopIntakeCommand() {

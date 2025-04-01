@@ -25,7 +25,7 @@ public class Superstructure extends SubsystemBase{
     //IT CAN'T BE THAT HARD
      
     public static Elevator elevator;
-    public static Pivot pivot;
+    public static Arm pivot;
 
     public static enum SuperStructureState {
         DEF,
@@ -45,7 +45,7 @@ public class Superstructure extends SubsystemBase{
     public static SuperStructureState superStructureState = SuperStructureState.LO;
     public static SuperStructureState nextSuperStructureState = SuperStructureState.L3;
 
-    public Superstructure(Elevator elevator, Pivot pivot) {
+    public Superstructure(Elevator elevator, Arm pivot) {
         Superstructure.elevator = elevator;
         Superstructure.pivot = pivot;
     }

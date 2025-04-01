@@ -8,10 +8,10 @@ import frc.robot.subsystems.*;
 
 public class ManualPivotCommand extends Command{
 
-    private final Pivot pivotSubsystem;
+    private final Arm pivotSubsystem;
     private final DoubleSupplier m_power;
 
-    public ManualPivotCommand(Pivot pivotSubsystem, DoubleSupplier power){
+    public ManualPivotCommand(Arm pivotSubsystem, DoubleSupplier power){
         this.pivotSubsystem = pivotSubsystem;
         m_power = power;
         addRequirements(pivotSubsystem);

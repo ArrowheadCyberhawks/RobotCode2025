@@ -5,15 +5,15 @@ import java.util.function.Supplier;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.Elevator;
-import frc.robot.subsystems.Pivot;
+import frc.robot.subsystems.Arm;
 
 public class SetSuperstructureCommand extends Command {
 	private final Elevator elevator;
-	private final Pivot pivot;
+	private final Arm pivot;
 	private final Supplier<Rotation2d> angleSupplier;
 	private final Supplier<Double> heightSupplier;
 
-	public SetSuperstructureCommand(Pivot pivotSubsystem, Elevator elevatorSubsystem,
+	public SetSuperstructureCommand(Arm pivotSubsystem, Elevator elevatorSubsystem,
 			Supplier<Rotation2d> desiredAngle, Supplier<Double> desiredHeight) {
 		elevator = elevatorSubsystem;
 		pivot = pivotSubsystem;

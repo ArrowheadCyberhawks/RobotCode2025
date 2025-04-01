@@ -67,7 +67,7 @@ public class RobotContainer {
   // subsystems
   public static SwerveSubsystem swerveSubsystem;
   private final Elevator elevator;
-  public final Pivot pivot;
+  public final Arm pivot;
   private final Grabber grabber;
   private final Climber climber;
 
@@ -105,7 +105,7 @@ public class RobotContainer {
 
     // Init Subsystems
     elevator = new Elevator();
-    pivot = new Pivot();
+    pivot = new Arm();
     grabber = new Grabber();
     climber = new Climber();
 
@@ -221,7 +221,7 @@ public class RobotContainer {
   private void configureBindings() {
     // Drive Controller
 
-    driverController.y()
+    driverController.b()
         .onTrue(swerveSubsystem.runOnce(() -> {
           swerveSubsystem.zeroHeading();
           swerveSubsystem.swerveDrive.synchronizeModuleEncoders();
@@ -254,8 +254,8 @@ public class RobotContainer {
     //TEMP
     //driverController.b().whileTrue(autoCycleCommandFactory.run());
 
-    driverController.leftBumper().whileTrue(climber.runClimbCommand(() -> 0.8));
-    driverController.rightBumper().whileTrue(climber.runClimbCommand(() -> -0.2));
+    driverController.povUp().whileTrue(climber.runClimbCommand(() -> 0.8));
+    driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.2));
 
     // X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[] { keypadHID.button(22), keypadHID.button(23) };

@@ -20,6 +20,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import lib.frc706.cyberlib.LocalADStarAK;
 import lib.frc706.cyberlib.commands.ToPointCommand;
@@ -28,6 +29,7 @@ import frc.robot.auto.AlignToReef;
 import frc.robot.commands.SetSuperstructureCommand;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
+import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.subsystems.*;
@@ -67,7 +69,10 @@ public class AutoCommandManager {
                                                                                                        // subsystems are
                                                                                                        // made
         NamedCommands.registerCommand("INTAKE",
-                grabberSubsystem.runGrabberCommand(0.25).until(grabberSubsystem::hasCoral));
+                grabberSubsystem.runGrabberCommand(GrabberState.INTAKE.getSpeed())
+                .until(grabberSubsystem::hasAlgae)
+                .withTimeout(2)
+        );
         NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(1));
 
         NamedCommands.registerCommand("HUMAN", superstructure.Intake());
@@ -172,7 +177,7 @@ public class AutoCommandManager {
                 .andThen(new ToPointCommand(RobotContainer.swerveSubsystem, () -> targetPose));
     }
 
-    private void elevatorCommands(String name, Elevator elevator, Pivot pivot) {
+    private void elevatorCommands(String name, Elevator elevator, Arm pivot) {
         NamedCommands.registerCommand(name, elevator.setLevelCommand(ElevatorLevel.valueOf(name))
                 .andThen(new WaitCommand(0.3))
                 .andThen(pivot.setPivotPositionCommand(PivotPosition.HI)));

@@ -160,7 +160,7 @@ public final class Constants {
 
     public static enum GrabberState {
       INTAKE(0.25),
-      OUTTAKE(-0.50),
+      OUTTAKE(-0.90),
       HOLD(0.07),
       STOP(0.0);
 

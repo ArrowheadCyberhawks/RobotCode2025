@@ -29,18 +29,15 @@ import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
  * The Grabber subsystem covers the motors that manipulate the game piece
  * as well as the pivoting mechanism.
  */
-public class Pivot extends SubsystemBase {
+public class Arm extends SubsystemBase {
     private final SparkMax pivotMotor;
     private final RelativeEncoder pivotEncoder;
-    private final ProfiledPIDController pivotController = new ProfiledPIDController(kPivotP.get(), 0, 0, new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get())); //0.09
-
-    private GrabberState grabberState = GrabberState.STOP;
-    
+    private final ProfiledPIDController pivotController = new ProfiledPIDController(kPivotP.get(), 0, 0, new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get())); //0.09    
 
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
      */
-    public Pivot() {
+    public Arm() {
         pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
         pivotEncoder = pivotMotor.getEncoder();
 
@@ -60,13 +57,13 @@ public class Pivot extends SubsystemBase {
         Logger.recordOutput(getName() + "/Pivot Target", pivotController.getGoal().position);
     }
 
-    // private void updateConstants() {
-    //     if (kPivotP.get() != pivotController.getP()
-    //         || kPivotMaxVel.get() != pivotController.getConstraints().maxVelocity) {
-    //         pivotController.setP(kPivotP.get());
-    //         pivotController.setConstraints(new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get()));
-    //     }
-    // }
+    private void updateConstants() {
+        if (kPivotP.get() != pivotController.getP()
+            || kPivotMaxVel.get() != pivotController.getConstraints().maxVelocity) {
+            pivotController.setP(kPivotP.get());
+            pivotController.setConstraints(new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get()));
+        }
+    }
 
     /**
      * Sets the pivot angle of the grabber.
@@ -85,10 +82,6 @@ public class Pivot extends SubsystemBase {
 
     public void resetPivotTarget() {
         pivotController.setGoal(getPivotAngle().getRadians());
-    }
-    
-    public void setGrabberState(GrabberState state) {
-        grabberState = state;
     }
 
     /**
@@ -134,16 +127,5 @@ public class Pivot extends SubsystemBase {
 
     public Command runPivotCommand(double speed) {
         return runEnd(() -> setPivotMotor(speed), () -> stopPivotMotor());
-    }
-
-    /**
-     * InstantCommand to simply set the grabber state.
-     */
-    private Command setGrabberStateCommand(GrabberState state) {
-        return this.runOnce(() -> setGrabberState(state));
-    }
-
-    public Command stopIntakeCommand() {
-        return setGrabberStateCommand(GrabberState.STOP);
     }
 }
