@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import com.playingwithfusion.TimeOfFlight;
 import com.playingwithfusion.TimeOfFlight.RangingMode;
@@ -51,8 +52,10 @@ public class Grabber extends SubsystemBase {
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
-        coralSensor.setRangingMode(RangingMode.Short, 100);
+        coralSensor.setRangingMode(RangingMode.Short, 24);
         algaeSensor.setRangingMode(RangingMode.Short, 100);
+
+        new Trigger(this::hasCoral).onTrue(stopIntakeCommand());
     }
 
 
@@ -96,7 +99,7 @@ public class Grabber extends SubsystemBase {
      */
     public boolean hasCoral() {
         double coralRange = getCoralRange().in(Meters);
-        return coralRange > 0 && coralRange < 0.05;
+        return coralRange > 0 && coralRange < 0.07;
         //return getCoralRange().compareTo(kCoralSensorThreshold) < 0;
     }
 
@@ -134,8 +137,8 @@ public class Grabber extends SubsystemBase {
     public void setCurrentLimit(int amps) {
         grabberMotor1Config.smartCurrentLimit(amps);
         grabberMotor2Config.smartCurrentLimit(amps);
-        grabberMotor1.configure(grabberMotor1Config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        grabberMotor2.configure(grabberMotor2Config, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        grabberMotor1.configure(grabberMotor1Config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        grabberMotor2.configure(grabberMotor2Config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
     }
    
 
@@ -170,13 +173,13 @@ public class Grabber extends SubsystemBase {
     }
 
     /**
-     * Command to run the intake at full power until algae is detected, then stops.
+     * Command to run the intake at full power until algae is detected, then holds it.
      * @return
      */
     public Command intakeCommand() {
         stopGrabberMotors();
-        setCurrentLimit(5);
-        return runEnd(() -> setGrabberState(GrabberState.INTAKE), holdCommand()::schedule).until(this::hasAlgae);
+        setCurrentLimit(50);
+        return startEnd(() -> setGrabberState(GrabberState.INTAKE), () -> setGrabberState(GrabberState.HOLD)).until(this::hasAlgae);
     }
 
     public Command holdCommand() {
@@ -187,12 +190,14 @@ public class Grabber extends SubsystemBase {
     public Command outtakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(40);
-        return runEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP)).onlyWhile(this::hasAlgae);
+        return startEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP));
     }
 
     public Command stopIntakeCommand() {
         return setGrabberStateCommand(GrabberState.STOP);
     }
+
+
     public Command getGamePieceCommand() {
         return (hasAlgae()) ? outtakeCommand() : intakeCommand();
     }

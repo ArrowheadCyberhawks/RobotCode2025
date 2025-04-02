@@ -191,7 +191,7 @@ public class RobotContainer {
 
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
-        () -> true,
+        driverController.leftStick()::getAsBoolean,
         IOConstants.kDriverControllerDeadband,
         SwerveConstants.kMaxVelTele.in(MetersPerSecond),
         SwerveConstants.kMaxAccelTele.in(MetersPerSecondPerSecond),
@@ -275,8 +275,8 @@ public class RobotContainer {
 
     //ADD HUMAN PLAYER STATIONS, IN FIELDCONSTANTS :)
 
-    keypadHID.button(1).onTrue(grabber.intakeCommand());
-    keypadHID.button(4).onTrue(grabber.outtakeCommand());
+    keypadHID.button(1).whileTrue(grabber.intakeCommand());
+    keypadHID.button(4).whileTrue(grabber.outtakeCommand());
     keypadHID.button(2).onTrue(superstructure.LO()); //switch to human intake
 
     keypadHID.button(7).onTrue(superstructure.setNextSuperStructure(SuperStructureState.BARGE));
