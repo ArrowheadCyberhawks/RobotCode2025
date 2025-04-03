@@ -1,12 +1,12 @@
 package frc.robot.subsystems;
 
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.Millimeters;
 import static frc.robot.constants.Constants.GrabberConstants.*;
 
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.spark.SparkMax;
+import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
@@ -15,14 +15,10 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
-import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 
 /**
@@ -30,25 +26,24 @@ import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
  * as well as the pivoting mechanism.
  */
 public class Arm extends SubsystemBase {
-    private final SparkMax pivotMotor;
-    private final RelativeEncoder pivotEncoder;
-    private final ProfiledPIDController pivotController = new ProfiledPIDController(kPivotP.get(), 0, 0, new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get())); //0.09    
+    private final SparkMax pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
+    private final ProfiledPIDController pivotController = new ProfiledPIDController(kPivotP.get(), kPivotI.get(), kPivotD.get(), new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get())); //0.09    
+    private final CANcoder pivotEncoder = new CANcoder(kPivotEncoderId); //0.09
+    private final StatusSignal<Angle> pivotEncoderAngle = pivotEncoder.getAbsolutePosition();
 
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
      */
     public Arm() {
-        pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
-        pivotEncoder = pivotMotor.getEncoder();
-
         pivotController.setGoal(getPivotAngle().getRadians());
         pivotController.setTolerance(Units.degreesToRadians(3));
+        pivotController.enableContinuousInput(-Math.PI, Math.PI);
     }
 
 
     public void periodic() {
-        // updateConstants();
-        setPivotMotor(MathUtil.clamp(pivotController.calculate(pivotEncoder.getPosition()), -kMaxPivotPower, kMaxPivotPower));
+        updateConstants();
+        setPivotMotor(MathUtil.clamp(pivotController.calculate(getPivotAngle().getRadians()), -kMaxPivotPower, kMaxPivotPower));
 
         SmartDashboard.putNumber("Pivot Angle", getPivotAngle().getRadians());
         SmartDashboard.putNumber("Pivot Target", pivotController.getGoal().position);
@@ -59,8 +54,13 @@ public class Arm extends SubsystemBase {
 
     private void updateConstants() {
         if (kPivotP.get() != pivotController.getP()
-            || kPivotMaxVel.get() != pivotController.getConstraints().maxVelocity) {
+                || kPivotI.get() != pivotController.getI()
+                || kPivotD.get() != pivotController.getD()
+                || kPivotMaxAccel.get() != pivotController.getConstraints().maxAcceleration
+                || kPivotMaxVel.get() != pivotController.getConstraints().maxVelocity) {
             pivotController.setP(kPivotP.get());
+            pivotController.setI(kPivotI.get());
+            pivotController.setD(kPivotD.get());
             pivotController.setConstraints(new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get()));
         }
     }
@@ -97,7 +97,8 @@ public class Arm extends SubsystemBase {
      * @return A Rotation2d representing the position of the pivot motor encoder.
      */
     public Rotation2d getPivotAngle() {
-        return new Rotation2d(pivotMotor.getEncoder().getPosition());
+        pivotEncoderAngle.refresh();
+        return Rotation2d.fromRotations(pivotEncoderAngle.getValueAsDouble());
     }
 
     public void stopPivotMotor() {
@@ -109,7 +110,7 @@ public class Arm extends SubsystemBase {
     }
 
     public void resetPivotAngle(Rotation2d angle) {
-        pivotEncoder.setPosition(angle.getRadians());
+        pivotEncoder.setPosition(angle.getRotations());
     }
 
     /**

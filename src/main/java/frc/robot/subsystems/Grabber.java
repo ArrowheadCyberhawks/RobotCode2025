@@ -4,6 +4,8 @@ import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeters;
 import static frc.robot.constants.Constants.GrabberConstants.*;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.spark.SparkMax;
@@ -159,6 +161,15 @@ public class Grabber extends SubsystemBase {
      */
     public Command runGrabberCommand(double speed) {
         return runGrabberCommand(speed, speed);
+    }
+
+    /**
+     * Runs both grabber motors at the same speed.
+     * @param speed The speed to run the grabber motors at. Should be between -1 and 1.
+     * @return A command that runs the grabber motors at the given speed.
+     */
+    public Command runGrabberCommand(DoubleSupplier speed) {
+        return runEnd(() -> setGrabberMotors(speed.getAsDouble(), speed.getAsDouble()), this::stopGrabberMotors);
     }
 
     public Command stopGrabberCommand() {

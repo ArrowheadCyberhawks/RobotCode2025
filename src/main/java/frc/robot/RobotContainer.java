@@ -302,7 +302,7 @@ public class RobotContainer {
     manipulatorController.leftStick()
         .whileTrue(new ManualElevatorCommand(elevator, () -> -manipulatorController.getLeftY() / 50));
     manipulatorController.rightStick()
-        .whileTrue(new ManualPivotCommand(pivot, () -> -manipulatorController.getRightY() / 8));
+        .whileTrue(new ManualPivotCommand(pivot, () -> -manipulatorController.getRightY()/2));
 
     //Manual Coral Heights
     manipulatorController.a().onTrue(superstructure.LO()); //switch to L1
@@ -317,17 +317,17 @@ public class RobotContainer {
     manipulatorController.pov(180).onTrue(superstructure.Processor());
 
     //Intake/Outake
-    manipulatorController.leftTrigger().onTrue(grabber.intakeCommand());
-    manipulatorController.rightTrigger().onTrue(grabber.outtakeCommand());
+    manipulatorController.rightTrigger().whileTrue(grabber.intakeCommand());
+    manipulatorController.leftTrigger().whileTrue(grabber.outtakeCommand());
 
     manipulatorController.leftBumper().onTrue(superstructure.Intake());
     manipulatorController.rightBumper().onTrue(superstructure.LO());
 
     //reset angles
-    manipulatorController.start().onTrue(new InstantCommand(() -> new InstantCommand(() -> {
-      pivot.resetPivotAngle(new Rotation2d());
+    manipulatorController.start().onTrue(new InstantCommand(() -> {
+      pivot.resetPivotAngle(Rotation2d.kZero);
       System.out.println("resetting pivot angle");
-    })));
+    }));
     manipulatorController.back().onTrue(new InstantCommand(() -> elevator.resetElevatorEncoders()));
 
   }

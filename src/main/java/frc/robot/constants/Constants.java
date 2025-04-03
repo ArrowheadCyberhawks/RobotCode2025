@@ -117,10 +117,12 @@ public final class Constants {
     public static final int kGrabberMotor2Port = 12;
     public static final int kPivotMotorPort = 11;
 
-    public static final int kCoralSensorPort = 22;
-    public static final int kAlgaeSensorPort = 13;
+    public static final int kCoralSensorPort = 13;
+    public static final int kAlgaeSensorPort = 22;
 
-    public static final double kMaxPivotPower = 0.5;
+    public static final int kPivotEncoderId = 55;
+
+    public static final double kMaxPivotPower = 0.7;
 
     public static final Rotation2d kPivotLimit = Rotation2d.fromDegrees(0);
 
@@ -129,7 +131,10 @@ public final class Constants {
     public static final Distance kCoralSensorThreshold = Centimeters.of(10);
     public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
 
-    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 3);
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 0.7
+    );//3
+    public static final LoggedNetworkNumber kPivotI = new LoggedNetworkNumber("Grabber/kPivotI", 0.0);
+    public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.0);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
     public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
 
@@ -145,7 +150,7 @@ public final class Constants {
       ALGPICK(Rotation2d.fromRadians(1.01)),
       ALGREEF(Rotation2d.fromRadians(0.41)),
       PROC(Rotation2d.fromRadians(0.75)),
-      HI(new Rotation2d(0));//70
+      HI(Rotation2d.kZero);//70
       
       private final Rotation2d angle;
 
