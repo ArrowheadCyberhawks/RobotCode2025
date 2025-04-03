@@ -53,7 +53,7 @@ public final class Constants {
     public static final int kKeypadPort = 5;
 
     public static final double kManipulatorJoystickDeadband = 0.05;
-    public static final double kDriverControllerDeadband = 0.07;
+    public static final double kDriverControllerDeadband = 0.04;
 
   }
 
@@ -87,6 +87,8 @@ public final class Constants {
     public static final LoggedNetworkNumber kElevatorMaxAccel = new LoggedNetworkNumber("Elevator/kElevatorMaxAccel", 10);
 
     public static final int elevatorMotorID = 9;
+
+    public static final double maxHeight = 1.65;
 
     public static enum ElevatorLevel {
       LO(0.0),
@@ -131,12 +133,13 @@ public final class Constants {
     public static final Distance kCoralSensorThreshold = Centimeters.of(10);
     public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
 
-    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 0.7
-    );//3
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 0.7);//3
     public static final LoggedNetworkNumber kPivotI = new LoggedNetworkNumber("Grabber/kPivotI", 0.0);
     public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.0);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
     public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
+
+    public static final LoggedNetworkNumber kPivotUpP = new LoggedNetworkNumber("Grabber/kPivotUpP", 0.3);
 
     public static enum PivotPosition { //TODO update positions
       DOWN(Rotation2d.kPi),//-65  was at - 40 
@@ -147,7 +150,7 @@ public final class Constants {
       HUMAN(Rotation2d.fromRadians(4.08)),
       ZERO(Rotation2d.kZero),
 
-      ALGPICK(Rotation2d.fromRadians(1.01)),
+      ALGPICK(Rotation2d.fromRadians(1.06)),
       ALGREEF(Rotation2d.fromRadians(0.41)),
       PROC(Rotation2d.fromRadians(0.75)),
       HI(Rotation2d.kZero);//70
@@ -164,7 +167,7 @@ public final class Constants {
     }
 
     public static enum GrabberState {
-      INTAKE(0.25),
+      INTAKE(0.35),
       OUTTAKE(-0.90),
       HOLD(0.07),
       STOP(0.0);

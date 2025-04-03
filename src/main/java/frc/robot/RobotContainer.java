@@ -191,7 +191,7 @@ public class RobotContainer {
 
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
-        driverController.leftStick()::getAsBoolean,
+        driverController.leftStick().negate()::getAsBoolean,
         IOConstants.kDriverControllerDeadband,
         SwerveConstants.kMaxVelTele.in(MetersPerSecond),
         SwerveConstants.kMaxAccelTele.in(MetersPerSecondPerSecond),
@@ -317,8 +317,8 @@ public class RobotContainer {
     manipulatorController.pov(180).onTrue(superstructure.Processor());
 
     //Intake/Outake
-    manipulatorController.rightTrigger().whileTrue(grabber.intakeCommand());
-    manipulatorController.leftTrigger().whileTrue(grabber.outtakeCommand());
+    manipulatorController.leftTrigger().whileTrue(grabber.intakeCommand());
+    manipulatorController.rightTrigger().whileTrue(grabber.outtakeCommand());
 
     manipulatorController.leftBumper().onTrue(superstructure.Intake());
     manipulatorController.rightBumper().onTrue(superstructure.LO());

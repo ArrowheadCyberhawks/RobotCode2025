@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Centimeter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.Millimeters;
 import static frc.robot.constants.Constants.GrabberConstants.*;
@@ -67,6 +68,7 @@ public class Grabber extends SubsystemBase {
         Logger.recordOutput(getName() + "/Has Coral", hasCoral());
         Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
 
+        Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Centimeter));
         //Controling LEDS
 
         // if(hasAlgae() || hasCoral()) {
@@ -189,7 +191,7 @@ public class Grabber extends SubsystemBase {
      */
     public Command intakeCommand() {
         stopGrabberMotors();
-        setCurrentLimit(50);
+        setCurrentLimit(20);
         return startEnd(() -> setGrabberState(GrabberState.INTAKE), () -> setGrabberState(GrabberState.HOLD)).until(this::hasAlgae);
     }
 

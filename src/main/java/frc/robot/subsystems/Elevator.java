@@ -13,6 +13,7 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -35,6 +36,9 @@ public class Elevator extends SubsystemBase {
     @Override
     public void periodic() {
         // updateConstants();
+        if(DriverStation.isDisabled()) {
+            elevatorController.setGoal(getHeight().in(Meters));
+        }
         elevatorMotor.set(elevatorController.calculate(elevatorEncoder.getPosition()));
         
         SmartDashboard.putNumber("Elevator Height", elevatorEncoder.getPosition());
@@ -72,6 +76,8 @@ public class Elevator extends SubsystemBase {
     public void setHeight(double height) {
         if (height < 0) {
             height = 0;
+        } else if (height > maxHeight) {
+            height = maxHeight;
         }
         elevatorController.setGoal(height);
     }

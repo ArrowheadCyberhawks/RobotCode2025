@@ -43,6 +43,11 @@ public class Arm extends SubsystemBase {
 
     public void periodic() {
         updateConstants();
+        if (Math.abs(getPivotAngle().getDegrees()) < 15) {
+            pivotController.setP(kPivotUpP.get());
+        } else {
+            pivotController.setP(kPivotP.get());
+        }
         setPivotMotor(MathUtil.clamp(pivotController.calculate(getPivotAngle().getRadians()), -kMaxPivotPower, kMaxPivotPower));
 
         SmartDashboard.putNumber("Pivot Angle", getPivotAngle().getRadians());
