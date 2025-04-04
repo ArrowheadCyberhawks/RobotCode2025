@@ -93,14 +93,14 @@ public final class Constants {
     public static enum ElevatorLevel {
       LO(0.0),
       L1(0.444),
-      L2(0.285), //0.269 
-      L3(0.642), 
-      L4(1.37), //1.354
-      HI(1.7),
-      HUMAN(0.85),
+      L2(0.267), //0.269 
+      L3(0.66), 
+      L4(1.327 ), //1.354
+      HI(1.65),
+      HUMAN(0.911),
       CLEAR(1.1),
-      ALG3(0.77),
-      ALG2(0.39);
+      ALG3(0.866),
+      ALG2(0.461);
 
       private final double height;
 
@@ -133,27 +133,32 @@ public final class Constants {
     public static final Distance kCoralSensorThreshold = Centimeters.of(10);
     public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
 
-    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 0.7);//3
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 7.5);//0.7
     public static final LoggedNetworkNumber kPivotI = new LoggedNetworkNumber("Grabber/kPivotI", 0.0);
-    public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.0);
+    public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.75);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
     public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
 
     public static final LoggedNetworkNumber kPivotUpP = new LoggedNetworkNumber("Grabber/kPivotUpP", 0.3);
 
+    public static final LoggedNetworkNumber kPivotS = new LoggedNetworkNumber("Grabber/kPivotS", 0.0);
+    public static final LoggedNetworkNumber kPivotG = new LoggedNetworkNumber("Grabber/kPivotG", 0.4);
+    public static final LoggedNetworkNumber kPivotV = new LoggedNetworkNumber("Grabber/kPivotV", 0.15);
+    public static final LoggedNetworkNumber kPivotA = new LoggedNetworkNumber("Grabber/kPivotA", 0.04);
+
+
     public static enum PivotPosition { //TODO update positions
-      DOWN(Rotation2d.kPi),//-65  was at - 40 
+      //DOWN(Rotation2d.kPi),//-65  was at - 40 
       OUT(Rotation2d.fromDegrees(5.0)),
-      PLACE(Rotation2d.fromRadians(0.56)),
-      L1(Rotation2d.fromRadians(4.346)),
-      L4(Rotation2d.fromRadians(0.76)),
-      HUMAN(Rotation2d.fromRadians(4.08)),
+      PLACE(Rotation2d.fromRadians(1.05)),
+      L1(Rotation2d.fromRadians(3.034)),
+      L4(Rotation2d.fromRadians(0.866)),
+      HUMAN(Rotation2d.fromRadians(4.2)),
       ZERO(Rotation2d.kZero),
 
-      ALGPICK(Rotation2d.fromRadians(1.06)),
-      ALGREEF(Rotation2d.fromRadians(0.41)),
-      PROC(Rotation2d.fromRadians(0.75)),
-      HI(Rotation2d.kZero);//70
+      ALGPICK(Rotation2d.fromRadians(0.61)),
+      ALGREEF(Rotation2d.fromRadians(1.125)),
+      HI(Rotation2d.fromRadians(2.139));//70
       
       private final Rotation2d angle;
 
@@ -167,9 +172,9 @@ public final class Constants {
     }
 
     public static enum GrabberState {
-      INTAKE(0.35),
+      INTAKE(0.6),
       OUTTAKE(-0.90),
-      HOLD(0.07),
+      HOLD(0.1),
       STOP(0.0);
 
       private final double speed;
@@ -219,13 +224,13 @@ public final class Constants {
     }
 
     public static class Auto {
-      public static final double kPTranslation = 9.45; //6.5
-      public static final double kITranslation = 0.62;
-      public static final double kDTranslation = 0.02;
+      public static final double kPTranslation = 8.45; //6.5
+      public static final double kITranslation = 0.3;
+      public static final double kDTranslation = 0.01;
 
-      public static final double kPTheta = 9;
-      public static final double kITheta = 0.2;
-      public static final double kDTheta = 0.01;
+      public static final double kPTheta = 6;
+      public static final double kITheta = 0.1;
+      public static final double kDTheta = 0.005;
       
       public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
       public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);

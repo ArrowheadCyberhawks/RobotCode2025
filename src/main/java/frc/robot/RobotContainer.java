@@ -124,7 +124,12 @@ public class RobotContainer {
       };
     } else {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortUSB,
-          IOConstants.kDriverControllerDeadband, 0.15);
+          IOConstants.kDriverControllerDeadband, 0.15) {
+          @Override
+        public double interpolate(double value) {
+          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+        }
+      };
     }
 
     if (DriverStation.isJoystickConnected(IOConstants.kManipulatorControllerPortBT)) {
@@ -138,7 +143,7 @@ public class RobotContainer {
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     cam0 = new PhotonCameraWrapper(Constants.CameraConstants.cam0.name, Constants.CameraConstants.cam0.offset);
-    cam1 = new PhotonCameraWrapper(Constants.CameraConstants.cam1.name, Constants.CameraConstants.cam1.offset);
+    cam1 = new PhotonCameraWrapper("cam2", Constants.CameraConstants.cam1.offset);
 
     // cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new
     // Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new
@@ -191,7 +196,7 @@ public class RobotContainer {
 
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
-        driverController.leftStick().negate()::getAsBoolean,
+        driverController.rightBumper().negate()::getAsBoolean,
         IOConstants.kDriverControllerDeadband,
         SwerveConstants.kMaxVelTele.in(MetersPerSecond),
         SwerveConstants.kMaxAccelTele.in(MetersPerSecondPerSecond),
@@ -282,7 +287,7 @@ public class RobotContainer {
     keypadHID.button(7).onTrue(superstructure.setNextSuperStructure(SuperStructureState.BARGE));
     keypadHID.button(11).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG3));
     keypadHID.button(15).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG2));
-    keypadHID.button(19).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PROCESSOR));
+    keypadHID.button(19).onTrue(superstructure.AlgaePickup());
     keypadHID.button(24).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PICKUP));
     // TODO: Add algae pickup to superstructure subsystem (button 24)
 
@@ -302,7 +307,7 @@ public class RobotContainer {
     manipulatorController.leftStick()
         .whileTrue(new ManualElevatorCommand(elevator, () -> -manipulatorController.getLeftY() / 50));
     manipulatorController.rightStick()
-        .whileTrue(new ManualPivotCommand(pivot, () -> -manipulatorController.getRightY()/2));
+        .whileTrue(new ManualPivotCommand(pivot, () -> manipulatorController.getRightY()/2));
 
     //Manual Coral Heights
     manipulatorController.a().onTrue(superstructure.LO()); //switch to L1
@@ -320,8 +325,8 @@ public class RobotContainer {
     manipulatorController.leftTrigger().whileTrue(grabber.intakeCommand());
     manipulatorController.rightTrigger().whileTrue(grabber.outtakeCommand());
 
-    manipulatorController.leftBumper().onTrue(superstructure.Intake());
-    manipulatorController.rightBumper().onTrue(superstructure.LO());
+    manipulatorController.start().onTrue(superstructure.Intake());
+    manipulatorController.back().onTrue(superstructure.LO());
 
     //reset angles
     manipulatorController.start().onTrue(new InstantCommand(() -> {

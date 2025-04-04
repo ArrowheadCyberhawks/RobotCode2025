@@ -1,5 +1,6 @@
 package frc.robot.subsystems;
 
+import static edu.wpi.first.units.Units.Volts;
 import static frc.robot.constants.Constants.GrabberConstants.*;
 
 import org.littletonrobotics.junction.Logger;
@@ -11,6 +12,7 @@ import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
@@ -30,6 +32,7 @@ public class Arm extends SubsystemBase {
     private final ProfiledPIDController pivotController = new ProfiledPIDController(kPivotP.get(), kPivotI.get(), kPivotD.get(), new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get())); //0.09    
     private final CANcoder pivotEncoder = new CANcoder(kPivotEncoderId); //0.09
     private final StatusSignal<Angle> pivotEncoderAngle = pivotEncoder.getAbsolutePosition();
+    private final ArmFeedforward pivotFeedforward = new ArmFeedforward(kPivotS.get(), kPivotG.get(), kPivotV.get(), kPivotA.get()); //0.09
 
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
@@ -37,18 +40,20 @@ public class Arm extends SubsystemBase {
     public Arm() {
         pivotController.setGoal(getPivotAngle().getRadians());
         pivotController.setTolerance(Units.degreesToRadians(3));
-        pivotController.enableContinuousInput(-Math.PI, Math.PI);
+        // pivotController.enableContinuousInput(0, 2 * Math.PI);
     }
 
 
     public void periodic() {
         updateConstants();
-        if (Math.abs(getPivotAngle().getDegrees()) < 15) {
-            pivotController.setP(kPivotUpP.get());
-        } else {
-            pivotController.setP(kPivotP.get());
-        }
-        setPivotMotor(MathUtil.clamp(pivotController.calculate(getPivotAngle().getRadians()), -kMaxPivotPower, kMaxPivotPower));
+        // if (Math.abs(getPivotAngle().getDegrees()) < 15) {
+        //     pivotController.setP(kPivotUpP.get());
+        // } else {
+        //     pivotController.setP(kPivotP.get());
+        // }
+        // setPivotMotor(MathUtil.clamp(pivotController.calculate(getPivotAngle().getRadians()), -kMaxPivotPower, kMaxPivotPower));
+        
+        pivotMotor.setVoltage(Volts.of(pivotFeedforward.calculate(pivotController.getSetpoint().position, pivotController.getSetpoint().velocity) + pivotController.calculate(getPivotAngle().getRadians())));
 
         SmartDashboard.putNumber("Pivot Angle", getPivotAngle().getRadians());
         SmartDashboard.putNumber("Pivot Target", pivotController.getGoal().position);
@@ -61,11 +66,19 @@ public class Arm extends SubsystemBase {
         if (kPivotP.get() != pivotController.getP()
                 || kPivotI.get() != pivotController.getI()
                 || kPivotD.get() != pivotController.getD()
+                || kPivotS.get() != pivotFeedforward.getKs()
+                || kPivotG.get() != pivotFeedforward.getKg()
+                || kPivotV.get() != pivotFeedforward.getKv()
+                || kPivotA.get() != pivotFeedforward.getKa()
                 || kPivotMaxAccel.get() != pivotController.getConstraints().maxAcceleration
                 || kPivotMaxVel.get() != pivotController.getConstraints().maxVelocity) {
             pivotController.setP(kPivotP.get());
             pivotController.setI(kPivotI.get());
             pivotController.setD(kPivotD.get());
+            pivotFeedforward.setKs(kPivotS.get());
+            pivotFeedforward.setKg(kPivotG.get());
+            pivotFeedforward.setKv(kPivotV.get());
+            pivotFeedforward.setKa(kPivotA.get());
             pivotController.setConstraints(new Constraints(kPivotMaxVel.get(), kPivotMaxAccel.get()));
         }
     }
