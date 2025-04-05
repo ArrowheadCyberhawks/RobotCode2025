@@ -97,10 +97,10 @@ public final class Constants {
       L3(0.66), 
       L4(1.327 ), //1.354
       HI(1.65),
-      HUMAN(0.911),
+      HUMAN(0.930),
       CLEAR(1.1),
-      ALG3(0.866),
-      ALG2(0.461);
+      ALG3(0.849),
+      ALG2(0.46);
 
       private final double height;
 
@@ -150,15 +150,15 @@ public final class Constants {
     public static enum PivotPosition { //TODO update positions
       //DOWN(Rotation2d.kPi),//-65  was at - 40 
       OUT(Rotation2d.fromDegrees(5.0)),
-      PLACE(Rotation2d.fromRadians(1.05)),
+      PLACE(Rotation2d.fromRadians(1.312)),
       L1(Rotation2d.fromRadians(3.034)),
-      L4(Rotation2d.fromRadians(0.866)),
-      HUMAN(Rotation2d.fromRadians(4.2)),
+      L4(Rotation2d.fromRadians(1.310)),
+      HUMAN(Rotation2d.fromRadians(3.965)),
       ZERO(Rotation2d.kZero),
 
-      ALGPICK(Rotation2d.fromRadians(0.61)),
-      ALGREEF(Rotation2d.fromRadians(1.125)),
-      HI(Rotation2d.fromRadians(2.139));//70
+      ALGPICK(Rotation2d.fromRadians(0.966)),
+      ALGREEF(Rotation2d.fromRadians(1.33)),
+      HI(Rotation2d.fromRadians(1.762));//70
       
       private final Rotation2d angle;
 
@@ -174,7 +174,7 @@ public final class Constants {
     public static enum GrabberState {
       INTAKE(0.6),
       OUTTAKE(-0.90),
-      HOLD(0.1),
+      HOLD(0.15),
       STOP(0.0);
 
       private final double speed;
@@ -340,8 +340,8 @@ public final class Constants {
     }
     public static class cam1 {
       public static final String name = "cam1";
-      public static final Translation3d translation = new Translation3d(Inches.of(-1.00), Inches.of(-10.50), Inches.of(9));
-      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(0),0, Units.degreesToRadians(-4));
+      public static final Translation3d translation = new Translation3d(Inches.of(-0.75), Inches.of(-12.75), Inches.of(10.25));
+      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(0), Units.degreesToRadians(-5));
       public static final Transform3d offset = new Transform3d(translation, rotation);
     }
 

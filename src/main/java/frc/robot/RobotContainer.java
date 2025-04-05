@@ -29,6 +29,7 @@ import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
+import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.PID.PointTrack;
 
@@ -307,7 +308,7 @@ public class RobotContainer {
     manipulatorController.leftStick()
         .whileTrue(new ManualElevatorCommand(elevator, () -> -manipulatorController.getLeftY() / 50));
     manipulatorController.rightStick()
-        .whileTrue(new ManualPivotCommand(pivot, () -> manipulatorController.getRightY()/2));
+        .whileTrue(new ManualPivotCommand(pivot, () -> manipulatorController.getRightY()/4));
 
     //Manual Coral Heights
     manipulatorController.a().onTrue(superstructure.LO()); //switch to L1
@@ -322,17 +323,17 @@ public class RobotContainer {
     manipulatorController.pov(180).onTrue(superstructure.Processor());
 
     //Intake/Outake
-    manipulatorController.leftTrigger().whileTrue(grabber.intakeCommand());
+    manipulatorController.leftTrigger().whileTrue(grabber.run(()->grabber.setGrabberState(GrabberState.INTAKE))).onFalse(grabber.run(()->grabber.setGrabberState(GrabberState.HOLD)));
     manipulatorController.rightTrigger().whileTrue(grabber.outtakeCommand());
 
     manipulatorController.start().onTrue(superstructure.Intake());
     manipulatorController.back().onTrue(superstructure.LO());
 
     //reset angles
-    manipulatorController.start().onTrue(new InstantCommand(() -> {
-      pivot.resetPivotAngle(Rotation2d.kZero);
-      System.out.println("resetting pivot angle");
-    }));
+    // manipulatorController.start().onTrue(new InstantCommand(() -> {
+    //   pivot.resetPivotAngle(Rotation2d.kZero);
+    //   System.out.println("resetting pivot angle");
+    // }));
     manipulatorController.back().onTrue(new InstantCommand(() -> elevator.resetElevatorEncoders()));
 
   }

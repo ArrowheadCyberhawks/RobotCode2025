@@ -71,7 +71,7 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("INTAKE",
                 grabberSubsystem.runGrabberCommand(GrabberState.INTAKE.getSpeed())
                 .until(grabberSubsystem::hasAlgae)
-                .withTimeout(2)
+                .withTimeout(3.5)
         );
         NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(1));
 
