@@ -129,6 +129,7 @@ public class Arm extends SubsystemBase {
 
     public void resetPivotAngle(Rotation2d angle) {
         pivotEncoder.setPosition(angle.getRotations());
+        resetPivotTarget();
     }
 
     /**

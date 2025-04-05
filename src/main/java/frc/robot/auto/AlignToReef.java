@@ -104,16 +104,16 @@ public class AlignToReef {
                 new Pose2d(
                     swerveSubsystem.getPose().getTranslation(), getPathVelocityHeading(swerveSubsystem.swerveDrive.getFieldVelocity(), waypoint)),
                     waypoint);
-
+        
         //Crash-proof
         if (waypoints.size() < 2) {
              return Commands.print("ERROR: Not enough waypoints to generate a path ( < 2 waypoints )");
         }
         
         //If the robot is close enough it uses only PID
-        if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < modeVal) {
-            return autoDrive(waypoint);
-        }
+        // if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < modeVal) {
+        //     return autoDrive(waypoint);
+        // }
 
         //Create constraints for the path and the path itself
         //TODO Move to Constants

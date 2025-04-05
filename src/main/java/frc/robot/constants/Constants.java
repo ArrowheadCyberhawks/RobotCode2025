@@ -146,28 +146,32 @@ public final class Constants {
     public static final LoggedNetworkNumber kPivotV = new LoggedNetworkNumber("Grabber/kPivotV", 0.15);
     public static final LoggedNetworkNumber kPivotA = new LoggedNetworkNumber("Grabber/kPivotA", 0.04);
 
-
+    public static final double grabberOffset = Math.PI/2;
     public static enum PivotPosition { //TODO update positions
       //DOWN(Rotation2d.kPi),//-65  was at - 40 
-      OUT(Rotation2d.fromDegrees(5.0)),
-      PLACE(Rotation2d.fromRadians(1.312)),
-      L1(Rotation2d.fromRadians(3.034)),
-      L4(Rotation2d.fromRadians(1.310)),
-      HUMAN(Rotation2d.fromRadians(3.965)),
+      
+      OUT(Rotation2d.fromDegrees(5.0 + grabberOffset)),
+      PLACE(Rotation2d.fromRadians(1.1 + grabberOffset)),
+      L1(Rotation2d.fromRadians(Math.PI + grabberOffset)),
+      L4(Rotation2d.fromRadians(0.96 + grabberOffset)),
+      HUMAN(Rotation2d.fromRadians(3.902 + grabberOffset)),
       ZERO(Rotation2d.kZero),
 
-      ALGPICK(Rotation2d.fromRadians(0.966)),
-      ALGREEF(Rotation2d.fromRadians(1.33)),
-      HI(Rotation2d.fromRadians(1.762));//70
+      ALGPICK(Rotation2d.fromRadians(0.65 + grabberOffset)),
+      ALGREEF(Rotation2d.fromRadians(1.125 + grabberOffset)),
+      HI(Rotation2d.fromRadians(1.762 + grabberOffset));//70
       
       private final Rotation2d angle;
 
       private PivotPosition(Rotation2d angle) {
           this.angle = angle;
+          //put grabberoffset here next time
       }
 
       public Rotation2d getAngle() {
           return angle;
+         //put grabberoffset here next time
+
       }
     }
 

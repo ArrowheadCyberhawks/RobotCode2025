@@ -6,50 +6,35 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import lib.frc706.cyberlib.XboxControllerWrapper;
-import lib.frc706.cyberlib.commands.ToPointCommand;
-import lib.frc706.cyberlib.commands.ToTagCommand;
 import lib.frc706.cyberlib.commands.TrackPointCommand;
-import lib.frc706.cyberlib.commands.controller.ControllerRumbleCommand;
 import lib.frc706.cyberlib.commands.controller.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import frc.robot.auto.DriveToPose;
 import frc.robot.auto.AlignToReef;
-import frc.robot.auto.AutoCycle;
-import frc.robot.commands.LEDCommand;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
-import frc.robot.commands.SetSuperstructureCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.IOConstants;
 import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
-import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
-import java.util.function.BooleanSupplier;
-
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -261,7 +246,9 @@ public class RobotContainer {
     //driverController.b().whileTrue(autoCycleCommandFactory.run());
 
     driverController.povUp().whileTrue(climber.runClimbCommand(() -> 0.8));
-    driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.2));
+    driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.4));
+    driverController.povLeft().onTrue(climber.climbOutCommand());
+    driverController.povRight().onTrue(climber.climbInCommand());
 
     // X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[] { keypadHID.button(22), keypadHID.button(23) };
@@ -311,7 +298,7 @@ public class RobotContainer {
         .whileTrue(new ManualPivotCommand(pivot, () -> manipulatorController.getRightY()/4));
 
     //Manual Coral Heights
-    manipulatorController.a().onTrue(superstructure.LO()); //switch to L1
+    manipulatorController.a().onTrue(superstructure.Intake());
     manipulatorController.b().onTrue(superstructure.L2());
     manipulatorController.x().onTrue(superstructure.L3());
     manipulatorController.y().onTrue(superstructure.L4());
@@ -326,15 +313,15 @@ public class RobotContainer {
     manipulatorController.leftTrigger().whileTrue(grabber.run(()->grabber.setGrabberState(GrabberState.INTAKE))).onFalse(grabber.run(()->grabber.setGrabberState(GrabberState.HOLD)));
     manipulatorController.rightTrigger().whileTrue(grabber.outtakeCommand());
 
-    manipulatorController.start().onTrue(superstructure.Intake());
-    manipulatorController.back().onTrue(superstructure.LO());
+    manipulatorController.start().onTrue(grabber.runOnce(() -> pivot.resetPivotAngle(new Rotation2d(3*Math.PI/2))).ignoringDisable(true));
+    manipulatorController.back().onTrue(superstructure.LO()); //switch to L1;
 
     //reset angles
     // manipulatorController.start().onTrue(new InstantCommand(() -> {
     //   pivot.resetPivotAngle(Rotation2d.kZero);
     //   System.out.println("resetting pivot angle");
     // }));
-    manipulatorController.back().onTrue(new InstantCommand(() -> elevator.resetElevatorEncoders()));
+    // manipulatorController.back().onTrue(new InstantCommand(() -> elevator.resetElevatorEncoders()));
 
   }
 
