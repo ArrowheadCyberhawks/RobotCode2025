@@ -159,8 +159,7 @@ public class Grabber extends SubsystemBase {
     /**
      * Runs both grabber motors at the same speed.
      * @param speed The speed to run the grabber motors at. Should be between -1 and 1.
-     * @return A command that runs the grabber motors at the given speed.
-     */
+     * @return A command that runs the grabber motors
     public Command runGrabberCommand(double speed) {
         return runGrabberCommand(speed, speed);
     }

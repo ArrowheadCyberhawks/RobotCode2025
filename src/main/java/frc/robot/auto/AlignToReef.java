@@ -111,9 +111,9 @@ public class AlignToReef {
         }
         
         //If the robot is close enough it uses only PID
-        // if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < modeVal) {
-        //     return autoDrive(waypoint);
-        // }
+        if (waypoints.get(0).anchor().getDistance(waypoints.get(1).anchor()) < modeVal) {
+            return autoDrive(waypoint);
+        }
 
         //Create constraints for the path and the path itself
         //TODO Move to Constants

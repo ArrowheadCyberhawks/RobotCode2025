@@ -146,7 +146,7 @@ public final class Constants {
     public static final LoggedNetworkNumber kPivotV = new LoggedNetworkNumber("Grabber/kPivotV", 0.15);
     public static final LoggedNetworkNumber kPivotA = new LoggedNetworkNumber("Grabber/kPivotA", 0.04);
 
-    public static final double grabberOffset = Math.PI/2;
+    public static final double grabberOffset = Math.PI/2 + 0.21;
     public static enum PivotPosition { //TODO update positions
       //DOWN(Rotation2d.kPi),//-65  was at - 40 
       
@@ -157,7 +157,7 @@ public final class Constants {
       HUMAN(Rotation2d.fromRadians(3.902 + grabberOffset)),
       ZERO(Rotation2d.kZero),
 
-      ALGPICK(Rotation2d.fromRadians(0.65 + grabberOffset)),
+      ALGPICK(Rotation2d.fromRadians(0.622 + grabberOffset)),
       ALGREEF(Rotation2d.fromRadians(1.125 + grabberOffset)),
       HI(Rotation2d.fromRadians(1.762 + grabberOffset));//70
       

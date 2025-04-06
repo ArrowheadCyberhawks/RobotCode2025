@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -69,12 +71,13 @@ public class AutoCommandManager {
                                                                                                        // more
                                                                                                        // subsystems are
                                                                                                        // made
+
         NamedCommands.registerCommand("INTAKE",
-                (grabberSubsystem.runGrabberCommand(GrabberState.INTAKE.getSpeed())
+                (grabberSubsystem.runGrabberCommand(() -> GrabberState.INTAKE.getSpeed())
                 .until(grabberSubsystem::hasAlgae))
                 .withTimeout(5)
         );
-        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(1));
+        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.runGrabberCommand(GrabberState.OUTTAKE::getSpeed).withTimeout(2.0));
 
         NamedCommands.registerCommand("HUMAN", superstructure.Intake());
         NamedCommands.registerCommand("DEF", superstructure.LO());
@@ -90,31 +93,54 @@ public class AutoCommandManager {
 
         NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.climbOutCommand());
 
-        NamedCommands.registerCommand("NearR", new DriveToPose(swerveSubsystem, ReefPoint.kNearR.getPose()).withTimeout(0.75));
-        NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearRightR", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftL.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftL.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarR", new DriveToPose(swerveSubsystem, ReefPoint.kFarR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarC", new DriveToPose(swerveSubsystem, ReefPoint.kFarC.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarL", new DriveToPose(swerveSubsystem, ReefPoint.kFarL.getPose()).withTimeout(75.5));
-        NamedCommands.registerCommand("NearR", new DriveToPose(swerveSubsystem, ReefPoint.kNearR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearC", new DriveToPose(swerveSubsystem, ReefPoint.kNearC.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearL", new DriveToPose(swerveSubsystem, ReefPoint.kNearL.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarRightR", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarRightC", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightC.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarRightL", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightL.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearRightR", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearRightC", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightC.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearRightL", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightL.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarLeftC", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftC.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("FarLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftL.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftR.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearLeftC", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftC.getPose()).withTimeout(.75));
-        NamedCommands.registerCommand("NearLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftL.getPose()).withTimeout(.75));
+        NamedCommands.registerCommand("FarLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftL).withTimeout(.5));
+        NamedCommands.registerCommand("FarLeftR", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftR).withTimeout(.5));
+        NamedCommands.registerCommand("NearLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftL).withTimeout(.5));
+        NamedCommands.registerCommand("NearLeftR", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftR).withTimeout(.5));
+        NamedCommands.registerCommand("FarR", alignmentCommandFactory.generateCommand(ReefPoint.kFarR).withTimeout(.5));
+        NamedCommands.registerCommand("FarC", alignmentCommandFactory.generateCommand(ReefPoint.kFarC).withTimeout(.5));
+        NamedCommands.registerCommand("FarL", alignmentCommandFactory.generateCommand(ReefPoint.kFarL).withTimeout(.5));
+        NamedCommands.registerCommand("NearR", alignmentCommandFactory.generateCommand(ReefPoint.kNearR).withTimeout(.5));
+        NamedCommands.registerCommand("NearC", alignmentCommandFactory.generateCommand(ReefPoint.kNearC).withTimeout(.5));
+        NamedCommands.registerCommand("NearL", alignmentCommandFactory.generateCommand(ReefPoint.kNearL).withTimeout(.5));
+        NamedCommands.registerCommand("FarRightR", alignmentCommandFactory.generateCommand(ReefPoint.kFarRightR).withTimeout(.5));
+        NamedCommands.registerCommand("FarRightC", alignmentCommandFactory.generateCommand(ReefPoint.kFarRightC).withTimeout(.5));
+        NamedCommands.registerCommand("FarRightL", alignmentCommandFactory.generateCommand(ReefPoint.kFarRightL).withTimeout(.5));
+        NamedCommands.registerCommand("NearRightR", alignmentCommandFactory.generateCommand(ReefPoint.kNearRightR).withTimeout(.5));
+        NamedCommands.registerCommand("NearRightC", alignmentCommandFactory.generateCommand(ReefPoint.kNearRightC).withTimeout(.5));
+        NamedCommands.registerCommand("NearRightL", alignmentCommandFactory.generateCommand(ReefPoint.kNearRightL).withTimeout(.5));
+        NamedCommands.registerCommand("FarLeftR", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftR).withTimeout(.5));
+        NamedCommands.registerCommand("FarLeftC", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftC).withTimeout(.5));
+        NamedCommands.registerCommand("FarLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftL).withTimeout(.5));
+        NamedCommands.registerCommand("NearLeftR", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftR).withTimeout(.5));
+        NamedCommands.registerCommand("NearLeftC", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftC).withTimeout(.5));
+        NamedCommands.registerCommand("NearLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftL).withTimeout(.5));
+
+        // NamedCommands.registerCommand("NearR", new DriveToPose(swerveSubsystem, ReefPoint.kNearR.getPose()).withTimeout(0.75));
+        // NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearRightR", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarR", new DriveToPose(swerveSubsystem, ReefPoint.kFarR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarC", new DriveToPose(swerveSubsystem, ReefPoint.kFarC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarL", new DriveToPose(swerveSubsystem, ReefPoint.kFarL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearR", new DriveToPose(swerveSubsystem, ReefPoint.kNearR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearC", new DriveToPose(swerveSubsystem, ReefPoint.kNearC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearL", new DriveToPose(swerveSubsystem, ReefPoint.kNearL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarRightR", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarRightC", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarRightL", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearRightR", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearRightC", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearRightL", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftC", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftC", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftL.getPose()).withTimeout(.75));
     }
 
     public static Command pathfindToPoseCommand(Pose2d targetPose) {
