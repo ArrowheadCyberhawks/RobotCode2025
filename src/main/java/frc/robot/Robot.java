@@ -11,6 +11,7 @@ import org.littletonrobotics.junction.inputs.LoggedPowerDistribution;
 import org.littletonrobotics.junction.networktables.NT4Publisher;
 import org.littletonrobotics.junction.wpilog.WPILOGWriter;
 
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -38,6 +39,7 @@ public class Robot extends LoggedRobot {
       Logger.addDataReceiver(new NT4Publisher());
       Logger.addDataReceiver(new WPILOGWriter());
       LoggedPowerDistribution.getInstance(32, ModuleType.kRev);
+      DataLogManager.logNetworkTables(false);
     }
     AutoLogOutputManager.addPackage("lib.frc706");
     Logger.start();
@@ -70,7 +72,9 @@ public class Robot extends LoggedRobot {
   public void disabledInit() {}
 
   @Override
-  public void disabledPeriodic() {}
+  public void disabledPeriodic() {
+    m_robotContainer.pivot.resetPivotTarget();
+  }
 
   /** This autonomous runs the autonomous command selected by your {@link RobotContainer} class. */
   @Override
@@ -100,6 +104,9 @@ public class Robot extends LoggedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }
+
+    //Sets the target angle of the pivot motor to the current angle
+    m_robotContainer.pivot.resetPivotTarget();
   }
 
   /** This function is called periodically during operator control. */

@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.67482760457779,
+        "y": 3.8808580989530355
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 7.00933793688121,
+        "y": 3.8859833178849534
+      },
+      "isLocked": false,
+      "linkedName": "FarC"
+    },
+    {
+      "anchor": {
+        "x": 7.8676693415944,
+        "y": 5.264870707779088
+      },
+      "prevControl": {
+        "x": 6.607225848450491,
+        "y": 5.0038807970712265
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.0,
+    "maxAcceleration": 0.75,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 180.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 11.30993247402028
+  },
+  "reversed": false,
+  "folder": "BranchToNet",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": false
+}

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.315868466959727,
-        "y": 2.9349242946916196
+        "x": 5.142427187681895,
+        "y": 2.9823171241024697
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.918482864810115,
-        "y": 2.1011094410748568
+        "x": 5.494032762061952,
+        "y": 2.0760964550122947
       },
       "isLocked": false,
       "linkedName": "FarRightR"
     },
     {
       "anchor": {
-        "x": 1.2587090163934425,
-        "y": 0.9981045081967216
+        "x": 1.0725,
+        "y": 1.0317499999999995
       },
       "prevControl": {
-        "x": 2.5521768888178453,
-        "y": 1.6818918721726512
+        "x": 2.4559735032355765,
+        "y": 1.9564153326948928
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,22 +33,22 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
-    "maxAcceleration": 1.2,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 0.6,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": -35.0
+    "rotation": 54.04133887389291
   },
   "reversed": false,
   "folder": "BranchToStation",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 29.999999999999996
+    "rotation": 119.99999999999999
   },
   "useDefaultConstraints": true
 }

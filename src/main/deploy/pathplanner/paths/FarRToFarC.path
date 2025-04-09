@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.67482760457779,
+        "y": 4.067979278262477
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 6.770887532810268,
+        "y": 4.102360648756793
+      },
+      "isLocked": false,
+      "linkedName": "FarR"
+    },
+    {
+      "anchor": {
+        "x": 5.67482760457779,
+        "y": 3.8808580989530355
+      },
+      "prevControl": {
+        "x": 6.5383240519451356,
+        "y": 3.85898026180491
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "FarC"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 0.5,
+    "maxAcceleration": 0.25,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 180.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "BranchToAlgae",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "useDefaultConstraints": false
+}

@@ -1,132 +1,216 @@
 package frc.robot.subsystems;
 
-import static frc.robot.Constants.GrabberConstants.*;
-import frc.robot.Constants.SensorConstants;
-import com.revrobotics.spark.SparkFlex;
-import com.revrobotics.spark.SparkMax;
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.SparkLowLevel.MotorType;
+import static edu.wpi.first.units.Units.Centimeter;
+import static edu.wpi.first.units.Units.Meters;
+import static edu.wpi.first.units.Units.Millimeters;
+import static frc.robot.constants.Constants.GrabberConstants.*;
 
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import java.util.function.DoubleSupplier;
+
+import org.littletonrobotics.junction.Logger;
+
+import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.SparkBase.PersistMode;
+import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.SparkLowLevel.MotorType;
+import com.revrobotics.spark.config.SparkMaxConfig;
+
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import com.playingwithfusion.TimeOfFlight;
+import com.playingwithfusion.TimeOfFlight.RangingMode;
+
 
 /**
  * The Grabber subsystem covers the motors that manipulate the game piece
  * as well as the pivoting mechanism.
  */
 public class Grabber extends SubsystemBase {
-    private final SparkFlex grabberMotor;
-    private final SparkMax pivotMotor;
-    private final RelativeEncoder pivotEncoder;
-    private final ProfiledPIDController pivotController = new ProfiledPIDController(0.4, 0, 0, new Constraints(kPivotMaxVel, kPivotMaxAccel)); //0.09
-    //private final TimeOfFlight grabberSensor;
+    private final SparkMax grabberMotor1; // left motor
+    private final SparkMax grabberMotor2; // right motor
+    private final SparkMaxConfig grabberMotor1Config;
+    private final SparkMaxConfig grabberMotor2Config;
+    private final TimeOfFlight coralSensor, algaeSensor;
 
+    private GrabberState grabberState = GrabberState.STOP;
+    
 
     /**
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
      */
     public Grabber() {
-        grabberMotor = new SparkFlex(kGrabberMotorPort, MotorType.kBrushless);
-        pivotMotor = new SparkMax(kPivotMotorPort, MotorType.kBrushless);
-        pivotEncoder = pivotMotor.getEncoder();
-        pivotController.setGoal(getPivotAngle());
-        //grabberSensor = new TimeOfFlight(SensorConstants.kTimeOfFlightPort);
-        // pivotController.setGoal(GrabberPosition.UP.getAngle().getRotations());
-        //pivotMotor.configure(new SparkMaxConfig().apply(new EncoderConfig().positionConversionFactor(1/60.0 * 2 * Math.PI)), ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        grabberMotor1 = new SparkMax(kGrabberMotor1Port, MotorType.kBrushless);
+        grabberMotor2 = new SparkMax(kGrabberMotor2Port, MotorType.kBrushless);
+        grabberMotor1Config = new SparkMaxConfig();
+        grabberMotor2Config = new SparkMaxConfig();
+        grabberMotor1Config.smartCurrentLimit(5);
+        grabberMotor2Config.smartCurrentLimit(5);
+        grabberMotor1Config.inverted(true);
+ 
+
+        coralSensor = new TimeOfFlight(kCoralSensorPort);
+        algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
+        coralSensor.setRangingMode(RangingMode.Short, 24);
+        algaeSensor.setRangingMode(RangingMode.Short, 100);
+
+        new Trigger(this::hasCoral).onTrue(stopIntakeCommand());
     }
 
 
     public void periodic() {
-        setPivotMotor(pivotController.calculate(pivotEncoder.getPosition()));
+        //in theory we could set this to two different speeds, but we'll see
+        setGrabberMotors(grabberState.getSpeed(), grabberState.getSpeed());
+        Logger.recordOutput(getName() + "/Has Coral", hasCoral());
+        Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
+
+        Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Centimeter));
+        //Controling LEDS
+
+        // if(hasAlgae() || hasCoral()) {
+        //     LEDSubsystem.ledState = LEDState.IN;
+        // }
     }
 
 
-    /*public double getSensorDistance() {
-        return grabberSensor.getRange();
-    }*/
-
     /**
-     * Sets the speed of the grabber motor.
-     * @param speed The percent speed to set the motor to. Should be between -1 and 1.
+     * Returns the current distance measured by the coral sensor.
+     * @return The distance measured by the coral sensor in millimeters.
      */
-    public void setGrabberMotor(double speed) {
-        grabberMotor.set(speed);
+    public Distance getCoralRange() {
+        return Millimeters.of(coralSensor.getRange());
+    }
+
+    public GrabberState getGrabberState() {
+        return grabberState;
     }
 
     /**
-     * Stops the grabber motor.
+     * Returns the current distance measured by the algae sensor.
+     * @return The distance measured by the algae sensor in millimeters.
      */
-    public void stopGrabberMotor() {
-        grabberMotor.stopMotor();
+    public Distance getAlgaeRange() {
+        return Millimeters.of(algaeSensor.getRange());
     }
 
     /**
-     * Sets the speed of the pivot motor.
-     * @param speed The percent speed to set the motor to. Should be between -1 and 1.
+     * Checks if there is an object within the coral sensor's range.
+     * @return whether the robot has a coral in the grabber.
      */
-    public void setPivotMotor(double speed) {
-        pivotMotor.set(speed);
+    public boolean hasCoral() {
+        double coralRange = getCoralRange().in(Meters);
+        return coralRange > 0 && coralRange < 0.07;
+        //return getCoralRange().compareTo(kCoralSensorThreshold) < 0;
+    }
+
+    /**
+     * Checks if there is an object within the algae sensor's range.
+     * @return whether the robot has an algae in the grabber.
+     */
+    public boolean hasAlgae() {
+        double algaeRange = getAlgaeRange().in(Meters);
+        return algaeRange > 0 && algaeRange < 0.05;
     }
     
     /**
-     * Returns the position of the pivot motor.
-     * @return The position of the encoder on the pivot motor.
+     * Sets the speeds of the grabber motors independently.
+     * @param speed1 The percent speed to set the left motor to. Should be between -1 and 1.
+     * @param speed2 The percent speed to set the right motor to. Should be between -1 and 1.
      */
-    public double getPivotAngle() {
-        return pivotMotor.getEncoder().getPosition();
-    }
-
-    public void stopPivotMotor() {
-        pivotMotor.stopMotor();
+    public void setGrabberMotors(double speed1, double speed2) {
+        grabberMotor1.set(speed1);
+        grabberMotor2.set(speed2);
     }
 
     /**
-     * Sets the pivot angle of the grabber.
-     * @param angle The Rotation2d to set the pivot to. 0 is horizontal, positive is up.
+     * Stops both grabber motors.
      */
-    public void setPivotAngle(Rotation2d angle) {
-        pivotController.setGoal(angle.getRotations());
+    public void stopGrabberMotors() {
+        grabberMotor1.stopMotor();
+        grabberMotor2.stopMotor();
     }
-
     
+    public void setGrabberState(GrabberState state) {
+        grabberState = state;
+    }
 
-    public void setPivotPosition(GrabberPosition position) {
-        setPivotAngle(position.getAngle());
+    public void setCurrentLimit(int amps) {
+        grabberMotor1Config.smartCurrentLimit(amps);
+        grabberMotor2Config.smartCurrentLimit(amps);
+        grabberMotor1.configure(grabberMotor1Config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+        grabberMotor2.configure(grabberMotor2Config, ResetMode.kNoResetSafeParameters, PersistMode.kNoPersistParameters);
+    }
+   
+
+    /**
+     * Runs each grabber motor at a given speed.
+     * @param speed1 The speed to run the left grabber motor at. Should be between -1 and 1.
+     * @param speed2 The speed to run the right grabber motor at. Should be between -1 and 1.
+     * @return A command that runs the grabber motors at the given speed.
+     */
+    public Command runGrabberCommand(double speed1, double speed2) {
+        return new RunCommand(() -> setGrabberMotors(speed1, speed2)).finallyDo(() -> stopGrabberMotors());
     }
 
     /**
-     * Command to set the pivot angle of the grabber.
-     * @param angle The Rotation2d to set the pivot to. 0 is horizontal, positive is up.
-     * @return A command that sets the pivot angle of the grabber.
-     */
-    public Command setPivotAngleCommand(Rotation2d angle) {
-        return runOnce(() -> setPivotAngle(angle));
-    }
-
-    public Command setPivotPositionCommand(GrabberPosition position) {
-        return runOnce(() -> setPivotPosition(position));
-    }
-
-    /**
-     * Runs the grabber motor at a given speed.
-     * @param speed The speed to run the grabber motor at. Should be between -1 and 1.
-     * @return A command that runs the grabber motor at the given speed.
-     */
+     * Runs both grabber motors at the same speed.
+     * @param speed The speed to run the grabber motors at. Should be between -1 and 1.
+     * @return A command that runs the grabber motors
     public Command runGrabberCommand(double speed) {
-        return new RunCommand(() -> setGrabberMotor(speed)).finallyDo(() -> stopGrabberMotor());
+        return runGrabberCommand(speed, speed);
     }
 
-    public Command runPivotCommand(double speed) {
-        return runEnd(() -> setPivotMotor(speed), () -> stopPivotMotor());
+    /**
+     * Runs both grabber motors at the same speed.
+     * @param speed The speed to run the grabber motors at. Should be between -1 and 1.
+     * @return A command that runs the grabber motors at the given speed.
+     */
+    public Command runGrabberCommand(DoubleSupplier speed) {
+        return runEnd(() -> setGrabberMotors(speed.getAsDouble(), speed.getAsDouble()), this::stopGrabberMotors);
     }
 
     public Command stopGrabberCommand() {
-        return runOnce(() -> stopGrabberMotor());
+        return runOnce(() -> stopGrabberMotors());
+    }
+
+    /**
+     * InstantCommand to simply set the grabber state.
+     */
+    private Command setGrabberStateCommand(GrabberState state) {
+        return runOnce(() -> setGrabberState(state));
+    }
+
+    /**
+     * Command to run the intake at full power until algae is detected, then holds it.
+     * @return
+     */
+    public Command intakeCommand() {
+        stopGrabberMotors();
+        setCurrentLimit(20);
+        return startEnd(() -> setGrabberState(GrabberState.INTAKE), () -> setGrabberState(GrabberState.HOLD)).until(this::hasAlgae);
+    }
+
+    public Command holdCommand() {
+        setCurrentLimit(5);
+        return runEnd(() -> setGrabberState(GrabberState.HOLD), stopIntakeCommand()::schedule).until(this::hasCoral);
+    }
+
+    public Command outtakeCommand() {
+        stopGrabberMotors();
+        setCurrentLimit(40);
+        return startEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP));
+    }
+
+    public Command stopIntakeCommand() {
+        return setGrabberStateCommand(GrabberState.STOP);
+    }
+
+
+    public Command getGamePieceCommand() {
+        return (hasAlgae()) ? outtakeCommand() : intakeCommand();
     }
 }
