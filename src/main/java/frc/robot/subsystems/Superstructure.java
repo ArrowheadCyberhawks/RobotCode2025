@@ -6,7 +6,10 @@ import com.revrobotics.RelativeEncoder;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.*;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
@@ -26,6 +29,7 @@ public class Superstructure extends SubsystemBase{
      
     public static Elevator elevator;
     public static Arm pivot;
+    public static Grabber grabber;
 
     public static enum SuperStructureState {
         DEF,
@@ -45,9 +49,10 @@ public class Superstructure extends SubsystemBase{
     public static SuperStructureState superStructureState = SuperStructureState.INTAKE;
     public static SuperStructureState nextSuperStructureState = SuperStructureState.L3;
 
-    public Superstructure(Elevator elevator, Arm pivot) {
+    public Superstructure(Elevator elevator, Arm pivot, Grabber grabber) {
         Superstructure.elevator = elevator;
         Superstructure.pivot = pivot;
+        Superstructure.grabber = grabber;
     }
 
     //NOTE: This ONLY WORKS if manual controls don't put it in a dangerous position, so just have height checks for each one seperately
@@ -135,6 +140,22 @@ public class Superstructure extends SubsystemBase{
         return new SetSuperstructureCommand(pivot, elevator, pivot::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
         .withTimeout(0.5)
         .andThen(c);
+    }
+
+    /**
+     * Automatically throws the algae onto the barge and brings the superstructure back down.
+     * @return The command.
+     */
+    public Command bargePlace() {
+        return new ParallelCommandGroup(
+            elevator.setLevelCommand(ElevatorLevel.HI),
+            pivot.setPivotPositionCommand(PivotPosition.HI),
+            grabber.outtakeCommand()
+                .withTimeout(1)
+                .beforeStarting(
+                    new WaitUntilCommand(() -> elevator.getHeight().in(Meters) > ElevatorLevel.HI.getHeight() - 0.25)
+                )
+        ).andThen(LO());
     }
 
     public Command getNextSuperStructure(SuperStructureState state) {

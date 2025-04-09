@@ -96,7 +96,7 @@ public final class Constants {
       L2(0.267), //0.269 
       L3(0.66), 
       L4(1.327 ), //1.354
-      HI(1.65),
+      HI(1.5),
       HUMAN(0.930),
       CLEAR(1.1),
       ALG3(0.849),
@@ -159,7 +159,7 @@ public final class Constants {
 
       ALGPICK(Rotation2d.fromRadians(0.622 + grabberOffset)),
       ALGREEF(Rotation2d.fromRadians(1.125 + grabberOffset)),
-      HI(Rotation2d.fromRadians(1.762 + grabberOffset));//70
+      HI(Rotation2d.fromRadians(2.46 + grabberOffset));//70
       
       private final Rotation2d angle;
 
