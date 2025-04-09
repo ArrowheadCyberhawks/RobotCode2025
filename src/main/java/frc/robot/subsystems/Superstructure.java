@@ -25,7 +25,7 @@ public class Superstructure extends SubsystemBase{
     //IT CAN'T BE THAT HARD
      
     public static Elevator elevator;
-    public static Pivot pivot;
+    public static Arm pivot;
 
     public static enum SuperStructureState {
         DEF,
@@ -42,10 +42,10 @@ public class Superstructure extends SubsystemBase{
         INTAKE
     }
 
-    public static SuperStructureState superStructureState = SuperStructureState.LO;
+    public static SuperStructureState superStructureState = SuperStructureState.INTAKE;
     public static SuperStructureState nextSuperStructureState = SuperStructureState.L3;
 
-    public Superstructure(Elevator elevator, Pivot pivot) {
+    public Superstructure(Elevator elevator, Arm pivot) {
         Superstructure.elevator = elevator;
         Superstructure.pivot = pivot;
     }
@@ -56,7 +56,7 @@ public class Superstructure extends SubsystemBase{
 
     public Command Intake() {
         superStructureState = SuperStructureState.INTAKE;
-        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.DOWN::getAngle, ElevatorLevel.LO::getHeight);
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight);
         if (superStructureState == SuperStructureState.L1 ||
                 superStructureState == SuperStructureState.L2 ||
                 superStructureState == SuperStructureState.LO ||
@@ -69,7 +69,7 @@ public class Superstructure extends SubsystemBase{
 
     public Command LO() {
         superStructureState = SuperStructureState.LO;
-        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight);
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.L1::getAngle, ElevatorLevel.LO::getHeight);
         return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
     }
 
@@ -82,7 +82,7 @@ public class Superstructure extends SubsystemBase{
 
     public Command Processor() {
         superStructureState = SuperStructureState.PROCESSOR;
-        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.PROC::getAngle, ElevatorLevel.LO::getHeight);
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ALGPICK::getAngle, ElevatorLevel.LO::getHeight);
         return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
     }
 
@@ -125,6 +125,11 @@ public class Superstructure extends SubsystemBase{
         return new SetSuperstructureCommand(pivot, elevator, PivotPosition.ALGREEF::getAngle, ElevatorLevel.ALG3::getHeight);
     }
 
+    public Command AlgaePickup() {
+        superStructureState = SuperStructureState.PICKUP;
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ALGPICK::getAngle, ElevatorLevel.LO::getHeight);
+        return end;//elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight() ? Clear(end) : end;
+    }
 
     public Command Clear(Command c) {
         return new SetSuperstructureCommand(pivot, elevator, pivot::getPivotAngle, ElevatorLevel.CLEAR::getHeight)

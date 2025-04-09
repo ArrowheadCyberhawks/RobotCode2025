@@ -53,7 +53,7 @@ public final class Constants {
     public static final int kKeypadPort = 5;
 
     public static final double kManipulatorJoystickDeadband = 0.05;
-    public static final double kDriverControllerDeadband = 0.07;
+    public static final double kDriverControllerDeadband = 0.04;
 
   }
 
@@ -88,17 +88,19 @@ public final class Constants {
 
     public static final int elevatorMotorID = 9;
 
+    public static final double maxHeight = 1.65;
+
     public static enum ElevatorLevel {
       LO(0.0),
       L1(0.444),
-      L2(0.285), //0.269 
-      L3(0.642), 
-      L4(1.37), //1.354
+      L2(0.267), //0.269 
+      L3(0.66), 
+      L4(1.327 ), //1.354
       HI(1.65),
-      HUMAN(0.85),
+      HUMAN(0.930),
       CLEAR(1.1),
-      ALG3(0.77),
-      ALG2(0.39);
+      ALG3(0.849),
+      ALG2(0.46);
 
       private final double height;
 
@@ -117,10 +119,12 @@ public final class Constants {
     public static final int kGrabberMotor2Port = 12;
     public static final int kPivotMotorPort = 11;
 
-    public static final int kCoralSensorPort = 22;
-    public static final int kAlgaeSensorPort = 13;
+    public static final int kCoralSensorPort = 13;
+    public static final int kAlgaeSensorPort = 22;
 
-    public static final double kMaxPivotPower = 0.5;
+    public static final int kPivotEncoderId = 55;
+
+    public static final double kMaxPivotPower = 0.7;
 
     public static final Rotation2d kPivotLimit = Rotation2d.fromDegrees(0);
 
@@ -129,39 +133,52 @@ public final class Constants {
     public static final Distance kCoralSensorThreshold = Centimeters.of(10);
     public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
 
-    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 3);
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 7.5);//0.7
+    public static final LoggedNetworkNumber kPivotI = new LoggedNetworkNumber("Grabber/kPivotI", 0.0);
+    public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.75);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
     public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
 
+    public static final LoggedNetworkNumber kPivotUpP = new LoggedNetworkNumber("Grabber/kPivotUpP", 0.3);
+
+    public static final LoggedNetworkNumber kPivotS = new LoggedNetworkNumber("Grabber/kPivotS", 0.0);
+    public static final LoggedNetworkNumber kPivotG = new LoggedNetworkNumber("Grabber/kPivotG", 0.4);
+    public static final LoggedNetworkNumber kPivotV = new LoggedNetworkNumber("Grabber/kPivotV", 0.15);
+    public static final LoggedNetworkNumber kPivotA = new LoggedNetworkNumber("Grabber/kPivotA", 0.04);
+
+    public static final double grabberOffset = Math.PI/2 + 0.21;
     public static enum PivotPosition { //TODO update positions
-      DOWN(Rotation2d.kPi),//-65  was at - 40 
-      OUT(Rotation2d.fromDegrees(5.0)),
-      PLACE(Rotation2d.fromRadians(0.56)),
-      L1(Rotation2d.fromRadians(4.346)),
-      L4(Rotation2d.fromRadians(0.76)),
-      HUMAN(Rotation2d.fromRadians(4.08)),
+      //DOWN(Rotation2d.kPi),//-65  was at - 40 
+      
+      OUT(Rotation2d.fromDegrees(5.0 + grabberOffset)),
+      PLACE(Rotation2d.fromRadians(1.1 + grabberOffset)),
+      L1(Rotation2d.fromRadians(Math.PI + grabberOffset)),
+      L4(Rotation2d.fromRadians(0.96 + grabberOffset)),
+      HUMAN(Rotation2d.fromRadians(3.902 + grabberOffset)),
       ZERO(Rotation2d.kZero),
 
-      ALGPICK(Rotation2d.fromRadians(1.01)),
-      ALGREEF(Rotation2d.fromRadians(0.41)),
-      PROC(Rotation2d.fromRadians(0.75)),
-      HI(new Rotation2d(0));//70
+      ALGPICK(Rotation2d.fromRadians(0.622 + grabberOffset)),
+      ALGREEF(Rotation2d.fromRadians(1.125 + grabberOffset)),
+      HI(Rotation2d.fromRadians(1.762 + grabberOffset));//70
       
       private final Rotation2d angle;
 
       private PivotPosition(Rotation2d angle) {
           this.angle = angle;
+          //put grabberoffset here next time
       }
 
       public Rotation2d getAngle() {
           return angle;
+         //put grabberoffset here next time
+
       }
     }
 
     public static enum GrabberState {
-      INTAKE(0.25),
-      OUTTAKE(-0.50),
-      HOLD(0.07),
+      INTAKE(0.6),
+      OUTTAKE(-0.90),
+      HOLD(0.15),
       STOP(0.0);
 
       private final double speed;
@@ -211,13 +228,13 @@ public final class Constants {
     }
 
     public static class Auto {
-      public static final double kPTranslation = 9.45; //6.5
-      public static final double kITranslation = 0.62;
-      public static final double kDTranslation = 0.02;
+      public static final double kPTranslation = 8.45; //6.5
+      public static final double kITranslation = 0.3;
+      public static final double kDTranslation = 0.01;
 
-      public static final double kPTheta = 9;
-      public static final double kITheta = 0.2;
-      public static final double kDTheta = 0.01;
+      public static final double kPTheta = 6;
+      public static final double kITheta = 0.1;
+      public static final double kDTheta = 0.005;
       
       public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
       public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
@@ -327,8 +344,8 @@ public final class Constants {
     }
     public static class cam1 {
       public static final String name = "cam1";
-      public static final Translation3d translation = new Translation3d(Inches.of(-1.00), Inches.of(-10.50), Inches.of(9));
-      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(0),0, Units.degreesToRadians(-4));
+      public static final Translation3d translation = new Translation3d(Inches.of(-0.75), Inches.of(-12.75), Inches.of(10.25));
+      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(0), Units.degreesToRadians(-5));
       public static final Transform3d offset = new Transform3d(translation, rotation);
     }
 

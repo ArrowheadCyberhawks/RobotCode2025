@@ -104,7 +104,7 @@ public class AlignToReef {
                 new Pose2d(
                     swerveSubsystem.getPose().getTranslation(), getPathVelocityHeading(swerveSubsystem.swerveDrive.getFieldVelocity(), waypoint)),
                     waypoint);
-
+        
         //Crash-proof
         if (waypoints.size() < 2) {
              return Commands.print("ERROR: Not enough waypoints to generate a path ( < 2 waypoints )");

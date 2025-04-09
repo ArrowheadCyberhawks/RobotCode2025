@@ -6,49 +6,36 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import lib.frc706.cyberlib.XboxControllerWrapper;
-import lib.frc706.cyberlib.commands.ToPointCommand;
-import lib.frc706.cyberlib.commands.ToTagCommand;
 import lib.frc706.cyberlib.commands.TrackPointCommand;
-import lib.frc706.cyberlib.commands.controller.ControllerRumbleCommand;
 import lib.frc706.cyberlib.commands.controller.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import frc.robot.auto.DriveToPose;
 import frc.robot.auto.AlignToReef;
-import frc.robot.auto.AutoCycle;
-import frc.robot.commands.LEDCommand;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
-import frc.robot.commands.SetSuperstructureCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.IOConstants;
 import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
-import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
+import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
-import java.util.function.BooleanSupplier;
-
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -67,7 +54,7 @@ public class RobotContainer {
   // subsystems
   public static SwerveSubsystem swerveSubsystem;
   private final Elevator elevator;
-  public final Pivot pivot;
+  public final Arm pivot;
   private final Grabber grabber;
   private final Climber climber;
 
@@ -105,7 +92,7 @@ public class RobotContainer {
 
     // Init Subsystems
     elevator = new Elevator();
-    pivot = new Pivot();
+    pivot = new Arm();
     grabber = new Grabber();
     climber = new Climber();
 
@@ -124,7 +111,12 @@ public class RobotContainer {
       };
     } else {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortUSB,
-          IOConstants.kDriverControllerDeadband, 0.15);
+          IOConstants.kDriverControllerDeadband, 0.15) {
+          @Override
+        public double interpolate(double value) {
+          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+        }
+      };
     }
 
     if (DriverStation.isJoystickConnected(IOConstants.kManipulatorControllerPortBT)) {
@@ -138,7 +130,7 @@ public class RobotContainer {
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     cam0 = new PhotonCameraWrapper(Constants.CameraConstants.cam0.name, Constants.CameraConstants.cam0.offset);
-    cam1 = new PhotonCameraWrapper(Constants.CameraConstants.cam1.name, Constants.CameraConstants.cam1.offset);
+    cam1 = new PhotonCameraWrapper("cam2", Constants.CameraConstants.cam1.offset);
 
     // cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new
     // Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new
@@ -191,7 +183,7 @@ public class RobotContainer {
 
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
-        () -> true,
+        driverController.rightBumper().negate()::getAsBoolean,
         IOConstants.kDriverControllerDeadband,
         SwerveConstants.kMaxVelTele.in(MetersPerSecond),
         SwerveConstants.kMaxAccelTele.in(MetersPerSecondPerSecond),
@@ -221,7 +213,7 @@ public class RobotContainer {
   private void configureBindings() {
     // Drive Controller
 
-    driverController.y()
+    driverController.b()
         .onTrue(swerveSubsystem.runOnce(() -> {
           swerveSubsystem.zeroHeading();
           swerveSubsystem.swerveDrive.synchronizeModuleEncoders();
@@ -254,8 +246,10 @@ public class RobotContainer {
     //TEMP
     //driverController.b().whileTrue(autoCycleCommandFactory.run());
 
-    driverController.leftBumper().whileTrue(climber.runClimbCommand(() -> 0.8));
-    driverController.rightBumper().whileTrue(climber.runClimbCommand(() -> -0.2));
+    driverController.povUp().whileTrue(climber.runClimbCommand(() -> 0.8));
+    driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.4));
+    driverController.povLeft().onTrue(climber.climbOutCommand());
+    driverController.povRight().onTrue(climber.climbInCommand());
 
     // X-KEYS LIGHTBOARD
     nearTriggers = new Trigger[] { keypadHID.button(22), keypadHID.button(23) };
@@ -275,14 +269,14 @@ public class RobotContainer {
 
     //ADD HUMAN PLAYER STATIONS, IN FIELDCONSTANTS :)
 
-    keypadHID.button(1).onTrue(grabber.intakeCommand());
-    keypadHID.button(4).onTrue(grabber.outtakeCommand());
+    keypadHID.button(1).whileTrue(grabber.intakeCommand());
+    keypadHID.button(4).whileTrue(grabber.outtakeCommand());
     keypadHID.button(2).onTrue(superstructure.LO()); //switch to human intake
 
     keypadHID.button(7).onTrue(superstructure.setNextSuperStructure(SuperStructureState.BARGE));
     keypadHID.button(11).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG3));
     keypadHID.button(15).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG2));
-    keypadHID.button(19).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PROCESSOR));
+    keypadHID.button(19).onTrue(superstructure.AlgaePickup());
     keypadHID.button(24).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PICKUP));
     // TODO: Add algae pickup to superstructure subsystem (button 24)
 
@@ -302,10 +296,10 @@ public class RobotContainer {
     manipulatorController.leftStick()
         .whileTrue(new ManualElevatorCommand(elevator, () -> -manipulatorController.getLeftY() / 50));
     manipulatorController.rightStick()
-        .whileTrue(new ManualPivotCommand(pivot, () -> -manipulatorController.getRightY() / 8));
+        .whileTrue(new ManualPivotCommand(pivot, () -> manipulatorController.getRightY()/4));
 
     //Manual Coral Heights
-    manipulatorController.a().onTrue(superstructure.LO()); //switch to L1
+    manipulatorController.a().onTrue(superstructure.Intake());
     manipulatorController.b().onTrue(superstructure.L2());
     manipulatorController.x().onTrue(superstructure.L3());
     manipulatorController.y().onTrue(superstructure.L4());
@@ -317,18 +311,18 @@ public class RobotContainer {
     manipulatorController.pov(180).onTrue(superstructure.Processor());
 
     //Intake/Outake
-    manipulatorController.leftTrigger().onTrue(grabber.intakeCommand());
-    manipulatorController.rightTrigger().onTrue(grabber.outtakeCommand());
+    manipulatorController.leftTrigger().whileTrue(grabber.run(()->grabber.setGrabberState(GrabberState.INTAKE))).onFalse(grabber.run(()->grabber.setGrabberState(GrabberState.HOLD)));
+    manipulatorController.rightTrigger().whileTrue(grabber.outtakeCommand());
 
-    manipulatorController.leftBumper().onTrue(superstructure.Intake());
-    manipulatorController.rightBumper().onTrue(superstructure.LO());
+    manipulatorController.start().onTrue(grabber.runOnce(() -> pivot.resetPivotAngle(new Rotation2d(3*Math.PI/2))).ignoringDisable(true));
+    manipulatorController.back().onTrue(superstructure.LO()); //switch to L1;
 
     //reset angles
-    manipulatorController.start().onTrue(new InstantCommand(() -> new InstantCommand(() -> {
-      pivot.resetPivotAngle(new Rotation2d());
-      System.out.println("resetting pivot angle");
-    })));
-    manipulatorController.back().onTrue(new InstantCommand(() -> elevator.resetElevatorEncoders()));
+    // manipulatorController.start().onTrue(new InstantCommand(() -> {
+    //   pivot.resetPivotAngle(Rotation2d.kZero);
+    //   System.out.println("resetting pivot angle");
+    // }));
+    // manipulatorController.back().onTrue(new InstantCommand(() -> elevator.resetElevatorEncoders()));
 
   }
 

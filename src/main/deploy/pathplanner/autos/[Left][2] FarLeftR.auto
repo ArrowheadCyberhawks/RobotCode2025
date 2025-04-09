@@ -91,7 +91,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "DEF"
+                        "name": "HUMAN"
                       }
                     },
                     {
@@ -179,7 +179,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "DEF"
+                        "name": "HUMAN"
                       }
                     }
                   ]

@@ -5,19 +5,31 @@
     "data": {
       "commands": [
         {
+          "type": "named",
+          "data": {
+            "name": "CLIMBOUT"
+          }
+        },
+        {
           "type": "parallel",
           "data": {
             "commands": [
               {
                 "type": "path",
                 "data": {
-                  "pathName": "CenterToFarL"
+                  "pathName": "CenterToFarR"
                 }
               },
               {
                 "type": "sequential",
                 "data": {
                   "commands": [
+                    {
+                      "type": "wait",
+                      "data": {
+                        "waitTime": 1.0
+                      }
+                    },
                     {
                       "type": "named",
                       "data": {
@@ -26,26 +38,14 @@
                     }
                   ]
                 }
-              },
-              {
-                "type": "named",
-                "data": {
-                  "name": "CLIMBOUT"
-                }
               }
             ]
           }
         },
         {
-          "type": "named",
-          "data": {
-            "name": "FarL"
-          }
-        },
-        {
           "type": "wait",
           "data": {
-            "waitTime": 0.5
+            "waitTime": 1.0
           }
         },
         {
@@ -58,6 +58,6 @@
     }
   },
   "resetOdom": true,
-  "folder": "Center",
+  "folder": null,
   "choreoAuto": false
 }
