@@ -106,7 +106,7 @@ public class RobotContainer {
           IOConstants.kDriverControllerDeadband, 0.15) {
         @Override
         public double interpolate(double value) {
-          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+          return value * MathUtil.interpolate(0.15, 0.5, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
         }
       };
     } else {
@@ -114,7 +114,7 @@ public class RobotContainer {
           IOConstants.kDriverControllerDeadband, 0.15) {
           @Override
         public double interpolate(double value) {
-          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+          return value * MathUtil.interpolate(0.15, 0.5, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
         }
       };
     }

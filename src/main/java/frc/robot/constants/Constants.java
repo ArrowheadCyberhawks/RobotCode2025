@@ -146,7 +146,7 @@ public final class Constants {
     public static final LoggedNetworkNumber kPivotV = new LoggedNetworkNumber("Grabber/kPivotV", 0.15);
     public static final LoggedNetworkNumber kPivotA = new LoggedNetworkNumber("Grabber/kPivotA", 0.04);
 
-    public static final double grabberOffset = Math.PI/2 + 0.21;
+    public static final double grabberOffset = Math.PI/2 + 0.42;
     public static enum PivotPosition { //TODO update positions
       //DOWN(Rotation2d.kPi),//-65  was at - 40 
       
@@ -203,7 +203,7 @@ public final class Constants {
 
     //TODO Tune to be slower
     public static final LinearVelocity kMaxVelTele = FeetPerSecond.of(19);
-    public static final LinearAcceleration kMaxAccelTele = kMaxVelTele.per(Second).times(5); //idk what this should be
+    public static final LinearAcceleration kMaxAccelTele = kMaxVelTele.per(Second).times(10); //idk what this should be
     public static final AngularVelocity kMaxAngularVelTele = RadiansPerSecond.of(2 * Math.PI); //idk 2 radians per second whatever
     public static final AngularAcceleration kMaxAngularAccelTele = kMaxAngularVelTele.per(Second).times(5);
 
