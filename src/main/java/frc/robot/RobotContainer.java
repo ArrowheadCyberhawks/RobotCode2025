@@ -14,6 +14,7 @@ import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.auto.AlignToReef;
+import frc.robot.auto.DriveToPose;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
 import frc.robot.constants.Constants;
@@ -25,6 +26,8 @@ import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
+import java.text.FieldPosition;
+
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
 import edu.wpi.first.math.MathUtil;
@@ -234,6 +237,10 @@ public class RobotContainer {
         () -> driverController.getRightTriggerAxis(),
         SwerveConstants.kMaxVelTele.in(MetersPerSecond), SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond)));
 
+    driverController.leftBumper().whileTrue(new DriveToPose(swerveSubsystem, 
+    	Constants.FieldPosition.kBargeMiddle::getPose,
+		() -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Red).equals(DriverStation.Alliance.Red) ? driverController.getLeftX() : -driverController.getLeftX()));
+
     //Drive to Human Player Station
     // driverController.b().whileTrue();
     // driverController.x().whileTrue();
@@ -318,6 +325,7 @@ public class RobotContainer {
     manipulatorController.back().onTrue(superstructure.LO()); //switch to L1;
     
     manipulatorController.rightBumper().onTrue(superstructure.bargePlace());
+    manipulatorController.leftBumper().onTrue(superstructure.reefPick());
     //reset angles
     // manipulatorController.start().onTrue(new InstantCommand(() -> {
     //   pivot.resetPivotAngle(Rotation2d.kZero);

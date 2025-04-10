@@ -83,12 +83,12 @@ public final class Constants {
 
   public static class ElevatorConstants {
     public static final LoggedNetworkNumber kElevatorP = new LoggedNetworkNumber("Elevator/kElevatorP", 3.5);
-    public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 6);
+    public static final LoggedNetworkNumber kElevatorMaxVel = new LoggedNetworkNumber("Elevator/kElevatorMaxVel", 10);
     public static final LoggedNetworkNumber kElevatorMaxAccel = new LoggedNetworkNumber("Elevator/kElevatorMaxAccel", 10);
 
     public static final int elevatorMotorID = 9;
 
-    public static final double maxHeight = 1.65;
+    public static final double maxHeight = 1.6;
 
     public static enum ElevatorLevel {
       LO(0.0),
@@ -96,7 +96,7 @@ public final class Constants {
       L2(0.267), //0.269 
       L3(0.66), 
       L4(1.327 ), //1.354
-      HI(1.5),
+      HI(1.55),
       HUMAN(0.930),
       CLEAR(1.1),
       ALG3(0.849),
@@ -152,13 +152,13 @@ public final class Constants {
       
       OUT(Rotation2d.fromDegrees(5.0 + grabberOffset)),
       PLACE(Rotation2d.fromRadians(1.1 + grabberOffset)),
-      L1(Rotation2d.fromRadians(Math.PI + grabberOffset)),
+      LO(Rotation2d.fromRadians(2.34 + grabberOffset)),
       L4(Rotation2d.fromRadians(0.96 + grabberOffset)),
       HUMAN(Rotation2d.fromRadians(3.902 + grabberOffset)),
       ZERO(Rotation2d.kZero),
 
       ALGPICK(Rotation2d.fromRadians(0.622 + grabberOffset)),
-      ALGREEF(Rotation2d.fromRadians(1.125 + grabberOffset)),
+      ALGREEF(Rotation2d.fromRadians(1.1 + grabberOffset)),
       HI(Rotation2d.fromRadians(2.46 + grabberOffset));//70
       
       private final Rotation2d angle;
@@ -270,7 +270,7 @@ public final class Constants {
    */
   public static enum FieldPosition { //nitin don't touch this either I DON'T WANT IT PRETTIER
       kBargeLeft(new Pose2d(8.775, 0.75, new Rotation2d()), new Pose2d(8.775, 7.25, new Rotation2d())),
-      kBargeMiddle(new Pose2d(8.775, 1.9, new Rotation2d()), new Pose2d(8.775, 6.16, new Rotation2d())),
+      kBargeMiddle(new Pose2d(9.8, 1.9, Rotation2d.kZero), new Pose2d(7.75, 6.16, Rotation2d.k180deg)),
       kBargeRight(new Pose2d(8.775, 3, new Rotation2d()), new Pose2d(8.775, 5, new Rotation2d())),
       kLeftCoralStation(new Pose2d(16.75, 0.65, new Rotation2d()), new Pose2d(0.75, 7.35, new Rotation2d())),
       kRightCoralStation(new Pose2d(16.75, 7.35, new Rotation2d()), new Pose2d(0.75, 0.65, new Rotation2d()));
