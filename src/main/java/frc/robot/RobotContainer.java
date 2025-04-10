@@ -14,7 +14,6 @@ import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.auto.AlignToReef;
-import frc.robot.auto.AlignToReef.PathOption;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
 import frc.robot.constants.Constants;

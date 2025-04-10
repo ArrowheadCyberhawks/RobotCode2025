@@ -64,42 +64,6 @@ public class AlignToReef {
     PathConstraints algaePathConstraints = new PathConstraints(1.5, 1, Math.PI, 2*Math.PI);
     PathConstraints stationPathConstraints = new PathConstraints(1.5, 1, Math.PI, 2*Math.PI);
 
-    public enum PathOption {
-        kFarR,
-        kFarC,
-        kFarL,
-        kNearR,
-        kNearC,
-        kNearL,
-      kFarRightR,
-      kFarRightC,
-      kFarRightL,
-      kNearRightR,
-      kNearRightC,
-      kNearRightL,
-      kFarLeftR,
-      kFarLeftC,
-      kFarLeftL,
-      kNearLeftR,
-      kNearLeftC,
-      kNearLeftL,
-      }
-
-    PathPlannerPath NearL;
-    PathPlannerPath NearR;
-    PathPlannerPath NearLeftL;
-    PathPlannerPath NearLeftR;
-    PathPlannerPath NearRightL;
-    PathPlannerPath NearRightR;
-    PathPlannerPath FarL;
-    PathPlannerPath FarR;
-    PathPlannerPath FarLeftL;
-    PathPlannerPath FarLeftR;
-    PathPlannerPath FarRightL;
-    PathPlannerPath FarRightR;
-
-    Map<PathOption, Command> scoringPathMap = new HashMap<>(12);
-
     public AlignToReef(SwerveSubsystem swerveSubsystem, Superstructure superstructure, Grabber grabber) {
         this.swerveSubsystem = swerveSubsystem;
         //this.leds = leds;
@@ -107,25 +71,6 @@ public class AlignToReef {
         this.superstructure = superstructure;
         superstructureExists = true;
         usePathplanner = true;
-
-            try {
-                NearL = PathPlannerPath.fromPathFile("WaypointToNearL");
-                NearR = PathPlannerPath.fromPathFile("WaypointToNearR");
-                NearLeftL = PathPlannerPath.fromPathFile("WaypointToNearLeftL");
-                NearLeftR = PathPlannerPath.fromPathFile("WaypointToNearRightR");
-                NearRightL = PathPlannerPath.fromPathFile("WaypointToNearRightL");
-                NearRightR = PathPlannerPath.fromPathFile("WaypointToNearRightR");
-                FarL = PathPlannerPath.fromPathFile("WaypointToFarL");
-                FarR = PathPlannerPath.fromPathFile("WaypointToFarR");
-                FarLeftL = PathPlannerPath.fromPathFile("WaypointToFarLeftL");
-                FarLeftR = PathPlannerPath.fromPathFile("WaypointToFarleftR");
-                FarRightL = PathPlannerPath.fromPathFile("WaypointToFarRightL");
-                FarRightR = PathPlannerPath.fromPathFile("WaypointToFarRightR");        
-            } catch (Exception e) {
-              System.out.println(e.getMessage());
-            }
-
-
     }
     
 
