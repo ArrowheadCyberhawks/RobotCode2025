@@ -57,7 +57,6 @@ public class Superstructure extends SubsystemBase{
     public Superstructure(Elevator elevator, Arm pivot, Grabber grabber) {
         Superstructure.elevator = elevator;
         Superstructure.pivot = pivot;
-        Superstructure.grabber = grabber;
         
     }
 
