@@ -233,9 +233,9 @@ public final class Constants {
       public static final double kITranslation = 0.3;
       public static final double kDTranslation = 0.01;
 
-      public static final double kPTheta = 9;
-      public static final double kITheta = 0.2;
-      public static final double kDTheta = 0.01;
+      public static final double kPTheta = 6;
+      public static final double kITheta = 0.1;
+      public static final double kDTheta = 0.005;
       
       public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
       public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
