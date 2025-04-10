@@ -69,7 +69,10 @@ public class Robot extends LoggedRobot {
 
   /** This function is called once each time the robot enters Disabled mode. */
   @Override
-  public void disabledInit() {}
+  public void disabledInit() {
+      // Store positions when disabled
+      m_robotContainer.pivot.storePositionOnDisable();
+  }
 
   @Override
   public void disabledPeriodic() {
@@ -86,6 +89,7 @@ public class Robot extends LoggedRobot {
     // () -> {m_robotContainer.swerveSubsystem.driveFieldOriented(new ChassisSpeeds());}, m_robotContainer.swerveSubsystem)
     // .withTimeout(Time.ofBaseUnits(20, Seconds)));
     // schedule the autonomous command (example)
+    m_robotContainer.pivot.restorePositionOnEnable();
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
@@ -97,16 +101,14 @@ public class Robot extends LoggedRobot {
 
   @Override
   public void teleopInit() {
-    // This makes sure that the autonomous stops running when
-    // teleop starts running. If you want the autonomous to
-    // continue until interrupted by another command, remove
-    // this line or comment it out.
-    if (m_autonomousCommand != null) {
-      m_autonomousCommand.cancel();
-    }
-
-    //Sets the target angle of the pivot motor to the current angle
-    m_robotContainer.pivot.resetPivotTarget();
+      // This makes sure that the autonomous stops running when
+      // teleop starts running.
+      if (m_autonomousCommand != null) {
+        m_autonomousCommand.cancel();
+      }
+      
+      // Restore positions on teleop init
+      m_robotContainer.pivot.restorePositionOnEnable();
   }
 
   /** This function is called periodically during operator control. */

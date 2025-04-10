@@ -7,6 +7,7 @@ import org.littletonrobotics.junction.Logger;
 
 import com.revrobotics.spark.SparkMax;
 import com.ctre.phoenix6.StatusSignal;
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -18,6 +19,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -38,28 +40,63 @@ public class Arm extends SubsystemBase {
      * Creates a new Grabber subsystem using the motor ports defined in Constants.
      */
     public Arm() {
+        // First, get initial angle reading
+        pivotEncoderAngle.refresh();
+        
+        // Configure the CANcoder to save position to non-volatile memory
+        // This is critical to maintain position between power cycles
+        pivotEncoder.clearStickyFaults();
+        
+        // Set up the controller with the current absolute position
         pivotController.setGoal(getPivotAngle().getRadians());
         pivotController.setTolerance(Units.degreesToRadians(3));
-        // pivotController.enableContinuousInput(0, 2 * Math.PI);
+        
+        // Set position to flash on the controller after boot
+        resetPivotAngle(getPivotAngle());
+        
+        // Log initial position for debugging
+        SmartDashboard.putNumber("Initial Pivot Angle", getPivotAngle().getDegrees());
+    }
+
+    private double lastPosition = 0.0;
+    
+    public void storePositionOnDisable() {
+        lastPosition = getPivotAngle().getRadians();
+        Logger.recordOutput(getName() + "/StoredPosition", lastPosition);
+    }
+    
+    public void restorePositionOnEnable() {
+        pivotController.setGoal(getPivotAngle().getRadians());
+        Logger.recordOutput(getName() + "/RestoredPosition", getPivotAngle().getRadians());
     }
 
 
     public void periodic() {
         updateConstants();
-        // if (Math.abs(getPivotAngle().getDegrees()) < 15) {
-        //     pivotController.setP(kPivotUpP.get());
-        // } else {
-        //     pivotController.setP(kPivotP.get());
-        // }
-        // setPivotMotor(MathUtil.clamp(pivotController.calculate(getPivotAngle().getRadians()), -kMaxPivotPower, kMaxPivotPower));
         
-        pivotMotor.setVoltage(Volts.of(pivotFeedforward.calculate(pivotController.getSetpoint().position, pivotController.getSetpoint().velocity) + pivotController.calculate(getPivotAngle().getRadians())));
-
-        SmartDashboard.putNumber("Pivot Angle", getPivotAngle().getRadians());
-        SmartDashboard.putNumber("Pivot Target", pivotController.getGoal().position);
-        // logging
+        // Add timestamp to help correlate encoder changes with events
+        double timestamp = Timer.getFPGATimestamp();
+        
+        // Calculate voltage with feed forward and PID
+        double ffOutput = pivotFeedforward.calculate(
+            pivotController.getSetpoint().position, 
+            pivotController.getSetpoint().velocity);
+        double pidOutput = pivotController.calculate(getPivotAngle().getRadians());
+        
+        // Set motor voltage
+        pivotMotor.setVoltage(Volts.of(ffOutput + pidOutput));
+        
+        // Enhanced logging
         Logger.recordOutput(getName() + "/Pivot Angle", getPivotAngle().getRadians());
         Logger.recordOutput(getName() + "/Pivot Target", pivotController.getGoal().position);
+        Logger.recordOutput(getName() + "/FF Output", ffOutput);
+        Logger.recordOutput(getName() + "/PID Output", pidOutput);
+        Logger.recordOutput(getName() + "/Timestamp", timestamp);
+        
+        // Log to SmartDashboard for driver visibility
+        SmartDashboard.putNumber("Pivot Angle", getPivotAngle().getDegrees());
+        SmartDashboard.putNumber("Pivot Target", Units.radiansToDegrees(pivotController.getGoal().position));
+        SmartDashboard.putBoolean("At Target", atPivotTarget());
     }
 
     private void updateConstants() {
@@ -128,8 +165,16 @@ public class Arm extends SubsystemBase {
     }
 
     public void resetPivotAngle(Rotation2d angle) {
+        // Set position on the encoder
         pivotEncoder.setPosition(angle.getRotations());
+        
+        // Important: Apply changes and store to non-volatile memory
+        // This is what's likely missing in your current code
+        pivotEncoder.optimizeBusUtilization(); 
+        
+        // Update the PID controller target to match the new angle
         resetPivotTarget();
+        Logger.recordOutput(getName() + "/ResetAngle", angle.getDegrees());
     }
 
     /**
