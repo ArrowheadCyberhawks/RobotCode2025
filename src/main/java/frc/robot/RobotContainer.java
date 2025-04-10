@@ -6,49 +6,43 @@ package frc.robot;
 
 import static edu.wpi.first.units.Units.*;
 import lib.frc706.cyberlib.XboxControllerWrapper;
-import lib.frc706.cyberlib.commands.ToPointCommand;
-import lib.frc706.cyberlib.commands.ToTagCommand;
 import lib.frc706.cyberlib.commands.TrackPointCommand;
-import lib.frc706.cyberlib.commands.controller.ControllerRumbleCommand;
 import lib.frc706.cyberlib.commands.controller.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
-import frc.robot.auto.DriveToPose;
 import frc.robot.auto.AlignToReef;
-import frc.robot.auto.AutoCycle;
-import frc.robot.commands.LEDCommand;
+import frc.robot.auto.AlignToReef.PathOption;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
-import frc.robot.commands.SetSuperstructureCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.IOConstants;
 import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
-import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
+import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
-import java.util.function.BooleanSupplier;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
+import com.pathplanner.lib.path.PathPlannerPath;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.util.Units;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.net.WebServer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
-import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -67,7 +61,7 @@ public class RobotContainer {
   // subsystems
   public static SwerveSubsystem swerveSubsystem;
   private final Elevator elevator;
-  public final Pivot pivot;
+  public final Arm pivot;
   private final Grabber grabber;
   private final Climber climber;
 
@@ -89,7 +83,27 @@ public class RobotContainer {
 
   //Automation CommandFactories
   private final AlignToReef alignmentCommandFactory;
-  //private final AutoCycle autoCycleCommandFactory;
+  private ReefPoint nextReef;
+  private PathPlannerPath nextPath;
+
+  PathPlannerPath NearL;
+  PathPlannerPath NearR;
+  PathPlannerPath NearC;
+  PathPlannerPath NearLeftL;
+  PathPlannerPath NearLeftR;
+  PathPlannerPath NearLeftC;
+  PathPlannerPath NearRightL;
+  PathPlannerPath NearRightR;
+  PathPlannerPath NearRightC;
+  PathPlannerPath FarL;
+  PathPlannerPath FarR;
+  PathPlannerPath FarC;
+  PathPlannerPath FarLeftL;
+  PathPlannerPath FarLeftR;
+  PathPlannerPath FarLeftC;
+  PathPlannerPath FarRightL;
+  PathPlannerPath FarRightR;
+  PathPlannerPath FarRightC;
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -105,11 +119,11 @@ public class RobotContainer {
 
     // Init Subsystems
     elevator = new Elevator();
-    pivot = new Pivot();
+    pivot = new Arm();
     grabber = new Grabber();
     climber = new Climber();
 
-    superstructure = new Superstructure(elevator, pivot);
+    superstructure = new Superstructure(elevator, pivot, grabber);
 
     // ledSubsystem = new LEDSubsystem();
 
@@ -124,7 +138,12 @@ public class RobotContainer {
       };
     } else {
       driverController = new XboxControllerWrapper(IOConstants.kDriverControllerPortUSB,
-          IOConstants.kDriverControllerDeadband, 0.15);
+          IOConstants.kDriverControllerDeadband, 0.15) {
+          @Override
+        public double interpolate(double value) {
+          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+        }
+      };
     }
 
     if (DriverStation.isJoystickConnected(IOConstants.kManipulatorControllerPortBT)) {
@@ -138,7 +157,7 @@ public class RobotContainer {
     // set up swerve + photonvision
     File swerveJsonDirectory = new File(Filesystem.getDeployDirectory(), "swerve");
     cam0 = new PhotonCameraWrapper(Constants.CameraConstants.cam0.name, Constants.CameraConstants.cam0.offset);
-    cam1 = new PhotonCameraWrapper(Constants.CameraConstants.cam1.name, Constants.CameraConstants.cam1.offset);
+    cam1 = new PhotonCameraWrapper("cam2", Constants.CameraConstants.cam1.offset);
 
     // cam2 = new PhotonCameraWrapper("cam2", new Transform3d(new
     // Translation3d(Inches.of(12.625), Inches.of(4.75), Inches.of(30.5)), new
@@ -179,7 +198,32 @@ public class RobotContainer {
     // set up limelight
     limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false);
 
+    try {
+      NearL = PathPlannerPath.fromPathFile("WaypointToNearL");
+      NearR = PathPlannerPath.fromPathFile("WaypointToNearR");
+      NearC = PathPlannerPath.fromPathFile("WaypointToNearC");
+      NearLeftL = PathPlannerPath.fromPathFile("WaypointToNearLeftL");
+      NearLeftR = PathPlannerPath.fromPathFile("WaypointToNearRightR");
+      NearLeftC = PathPlannerPath.fromPathFile("WaypointToNearRightC");
+      NearRightL = PathPlannerPath.fromPathFile("WaypointToNearRightL");
+      NearRightR = PathPlannerPath.fromPathFile("WaypointToNearRightR");
+      NearRightC = PathPlannerPath.fromPathFile("WaypointToNearRightC");
+      FarL = PathPlannerPath.fromPathFile("WaypointToFarL");
+      FarR = PathPlannerPath.fromPathFile("WaypointToFarR");
+      FarC = PathPlannerPath.fromPathFile("WaypointToFarC");
+      FarLeftL = PathPlannerPath.fromPathFile("WaypointToFarLeftL");
+      FarLeftR = PathPlannerPath.fromPathFile("WaypointToFarleftR");
+      FarLeftC = PathPlannerPath.fromPathFile("WaypointToFarleftC");
+      FarRightL = PathPlannerPath.fromPathFile("WaypointToFarRightL");
+      FarRightR = PathPlannerPath.fromPathFile("WaypointToFarRightR");
+      FarRightC = PathPlannerPath.fromPathFile("WaypointToFarRightC");             
+    } catch (Exception e) {
+      System.out.println(e.getMessage());
+    }
+
     alignmentCommandFactory = new AlignToReef(swerveSubsystem, superstructure, grabber);
+    nextReef = ReefPoint.kNearL;
+    nextPath = NearL;
 
     // commands and stuff
     autoManager = new AutoCommandManager(swerveSubsystem, superstructure, grabber, climber, alignmentCommandFactory);
@@ -191,7 +235,7 @@ public class RobotContainer {
 
     teleopCommand = new XboxDriveCommand(driverController,
         swerveSubsystem,
-        () -> true,
+        driverController.rightBumper().negate()::getAsBoolean,
         IOConstants.kDriverControllerDeadband,
         SwerveConstants.kMaxVelTele.in(MetersPerSecond),
         SwerveConstants.kMaxAccelTele.in(MetersPerSecondPerSecond),
@@ -221,7 +265,7 @@ public class RobotContainer {
   private void configureBindings() {
     // Drive Controller
 
-    driverController.y()
+    driverController.b()
         .onTrue(swerveSubsystem.runOnce(() -> {
           swerveSubsystem.zeroHeading();
           swerveSubsystem.swerveDrive.synchronizeModuleEncoders();
@@ -249,40 +293,46 @@ public class RobotContainer {
 
     //Change Positioning Mode
     // driverController.back().onTrue();
-    driverController.start().onTrue(alignmentCommandFactory.switchMode());
+    //driverController.start().onTrue(alignmentCommandFactory.switchMode());
 
     //TEMP
     //driverController.b().whileTrue(autoCycleCommandFactory.run());
 
-    driverController.leftBumper().whileTrue(climber.runClimbCommand(() -> 0.8));
-    driverController.rightBumper().whileTrue(climber.runClimbCommand(() -> -0.2));
+    driverController.povUp().whileTrue(climber.runClimbCommand(() -> 0.8));
+    driverController.povDown().whileTrue(climber.runClimbCommand(() -> -0.4));
+    driverController.povLeft().onTrue(climber.climbOutCommand());
+    driverController.povRight().onTrue(climber.climbInCommand());
+
+    //Auto-Positioning
+    driverController.leftTrigger(0.5).whileTrue(alignmentCommandFactory.generateCommand(nextReef, nextPath));
 
     // X-KEYS LIGHTBOARD
-    nearTriggers = new Trigger[] { keypadHID.button(22), keypadHID.button(23) };
-    nearLeftTriggers = new Trigger[] { keypadHID.button(13), keypadHID.button(17) };
-    nearRightTriggers = new Trigger[] { keypadHID.button(20), keypadHID.button(16) };
-    farTriggers = new Trigger[] { keypadHID.button(3), keypadHID.button(2) };
-    farLeftTriggers = new Trigger[] { keypadHID.button(5), keypadHID.button(9) };
-    farRightTriggers = new Trigger[] { keypadHID.button(12), keypadHID.button(8) };
+    lightboard();
+    // nearTriggers = new Trigger[] { keypadHID.button(22), keypadHID.button(23) };
+    // nearLeftTriggers = new Trigger[] { keypadHID.button(13), keypadHID.button(17) };
+    // nearRightTriggers = new Trigger[] { keypadHID.button(20), keypadHID.button(16) };
+    // farTriggers = new Trigger[] { keypadHID.button(3), keypadHID.button(2) };
+    // farLeftTriggers = new Trigger[] { keypadHID.button(5), keypadHID.button(9) };
+    // farRightTriggers = new Trigger[] { keypadHID.button(12), keypadHID.button(8) };
 
-    // Move to Pose
-    poseButtons(nearTriggers, "Near");
-    poseButtons(nearLeftTriggers, "NearLeft");
-    poseButtons(nearRightTriggers, "NearRight");
-    poseButtons(farTriggers, "Far");
-    poseButtons(farLeftTriggers, "FarLeft");
-    poseButtons(farRightTriggers, "FarRight");
+    // // Move to Pose
+    // poseButtons(nearTriggers, "Near");
+    // poseButtons(nearLeftTriggers, "NearLeft");
+    // poseButtons(nearRightTriggers, "NearRight");
+    // poseButtons(farTriggers, "Far");
+    // poseButtons(farLeftTriggers, "FarLeft");
+    // poseButtons(farRightTriggers, "FarRight");
 
     //ADD HUMAN PLAYER STATIONS, IN FIELDCONSTANTS :)
 
-    keypadHID.button(1).onTrue(grabber.intakeCommand());
-    keypadHID.button(4).onTrue(grabber.outtakeCommand());
+    keypadHID.button(1).whileTrue(grabber.intakeCommand());
+    keypadHID.button(4).whileTrue(grabber.outtakeCommand());
     keypadHID.button(2).onTrue(superstructure.LO()); //switch to human intake
 
     keypadHID.button(7).onTrue(superstructure.setNextSuperStructure(SuperStructureState.BARGE));
     keypadHID.button(11).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG3));
     keypadHID.button(15).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG2));
-    keypadHID.button(19).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PROCESSOR));
+    keypadHID.button(19).onTrue(superstructure.AlgaePickup());
     keypadHID.button(24).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PICKUP));
     // TODO: Add algae pickup to superstructure subsystem (button 24)
 
@@ -295,17 +345,16 @@ public class RobotContainer {
     keypadHID.button(21).onTrue(superstructure.setNextSuperStructure(SuperStructureState.INTAKE));
 
 
-    
     //MANIPULATOR CONTROLLER
 
     // Manual Elevator control
     manipulatorController.leftStick()
         .whileTrue(new ManualElevatorCommand(elevator, () -> -manipulatorController.getLeftY() / 50));
     manipulatorController.rightStick()
-        .whileTrue(new ManualPivotCommand(pivot, () -> -manipulatorController.getRightY() / 8));
+        .whileTrue(new ManualPivotCommand(pivot, () -> manipulatorController.getRightY()/4));
 
     //Manual Coral Heights
-    manipulatorController.a().onTrue(superstructure.LO()); //switch to L1
+    manipulatorController.a().onTrue(superstructure.Intake());
     manipulatorController.b().onTrue(superstructure.L2());
     manipulatorController.x().onTrue(superstructure.L3());
     manipulatorController.y().onTrue(superstructure.L4());
@@ -317,25 +366,59 @@ public class RobotContainer {
     manipulatorController.pov(180).onTrue(superstructure.Processor());
 
     //Intake/Outake
-    manipulatorController.leftTrigger().onTrue(grabber.intakeCommand());
-    manipulatorController.rightTrigger().onTrue(grabber.outtakeCommand());
+    manipulatorController.leftTrigger().whileTrue(grabber.run(() -> grabber.setGrabberState(GrabberState.INTAKE))).onFalse(grabber.run(()->grabber.setGrabberState(GrabberState.HOLD)));
+    manipulatorController.rightTrigger().whileTrue(grabber.outtakeCommand());
 
-    manipulatorController.leftBumper().onTrue(superstructure.Intake());
-    manipulatorController.rightBumper().onTrue(superstructure.LO());
+    manipulatorController.start().onTrue(grabber.runOnce(() -> pivot.resetPivotAngle(new Rotation2d(3*Math.PI/2))).ignoringDisable(true));
+    manipulatorController.back().onTrue(superstructure.LO()); //switch to L1;
 
     //reset angles
-    manipulatorController.start().onTrue(new InstantCommand(() -> new InstantCommand(() -> {
-      pivot.resetPivotAngle(new Rotation2d());
-      System.out.println("resetting pivot angle");
-    })));
-    manipulatorController.back().onTrue(new InstantCommand(() -> elevator.resetElevatorEncoders()));
+    // manipulatorController.start().onTrue(new InstantCommand(() -> {
+    //   pivot.resetPivotAngle(Rotation2d.kZero);
+    //   System.out.println("resetting pivot angle");
+    // }));
+    // manipulatorController.back().onTrue(new InstantCommand(() -> elevator.resetElevatorEncoders()));
 
   }
 
   private void poseButtons(Trigger[] triggers, String name) {
-    triggers[0].whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "L")));
-    triggers[1].whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "R")));
-    triggers[0].and(triggers[1]).whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "C")));
+    triggers[0].whileTrue(new InstantCommand(() -> nextReef = ReefPoint.valueOf("k" + name + "L")));
+    triggers[1].whileTrue(new InstantCommand(() -> nextReef = ReefPoint.valueOf("k" + name + "R")));
+    triggers[0].and(triggers[1]).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.valueOf("k" + name + "C")));
+  }
+
+  private void lightboard() {
+    //i just decided to remove the abstraction bc i actually don't know how to translate strings to variable names without doing a whole lot more stuff that might break
+    // Near
+    keypadHID.button(22).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearL).alongWith(new InstantCommand(() -> nextPath = NearL)));
+    keypadHID.button(23).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearR).alongWith(new InstantCommand(() -> nextPath = NearR)));
+    keypadHID.button(22).and(keypadHID.button(23)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearC).alongWith(new InstantCommand(() -> nextPath = NearC)));
+
+    // NearLeft
+    keypadHID.button(13).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearLeftL).alongWith(new InstantCommand(() -> nextPath = NearLeftL)));
+    keypadHID.button(17).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearLeftR).alongWith(new InstantCommand(() -> nextPath = NearLeftR)));
+    keypadHID.button(13).and(keypadHID.button(17)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearLeftC).alongWith(new InstantCommand(() -> nextPath = NearLeftC)));
+
+    // NearRight
+    keypadHID.button(20).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearRightL).alongWith(new InstantCommand(() -> nextPath = NearRightL)));
+    keypadHID.button(16).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearRightR).alongWith(new InstantCommand(() -> nextPath = NearRightR)));
+    keypadHID.button(20).and(keypadHID.button(16)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearRightC).alongWith(new InstantCommand(() -> nextPath = NearRightC)));
+
+    // Far
+    keypadHID.button(3).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarL).alongWith(new InstantCommand(() -> nextPath = FarL)));
+    keypadHID.button(2).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarR).alongWith(new InstantCommand(() -> nextPath = FarR)));
+    keypadHID.button(3).and(keypadHID.button(2)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarC).alongWith(new InstantCommand(() -> nextPath = FarC)));
+
+    // FarLeft
+    keypadHID.button(5).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarLeftL).alongWith(new InstantCommand(() -> nextPath = FarLeftL)));
+    keypadHID.button(9).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarLeftR).alongWith(new InstantCommand(() -> nextPath = FarLeftR)));
+    keypadHID.button(5).and(keypadHID.button(9)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarLeftC).alongWith(new InstantCommand(() -> nextPath = FarLeftC)));
+
+    // FarRight
+    keypadHID.button(12).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarRightL).alongWith(new InstantCommand(() -> nextPath = FarRightL)));
+    keypadHID.button(8).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarRightR).alongWith(new InstantCommand(() -> nextPath = FarRightR)));
+    keypadHID.button(12).and(keypadHID.button(8)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarRightC).alongWith(new InstantCommand(() -> nextPath = FarRightC)));
+
   }
 
   public Command getTeleopCommand() {

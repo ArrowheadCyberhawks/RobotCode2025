@@ -1,8 +1,12 @@
 package frc.robot.auto;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.BooleanSupplier;
 
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
@@ -25,11 +29,15 @@ import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
+import frc.robot.constants.Constants.PID.PathPlanner;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.ReefPoint;
+import frc.robot.constants.FieldConstants.Reef;
 import frc.robot.commands.SetSuperstructureCommand;
+import frc.robot.commons.TagUtils;
 import frc.robot.commands.LEDCommand;
 import frc.robot.auto.DriveToPose;
 import frc.robot.subsystems.*;
@@ -51,6 +59,47 @@ public class AlignToReef {
     //private final ReefPoint reef;
     private final double modeVal = 0.5;
 
+    //for more flexibility
+    PathConstraints coralPathConstraints = new PathConstraints(1.5, 1, Math.PI, 2*Math.PI);
+    PathConstraints algaePathConstraints = new PathConstraints(1.5, 1, Math.PI, 2*Math.PI);
+    PathConstraints stationPathConstraints = new PathConstraints(1.5, 1, Math.PI, 2*Math.PI);
+
+    public enum PathOption {
+        kFarR,
+        kFarC,
+        kFarL,
+        kNearR,
+        kNearC,
+        kNearL,
+      kFarRightR,
+      kFarRightC,
+      kFarRightL,
+      kNearRightR,
+      kNearRightC,
+      kNearRightL,
+      kFarLeftR,
+      kFarLeftC,
+      kFarLeftL,
+      kNearLeftR,
+      kNearLeftC,
+      kNearLeftL,
+      }
+
+    PathPlannerPath NearL;
+    PathPlannerPath NearR;
+    PathPlannerPath NearLeftL;
+    PathPlannerPath NearLeftR;
+    PathPlannerPath NearRightL;
+    PathPlannerPath NearRightR;
+    PathPlannerPath FarL;
+    PathPlannerPath FarR;
+    PathPlannerPath FarLeftL;
+    PathPlannerPath FarLeftR;
+    PathPlannerPath FarRightL;
+    PathPlannerPath FarRightR;
+
+    Map<PathOption, Command> scoringPathMap = new HashMap<>(12);
+
     public AlignToReef(SwerveSubsystem swerveSubsystem, Superstructure superstructure, Grabber grabber) {
         this.swerveSubsystem = swerveSubsystem;
         //this.leds = leds;
@@ -58,6 +107,25 @@ public class AlignToReef {
         this.superstructure = superstructure;
         superstructureExists = true;
         usePathplanner = true;
+
+            try {
+                NearL = PathPlannerPath.fromPathFile("WaypointToNearL");
+                NearR = PathPlannerPath.fromPathFile("WaypointToNearR");
+                NearLeftL = PathPlannerPath.fromPathFile("WaypointToNearLeftL");
+                NearLeftR = PathPlannerPath.fromPathFile("WaypointToNearRightR");
+                NearRightL = PathPlannerPath.fromPathFile("WaypointToNearRightL");
+                NearRightR = PathPlannerPath.fromPathFile("WaypointToNearRightR");
+                FarL = PathPlannerPath.fromPathFile("WaypointToFarL");
+                FarR = PathPlannerPath.fromPathFile("WaypointToFarR");
+                FarLeftL = PathPlannerPath.fromPathFile("WaypointToFarLeftL");
+                FarLeftR = PathPlannerPath.fromPathFile("WaypointToFarleftR");
+                FarRightL = PathPlannerPath.fromPathFile("WaypointToFarRightL");
+                FarRightR = PathPlannerPath.fromPathFile("WaypointToFarRightR");        
+            } catch (Exception e) {
+              System.out.println(e.getMessage());
+            }
+
+
     }
     
 
@@ -70,6 +138,19 @@ public class AlignToReef {
      * @param reef
      * @return
      */
+    public Command generateCommand(ReefPoint reef, PathPlannerPath path) {
+        //Crash-proof
+        if (reef == null || reef.getPose() == null) {
+            return Commands.print("Error: Reef or its pose is null");
+        }
+
+        return Commands.defer(() -> {
+            desiredBranchPublisher.accept(reef.getPose());
+            return autoScoreCommand(reef, path);
+            //return getPathFromWaypoint(getWaypointFromBranch(reef));
+        }, Set.of());
+    }
+
     public Command generateCommand(ReefPoint reef) {
         //Crash-proof
         if (reef == null || reef.getPose() == null) {
@@ -104,7 +185,7 @@ public class AlignToReef {
                 new Pose2d(
                     swerveSubsystem.getPose().getTranslation(), getPathVelocityHeading(swerveSubsystem.swerveDrive.getFieldVelocity(), waypoint)),
                     waypoint);
-
+        
         //Crash-proof
         if (waypoints.size() < 2) {
              return Commands.print("ERROR: Not enough waypoints to generate a path ( < 2 waypoints )");
@@ -115,24 +196,18 @@ public class AlignToReef {
             return autoDrive(waypoint);
         }
 
-        //Create constraints for the path and the path itself
-        //TODO Move to Constants
-        // PathConstraints constraints = new PathConstraints(
-        //         swerveSubsystem.swerveDrive.getMaximumChassisVelocity(), 0.5,
-        //         swerveSubsystem.swerveDrive.getMaximumChassisAngularVelocity(), Units.degreesToRadians(180));
+        // PathConstraints constraints = new PathConstraints(1.75, 1.25,
+        //     360, Units.degreesToRadians(180));
 
-        PathConstraints constraints = new PathConstraints(1.75, 1.25,
-            360, Units.degreesToRadians(180));
+        // PathPlannerPath path = new PathPlannerPath(
+        //         waypoints,
+        //         constraints,
+        //         new IdealStartingState(getVelocityMagnitude(swerveSubsystem.swerveDrive.getFieldVelocity()),
+        //                 swerveSubsystem.getPose().getRotation()),
+        //         new GoalEndState(0.0, waypoint.getRotation()));
 
-        PathPlannerPath path = new PathPlannerPath(
-                waypoints,
-                constraints,
-                new IdealStartingState(getVelocityMagnitude(swerveSubsystem.swerveDrive.getFieldVelocity()),
-                        swerveSubsystem.getPose().getRotation()),
-                new GoalEndState(0.0, waypoint.getRotation()));
-
-        //we have correct coordinates so we don't flip the path
-        path.preventFlipping = true;
+        // //we have correct coordinates so we don't flip the path
+        // path.preventFlipping = true;
 
         //Follows the path using pathplanner, brings the superstructure up, and then uses PID to get to the pose
         //return AutoBuilder.followPath(path).andThen(superstructureExists ? autoScore(waypoint) : autoDrive(waypoint));
@@ -149,6 +224,17 @@ public class AlignToReef {
         //     return autoDrive(waypoint).alongWith(getSuperStructure(waypoint));
         // }    
     
+    }
+
+    private Command autoScoreCommand(ReefPoint reef, PathPlannerPath path) {
+
+        //if close enough it uses PID
+        if (swerveSubsystem.getPose().getTranslation().getDistance(path.getStartingHolonomicPose().get().getTranslation()) < 1.00) {
+            return autoDrive(reef.getPose()).alongWith(getSuperStructure(reef.getPose()));
+        }
+
+        //otherwise brings it to the start of th epath in pathplanner
+        return AutoBuilder.pathfindThenFollowPath(path, coralPathConstraints).alongWith(getSuperStructure(reef.getPose()));
     }
 
     /**
@@ -177,10 +263,6 @@ public class AlignToReef {
         return reef.getPose();
     }
 
-    private Command autoScore(Pose2d waypoint) {
-        return autoDrive(waypoint).alongWith(getSuperStructure(waypoint));
-    }
-
     private Command autoDrive(Pose2d waypoint) {
         return Commands.sequence(
             Commands.print("start position PID loop to x: " + waypoint.getX() + "and y: " + waypoint.getY()),
@@ -197,14 +279,26 @@ public class AlignToReef {
 
     public Command getSuperStructure(Pose2d waypoint) {
         final double distance;
-        if (Superstructure.nextSuperStructureState.equals(SuperStructureState.L4)) {
+
+        if (Superstructure.nextSuperStructureState.equals(SuperStructureState.L4)) { //perhaps change to be based off of robot vel
             distance = 2.5;
         } else { //add more later
             distance = 1.5;
         }
 
-        Command structure = Commands.waitUntil(() -> swerveSubsystem.getPose().getTranslation().getDistance(waypoint.getTranslation()) < distance)
-                            .andThen(superstructure.getNextSuperStructure(Superstructure.nextSuperStructureState));
+        Command structure = 
+                new SequentialCommandGroup(
+                    new ConditionalCommand(
+                        superstructure.getNextSuperStructure(Superstructure.nextSuperStructureState), //brings it up
+                        new SequentialCommandGroup( //when not < distance
+                            superstructure.getNextSuperStructure(SuperStructureState.LO), //goes to the low position
+                            Commands.waitUntil(() -> swerveSubsystem.getPose().getTranslation().getDistance(waypoint.getTranslation()) < distance), //until close enough
+                            superstructure.getNextSuperStructure(Superstructure.nextSuperStructureState) //then brings it up
+                        ),
+                        () -> swerveSubsystem.getPose().getTranslation().getDistance(waypoint.getTranslation()) < distance)
+
+                );
+        
         return structure;
     }
 

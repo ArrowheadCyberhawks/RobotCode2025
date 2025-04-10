@@ -8,20 +8,20 @@
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.917562191910234,
-        "y": 4.0081468446453465
+        "x": 6.770887532810268,
+        "y": 4.102360648756793
       },
       "isLocked": false,
       "linkedName": "FarR"
     },
     {
       "anchor": {
-        "x": 5.67482760457779,
-        "y": 3.892160869820356
+        "x": 5.724062874638982,
+        "y": 3.7379938386198144
       },
       "prevControl": {
-        "x": 5.914369995221511,
-        "y": 3.8206105862102206
+        "x": 6.587559322006327,
+        "y": 3.716116001471689
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.75,
-    "maxAcceleration": 0.5,
+    "maxVelocity": 0.5,
+    "maxAcceleration": 0.25,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,

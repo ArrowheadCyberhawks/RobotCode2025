@@ -1,20 +1,28 @@
 package frc.robot.subsystems;
 
 
+import com.ctre.phoenix.schedulers.SequentialScheduler;
 import com.revrobotics.RelativeEncoder;
 
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.*;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import static edu.wpi.first.units.Units.*;
+
+import org.littletonrobotics.junction.Logger;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.units.measure.Distance;
 
 
 
@@ -25,7 +33,8 @@ public class Superstructure extends SubsystemBase{
     //IT CAN'T BE THAT HARD
      
     public static Elevator elevator;
-    public static Pivot pivot;
+    public static Arm pivot;
+    public static Grabber grabber;
 
     public static enum SuperStructureState {
         DEF,
@@ -42,12 +51,13 @@ public class Superstructure extends SubsystemBase{
         INTAKE
     }
 
-    public static SuperStructureState superStructureState = SuperStructureState.LO;
+    public static SuperStructureState superStructureState = SuperStructureState.INTAKE;
     public static SuperStructureState nextSuperStructureState = SuperStructureState.L3;
 
-    public Superstructure(Elevator elevator, Pivot pivot) {
+    public Superstructure(Elevator elevator, Arm pivot, Grabber grabber) {
         Superstructure.elevator = elevator;
         Superstructure.pivot = pivot;
+        
     }
 
     //NOTE: This ONLY WORKS if manual controls don't put it in a dangerous position, so just have height checks for each one seperately
@@ -56,7 +66,7 @@ public class Superstructure extends SubsystemBase{
 
     public Command Intake() {
         superStructureState = SuperStructureState.INTAKE;
-        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.DOWN::getAngle, ElevatorLevel.LO::getHeight);
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.HUMAN::getAngle, ElevatorLevel.HUMAN::getHeight);
         if (superStructureState == SuperStructureState.L1 ||
                 superStructureState == SuperStructureState.L2 ||
                 superStructureState == SuperStructureState.LO ||
@@ -69,7 +79,7 @@ public class Superstructure extends SubsystemBase{
 
     public Command LO() {
         superStructureState = SuperStructureState.LO;
-        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight);
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.L1::getAngle, ElevatorLevel.LO::getHeight);
         return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
     }
 
@@ -82,7 +92,7 @@ public class Superstructure extends SubsystemBase{
 
     public Command Processor() {
         superStructureState = SuperStructureState.PROCESSOR;
-        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.PROC::getAngle, ElevatorLevel.LO::getHeight);
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ALGPICK::getAngle, ElevatorLevel.LO::getHeight);
         return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
     }
 
@@ -111,7 +121,24 @@ public class Superstructure extends SubsystemBase{
 
     public Command Barge() {
         superStructureState = SuperStructureState.BARGE;
-        return new SetSuperstructureCommand(pivot, elevator, PivotPosition.HI::getAngle, ElevatorLevel.HI::getHeight);
+        // Note: This can be simplified down to bringing the pivot to a position and then bringing the elevator up, shooting once past a certain height
+        // Only use that method if time constraints deem it hard to do, or if the arm slop results in unexpected effects.
+        return new SequentialCommandGroup(
+            pivot.setPivotAngleCommand(PivotPosition.L1.getAngle()), //switch to a low position
+            new ParallelCommandGroup(
+                elevator.setLevelCommand(ElevatorLevel.HI), //brings the elevator up
+                new SequentialCommandGroup(
+                    new WaitUntilCommand(() -> elevator.getHeight().in(Meters) < 1.3), //waits until the elevator is high enough
+                    new ParallelCommandGroup(
+                        pivot.setPivotAngleCommand(PivotPosition.HI.getAngle()), //brings the pivot out
+                        new SequentialCommandGroup(
+                            new WaitUntilCommand(() -> pivot.getPivotAngle().getRadians() < Math.PI/2), //TODO change number
+                            grabber.outtakeCommand() //shoots once past shooting angle
+                        )
+                    )
+                )
+            )
+        );
     }
 
     public Command Algae2() {
@@ -125,6 +152,11 @@ public class Superstructure extends SubsystemBase{
         return new SetSuperstructureCommand(pivot, elevator, PivotPosition.ALGREEF::getAngle, ElevatorLevel.ALG3::getHeight);
     }
 
+    public Command AlgaePickup() {
+        superStructureState = SuperStructureState.PICKUP;
+        Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ALGPICK::getAngle, ElevatorLevel.LO::getHeight);
+        return end;//elevator.getHeight().in(Meters) < ElevatorLevel.CLEAR.getHeight() ? Clear(end) : end;
+    }
 
     public Command Clear(Command c) {
         return new SetSuperstructureCommand(pivot, elevator, pivot::getPivotAngle, ElevatorLevel.CLEAR::getHeight)
@@ -133,7 +165,6 @@ public class Superstructure extends SubsystemBase{
     }
 
     public Command getNextSuperStructure(SuperStructureState state) {
-
         //tad bit monkey but states
         switch (state) {
             case ALG3:
@@ -159,6 +190,10 @@ public class Superstructure extends SubsystemBase{
             default:
                 return LO();
         }
+    }
+
+    public void periodic() {
+
     }
 
     public Command setNextSuperStructure(SuperStructureState state) {

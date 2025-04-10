@@ -135,7 +135,7 @@ public class DriveToPose extends Command {
     }
 
     // gives next movement to swerve drive
-    swerveSubsystem.driveFieldOriented(new ChassisSpeeds(velocity.getX(),
+    swerveSubsystem.swerveDrive.driveFieldOriented(new ChassisSpeeds(velocity.getX(),
         yOverride.isPresent() ? yOverride.get().getAsDouble() : velocity.getY(), headingVelocity));
 
     Logger.recordOutput("DriveToPose/MeasuredDistance", currentDistance);

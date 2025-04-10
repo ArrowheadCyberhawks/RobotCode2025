@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import java.util.function.DoubleSupplier;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -20,14 +22,17 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import lib.frc706.cyberlib.LocalADStarAK;
 import lib.frc706.cyberlib.commands.ToPointCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.auto.AlignToReef;
+import frc.robot.auto.DriveToPose;
 import frc.robot.commands.SetSuperstructureCommand;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
+import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.subsystems.*;
@@ -66,9 +71,13 @@ public class AutoCommandManager {
                                                                                                        // more
                                                                                                        // subsystems are
                                                                                                        // made
+
         NamedCommands.registerCommand("INTAKE",
-                grabberSubsystem.runGrabberCommand(0.25).until(grabberSubsystem::hasCoral));
-        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.outtakeCommand().withTimeout(1));
+                (grabberSubsystem.runGrabberCommand(() -> GrabberState.INTAKE.getSpeed())
+                .until(grabberSubsystem::hasAlgae))
+                .withTimeout(5)
+        );
+        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.runGrabberCommand(GrabberState.OUTTAKE::getSpeed).withTimeout(2.0));
 
         NamedCommands.registerCommand("HUMAN", superstructure.Intake());
         NamedCommands.registerCommand("DEF", superstructure.LO());
@@ -80,6 +89,7 @@ public class AutoCommandManager {
 
         NamedCommands.registerCommand("BARGE", superstructure.Barge().withTimeout(3));
         NamedCommands.registerCommand("ALG2", superstructure.Algae2().withTimeout(2));
+        NamedCommands.registerCommand("ALG3", superstructure.Algae3().withTimeout(2.25));
 
         NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.climbOutCommand());
 
@@ -106,6 +116,31 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("NearLeftC", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftC).withTimeout(.5));
         NamedCommands.registerCommand("NearLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftL).withTimeout(.5));
 
+        // NamedCommands.registerCommand("NearR", new DriveToPose(swerveSubsystem, ReefPoint.kNearR.getPose()).withTimeout(0.75));
+        // NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearRightR", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarR", new DriveToPose(swerveSubsystem, ReefPoint.kFarR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarC", new DriveToPose(swerveSubsystem, ReefPoint.kFarC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarL", new DriveToPose(swerveSubsystem, ReefPoint.kFarL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearR", new DriveToPose(swerveSubsystem, ReefPoint.kNearR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearC", new DriveToPose(swerveSubsystem, ReefPoint.kNearC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearL", new DriveToPose(swerveSubsystem, ReefPoint.kNearL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarRightR", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarRightC", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarRightL", new DriveToPose(swerveSubsystem, ReefPoint.kFarRightL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearRightR", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearRightC", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearRightL", new DriveToPose(swerveSubsystem, ReefPoint.kNearRightL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftC", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("FarLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kFarLeftL.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftR", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftR.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftC", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftC.getPose()).withTimeout(.75));
+        // NamedCommands.registerCommand("NearLeftL", new DriveToPose(swerveSubsystem, ReefPoint.kNearLeftL.getPose()).withTimeout(.75));
     }
 
     public static Command pathfindToPoseCommand(Pose2d targetPose) {
@@ -172,7 +207,7 @@ public class AutoCommandManager {
                 .andThen(new ToPointCommand(RobotContainer.swerveSubsystem, () -> targetPose));
     }
 
-    private void elevatorCommands(String name, Elevator elevator, Pivot pivot) {
+    private void elevatorCommands(String name, Elevator elevator, Arm pivot) {
         NamedCommands.registerCommand(name, elevator.setLevelCommand(ElevatorLevel.valueOf(name))
                 .andThen(new WaitCommand(0.3))
                 .andThen(pivot.setPivotPositionCommand(PivotPosition.HI)));

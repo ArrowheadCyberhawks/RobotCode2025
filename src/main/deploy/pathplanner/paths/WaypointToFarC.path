@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.2204755847353885,
-        "y": 4.0
+        "x": 6.212111631651574,
+        "y": 3.892166478764723
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.9704755847353885,
-        "y": 4.0
+        "x": 5.962111631651574,
+        "y": 3.892166478764723
       },
       "isLocked": false,
-      "linkedName": "FarCenterWaypoint"
+      "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.67482760457779,
-        "y": 3.892160869820356
+        "x": 5.702347489711005,
+        "y": 3.892166478764723
       },
       "prevControl": {
-        "x": 5.9242226263888496,
-        "y": 3.874779181298777
+        "x": 5.951742511522064,
+        "y": 3.8747847902431443
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "FarC"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],

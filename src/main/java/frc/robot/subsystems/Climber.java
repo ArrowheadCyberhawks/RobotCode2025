@@ -73,10 +73,10 @@ public class Climber extends SubsystemBase {
     }
 
     public Command climbOutCommand() {
-        return runClimbCommand(() -> -0.8).withTimeout(1);
+        return runClimbCommand(() -> -0.8).until(() -> getPosition() < -100);
     }
 
     public Command climbInCommand() {
-        return runClimbCommand(() -> 0.8).withTimeout(4);
+        return runClimbCommand(() -> 0.8).until(() -> getPosition() > 120);
     }
 }
