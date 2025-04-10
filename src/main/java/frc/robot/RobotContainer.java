@@ -96,7 +96,7 @@ public class RobotContainer {
     grabber = new Grabber();
     climber = new Climber();
 
-    superstructure = new Superstructure(elevator, pivot);
+    superstructure = new Superstructure(elevator, pivot, grabber);
 
     // ledSubsystem = new LEDSubsystem();
 
@@ -106,7 +106,7 @@ public class RobotContainer {
           IOConstants.kDriverControllerDeadband, 0.15) {
         @Override
         public double interpolate(double value) {
-          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+          return value * MathUtil.interpolate(0.15, 0.5, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
         }
       };
     } else {
@@ -114,7 +114,7 @@ public class RobotContainer {
           IOConstants.kDriverControllerDeadband, 0.15) {
           @Override
         public double interpolate(double value) {
-          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+          return value * MathUtil.interpolate(0.15, 0.5, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
         }
       };
     }
@@ -316,7 +316,8 @@ public class RobotContainer {
 
     manipulatorController.start().onTrue(grabber.runOnce(() -> pivot.resetPivotAngle(new Rotation2d(3*Math.PI/2))).ignoringDisable(true));
     manipulatorController.back().onTrue(superstructure.LO()); //switch to L1;
-
+    
+    manipulatorController.rightBumper().onTrue(superstructure.bargePlace());
     //reset angles
     // manipulatorController.start().onTrue(new InstantCommand(() -> {
     //   pivot.resetPivotAngle(Rotation2d.kZero);

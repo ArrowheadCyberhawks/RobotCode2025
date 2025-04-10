@@ -15,6 +15,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -37,6 +39,8 @@ public class Grabber extends SubsystemBase {
     private final SparkMaxConfig grabberMotor2Config;
     private final TimeOfFlight coralSensor, algaeSensor;
 
+    private final Debouncer algaeDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+
     private GrabberState grabberState = GrabberState.STOP;
     
 
@@ -56,7 +60,7 @@ public class Grabber extends SubsystemBase {
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
         coralSensor.setRangingMode(RangingMode.Short, 24);
-        algaeSensor.setRangingMode(RangingMode.Short, 100);
+        algaeSensor.setRangingMode(RangingMode.Short, 24);
 
         new Trigger(this::hasCoral).onTrue(stopIntakeCommand());
     }
@@ -94,7 +98,7 @@ public class Grabber extends SubsystemBase {
      * @return The distance measured by the algae sensor in millimeters.
      */
     public Distance getAlgaeRange() {
-        return Millimeters.of(algaeSensor.getRange());
+        return algaeSensor.isRangeValid() ? Millimeters.of(algaeSensor.getRange()) : Millimeters.of(-1);
     }
 
     /**
@@ -113,7 +117,7 @@ public class Grabber extends SubsystemBase {
      */
     public boolean hasAlgae() {
         double algaeRange = getAlgaeRange().in(Meters);
-        return algaeRange > 0 && algaeRange < 0.05;
+        return algaeDebouncer.calculate(algaeRange >= 0 && algaeRange < 0.12);
     }
     
     /**
