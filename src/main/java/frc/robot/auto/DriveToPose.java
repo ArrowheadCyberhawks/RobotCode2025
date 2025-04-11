@@ -34,7 +34,7 @@ public class DriveToPose extends Command {
   // ri.get(), rd.get());
 
   private final ProfiledPIDController driveController = new ProfiledPIDController(Constants.PID.Auto.kPTranslation,
-      Constants.PID.Auto.kITranslation, Constants.PID.Auto.kDTranslation, new Constraints(1, .75));
+      Constants.PID.Auto.kITranslation, Constants.PID.Auto.kDTranslation, new Constraints(1.5, 1));
   private final PIDController headingController = new PIDController(Constants.PID.Auto.kThetaPIDConstants.kP,
       Constants.PID.Auto.kThetaPIDConstants.kI, Constants.PID.Auto.kThetaPIDConstants.kD);
 

@@ -3,16 +3,16 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.202663934426229,
-        "y": 5.6013831967213115
+        "x": 5.287509456178549,
+        "y": 5.510496229210226
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.0970093689910545,
-        "y": 5.374806249962149
+        "x": 5.181854890743375,
+        "y": 5.2839192824510635
       },
       "isLocked": false,
-      "linkedName": "FarLeftRWaypoint"
+      "linkedName": null
     },
     {
       "anchor": {
