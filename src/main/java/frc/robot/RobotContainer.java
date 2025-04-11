@@ -221,8 +221,8 @@ public class RobotContainer {
     }
 
     alignmentCommandFactory = new AlignToReef(swerveSubsystem, superstructure, grabber);
-    nextReef = ReefPoint.kNearL;
-    nextPath = NearL;
+    nextReef = ReefPoint.kFarLeftL;
+    nextPath = FarLeftL;
 
     // commands and stuff
     autoManager = new AutoCommandManager(swerveSubsystem, superstructure, grabber, climber, alignmentCommandFactory);
@@ -418,6 +418,7 @@ public class RobotContainer {
     keypadHID.button(8).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarRightR).alongWith(new InstantCommand(() -> nextPath = FarRightR)));
     keypadHID.button(12).and(keypadHID.button(8)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarRightC).alongWith(new InstantCommand(() -> nextPath = FarRightC)));
 
+    //System.out.println("Reef " + nextReef.toString() + "Path " + nextPath.toString());
   }
 
   public Command getTeleopCommand() {
