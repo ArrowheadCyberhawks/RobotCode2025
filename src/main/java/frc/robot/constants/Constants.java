@@ -94,14 +94,14 @@ public final class Constants {
     public static enum ElevatorLevel {
       LO(0.0),
       L1(0.444),
-      L2(0.267), //0.269 
+      L2(0.512), //0.269 
       L3(0.66), 
       L4(1.327 ), //1.354
       HI(maxHeight),
       HUMAN(0.930),
       CLEAR(1.1),
       ALG3(0.849),
-      ALG2(0.357);
+      ALG2(0.512);
 
       private final double height;
 
@@ -136,13 +136,11 @@ public final class Constants {
     public static final Distance kCoralSensorThreshold = Centimeters.of(10);
     public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
 
-    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 4);//0.7
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 7);//0.7
     public static final LoggedNetworkNumber kPivotI = new LoggedNetworkNumber("Grabber/kPivotI", 0.0);
     public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.75);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
     public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
-
-    public static final LoggedNetworkNumber kPivotUpP = new LoggedNetworkNumber("Grabber/kPivotUpP", 0.3);
 
     public static final LoggedNetworkNumber kPivotS = new LoggedNetworkNumber("Grabber/kPivotS", 0.0);
     public static final LoggedNetworkNumber kPivotG = new LoggedNetworkNumber("Grabber/kPivotG", 0.4);
@@ -161,7 +159,7 @@ public final class Constants {
 
 
       ALGPICK(Rotation2d.fromRadians(0.622 + grabberOffset)),
-      ALGREEF(Rotation2d.fromRadians(1.1 + grabberOffset)),
+      ALGREEF(Rotation2d.fromRadians(2.65)),
       HI(Rotation2d.fromRadians(3.67));//70
       
       private final Rotation2d angle;
@@ -273,7 +271,7 @@ public final class Constants {
    */
   public static enum FieldPosition { //nitin don't touch this either I DON'T WANT IT PRETTIER
       kBargeLeft(new Pose2d(8.775, 0.75, new Rotation2d()), new Pose2d(8.775, 7.25, new Rotation2d())),
-      kBargeMiddle(new Pose2d(9.8, 1.9, Rotation2d.kZero), new Pose2d(7.75, 6.16, Rotation2d.k180deg)),
+      kBargeMiddle(new Pose2d(9.8, 1.9, Rotation2d.k180deg), new Pose2d(7.75, 6.16, Rotation2d.kZero)),
       kBargeRight(new Pose2d(8.775, 3, new Rotation2d()), new Pose2d(8.775, 5, new Rotation2d())),
       kLeftCoralStation(new Pose2d(16.75, 0.65, new Rotation2d()), new Pose2d(0.75, 7.35, new Rotation2d())),
       kRightCoralStation(new Pose2d(16.75, 7.35, new Rotation2d()), new Pose2d(0.75, 0.65, new Rotation2d()));
