@@ -88,7 +88,7 @@ public final class Constants {
 
     public static final int elevatorMotorID = 9;
 
-    public static final double maxHeight = 1.6;
+    public static final double maxHeight = 1.63;
 
     public static enum ElevatorLevel {
       LO(0.0),
@@ -96,11 +96,11 @@ public final class Constants {
       L2(0.267), //0.269 
       L3(0.66), 
       L4(1.327 ), //1.354
-      HI(1.55),
+      HI(maxHeight),
       HUMAN(0.930),
       CLEAR(1.1),
       ALG3(0.849),
-      ALG2(0.46);
+      ALG2(0.357);
 
       private final double height;
 
@@ -121,8 +121,10 @@ public final class Constants {
 
     public static final int kCoralSensorPort = 13;
     public static final int kAlgaeSensorPort = 22;
+    public static final int kReefSensorPort = 34;
 
-    public static final int kPivotEncoderId = 55;
+
+    public static final int kPivotEncoderId = 56;
 
     public static final double kMaxPivotPower = 0.7;
 
@@ -133,7 +135,7 @@ public final class Constants {
     public static final Distance kCoralSensorThreshold = Centimeters.of(10);
     public static final Distance kAlgaeSensorThreshold = Centimeters.of(2);
 
-    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 7.5);//0.7
+    public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 4);//0.7
     public static final LoggedNetworkNumber kPivotI = new LoggedNetworkNumber("Grabber/kPivotI", 0.0);
     public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.75);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
@@ -152,14 +154,14 @@ public final class Constants {
       
       OUT(Rotation2d.fromDegrees(5.0 + grabberOffset)),
       PLACE(Rotation2d.fromRadians(1.1 + grabberOffset)),
-      LO(Rotation2d.fromRadians(2.34 + grabberOffset)),
+      LO(Rotation2d.fromRadians(3.968)),
       L4(Rotation2d.fromRadians(0.96 + grabberOffset)),
       HUMAN(Rotation2d.fromRadians(3.902 + grabberOffset)),
-      ZERO(Rotation2d.kZero),
+
 
       ALGPICK(Rotation2d.fromRadians(0.622 + grabberOffset)),
       ALGREEF(Rotation2d.fromRadians(1.1 + grabberOffset)),
-      HI(Rotation2d.fromRadians(2.46 + grabberOffset));//70
+      HI(Rotation2d.fromRadians(3.67));//70
       
       private final Rotation2d angle;
 

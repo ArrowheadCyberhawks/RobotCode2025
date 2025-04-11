@@ -22,7 +22,9 @@ import frc.robot.constants.Constants.IOConstants;
 import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
+import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
+import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
@@ -39,6 +41,9 @@ import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -325,7 +330,13 @@ public class RobotContainer {
     manipulatorController.back().onTrue(superstructure.LO()); //switch to L1;
     
     manipulatorController.rightBumper().onTrue(superstructure.bargePlace());
-    manipulatorController.leftBumper().onTrue(superstructure.reefPick());
+    manipulatorController.leftBumper().onTrue(new SequentialCommandGroup(
+				pivot.setPivotPositionCommand(PivotPosition.ALGREEF)
+				.alongWith(grabber.runGrabberCommand(GrabberState.INTAKE::getSpeed).withTimeout(2)),
+				grabber.intakeCommand().withTimeout(0.1),
+				pivot.setPivotPositionCommand(PivotPosition.LO)
+			)
+    );
     //reset angles
     // manipulatorController.start().onTrue(new InstantCommand(() -> {
     //   pivot.resetPivotAngle(Rotation2d.kZero);

@@ -81,7 +81,7 @@ public class Superstructure extends SubsystemBase{
 
 	public Command Pickup() {
 		superStructureState = SuperStructureState.LO;
-		Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.ZERO::getAngle, ElevatorLevel.LO::getHeight);
+		Command end = new SetSuperstructureCommand(pivot, elevator, PivotPosition.LO::getAngle, ElevatorLevel.LO::getHeight);
 		return superStructureState == SuperStructureState.INTAKE ? Clear(end) : end;
 	}
 
@@ -160,15 +160,23 @@ public class Superstructure extends SubsystemBase{
 	}
 
 	public Command reefPick() {
-		return new SequentialCommandGroup(
+		// return new SequentialCommandGroup(
+		// 		pivot.setPivotPositionCommand(PivotPosition.ALGREEF)
+		// 		.alongWith(grabber.runGrabberCommand(GrabberState.INTAKE::getSpeed).withTimeout(2)),
+		// 		grabber.intakeCommand().withTimeout(0.1),
+		// 		pivot.setPivotPositionCommand(PivotPosition.LO)
+		// 	)
+		// 	.repeatedly()
+		// 	.until(() -> grabber.hasAlgae() && pivot.getPivotAngle().getRadians() > PivotPosition.LO.getAngle().getRadians() - 0.1)
+		// 	.andThen(elevator.setLevelCommand(ElevatorLevel.LO));
+
+
+			return new SequentialCommandGroup(
 				pivot.setPivotPositionCommand(PivotPosition.ALGREEF)
 				.alongWith(grabber.runGrabberCommand(GrabberState.INTAKE::getSpeed).withTimeout(2)),
 				grabber.intakeCommand().withTimeout(0.1),
 				pivot.setPivotPositionCommand(PivotPosition.LO)
-			)
-			.repeatedly()
-			.until(() -> grabber.hasAlgae() && pivot.getPivotAngle().getRadians() > PivotPosition.LO.getAngle().getRadians() - 0.1)
-			.andThen(elevator.setLevelCommand(ElevatorLevel.LO));
+			);
 	}
 
 	public Command getNextSuperStructure(SuperStructureState state) {

@@ -37,9 +37,11 @@ public class Grabber extends SubsystemBase {
     private final SparkMax grabberMotor2; // right motor
     private final SparkMaxConfig grabberMotor1Config;
     private final SparkMaxConfig grabberMotor2Config;
-    private final TimeOfFlight coralSensor, algaeSensor;
+    private final TimeOfFlight coralSensor, algaeSensor, reefSensor;
 
     private final Debouncer algaeDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+    private final Debouncer reefDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+
 
     private GrabberState grabberState = GrabberState.STOP;
     
@@ -59,8 +61,11 @@ public class Grabber extends SubsystemBase {
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
+        reefSensor = new TimeOfFlight(kReefSensorPort);
         coralSensor.setRangingMode(RangingMode.Short, 24);
         algaeSensor.setRangingMode(RangingMode.Short, 24);
+        reefSensor.setRangingMode(RangingMode.Short, 24);
+
 
         new Trigger(this::hasCoral).onTrue(stopIntakeCommand());
     }
@@ -73,6 +78,8 @@ public class Grabber extends SubsystemBase {
         Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
 
         Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Centimeter));
+        Logger.recordOutput(getName() + "/Reef Range", getReefRange().in(Centimeter));
+
         //Controling LEDS
 
         // if(hasAlgae() || hasCoral()) {
@@ -101,6 +108,10 @@ public class Grabber extends SubsystemBase {
         return algaeSensor.isRangeValid() ? Millimeters.of(algaeSensor.getRange()) : Millimeters.of(-1);
     }
 
+    public Distance getReefRange() {
+        return reefSensor.isRangeValid() ? Millimeters.of(reefSensor.getRange()) : Millimeters.of(-1);
+    }
+
     /**
      * Checks if there is an object within the coral sensor's range.
      * @return whether the robot has a coral in the grabber.
@@ -118,6 +129,11 @@ public class Grabber extends SubsystemBase {
     public boolean hasAlgae() {
         double algaeRange = getAlgaeRange().in(Meters);
         return algaeDebouncer.calculate(algaeRange >= 0 && algaeRange < 0.12);
+    }
+
+    public boolean onReef() {
+        double reefRange = getReefRange().in(Meters);
+        return reefDebouncer.calculate(reefRange >= 0 && reefRange < 0.12);
     }
     
     /**
