@@ -20,6 +20,7 @@ import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 
@@ -142,7 +143,12 @@ public class Arm extends SubsystemBase {
     }
 
     public Command setPivotPositionCommand(PivotPosition position) {
-        return runOnce(() -> setPivotPosition(position));
+        return new RunCommand(() -> setPivotPosition(position), this) {
+                @Override
+                public boolean isFinished() {
+                    return atPivotTarget();
+                }
+            };
     }
 
     public Command runPivotCommand(double speed) {

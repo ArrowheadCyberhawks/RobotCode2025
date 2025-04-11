@@ -15,6 +15,8 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
+import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -35,7 +37,11 @@ public class Grabber extends SubsystemBase {
     private final SparkMax grabberMotor2; // right motor
     private final SparkMaxConfig grabberMotor1Config;
     private final SparkMaxConfig grabberMotor2Config;
-    private final TimeOfFlight coralSensor, algaeSensor;
+    private final TimeOfFlight coralSensor, algaeSensor, reefSensor;
+
+    private final Debouncer algaeDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+    private final Debouncer reefDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+
 
     private GrabberState grabberState = GrabberState.STOP;
     
@@ -55,8 +61,11 @@ public class Grabber extends SubsystemBase {
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);
         algaeSensor = new TimeOfFlight(kAlgaeSensorPort);
+        reefSensor = new TimeOfFlight(kReefSensorPort);
         coralSensor.setRangingMode(RangingMode.Short, 24);
-        algaeSensor.setRangingMode(RangingMode.Short, 100);
+        algaeSensor.setRangingMode(RangingMode.Short, 24);
+        reefSensor.setRangingMode(RangingMode.Short, 24);
+
 
         new Trigger(this::hasCoral).onTrue(stopIntakeCommand());
     }
@@ -69,6 +78,8 @@ public class Grabber extends SubsystemBase {
         Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
 
         Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Centimeter));
+        Logger.recordOutput(getName() + "/Reef Range", getReefRange().in(Centimeter));
+
         //Controling LEDS
 
         // if(hasAlgae() || hasCoral()) {
@@ -94,7 +105,11 @@ public class Grabber extends SubsystemBase {
      * @return The distance measured by the algae sensor in millimeters.
      */
     public Distance getAlgaeRange() {
-        return Millimeters.of(algaeSensor.getRange());
+        return algaeSensor.isRangeValid() ? Millimeters.of(algaeSensor.getRange()) : Millimeters.of(-1);
+    }
+
+    public Distance getReefRange() {
+        return reefSensor.isRangeValid() ? Millimeters.of(reefSensor.getRange()) : Millimeters.of(-1);
     }
 
     /**
@@ -113,7 +128,12 @@ public class Grabber extends SubsystemBase {
      */
     public boolean hasAlgae() {
         double algaeRange = getAlgaeRange().in(Meters);
-        return algaeRange > 0 && algaeRange < 0.05;
+        return algaeDebouncer.calculate(algaeRange >= 0 && algaeRange < 0.12);
+    }
+
+    public boolean onReef() {
+        double reefRange = getReefRange().in(Meters);
+        return reefDebouncer.calculate(reefRange >= 0 && reefRange < 0.12);
     }
     
     /**

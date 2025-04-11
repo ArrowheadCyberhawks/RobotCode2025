@@ -14,6 +14,7 @@ import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.auto.AlignToReef;
+import frc.robot.auto.DriveToPose;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
 import frc.robot.constants.Constants;
@@ -21,12 +22,15 @@ import frc.robot.constants.Constants.IOConstants;
 import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
+import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
+import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
+import java.text.FieldPosition;
 
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
@@ -42,6 +46,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -132,7 +139,7 @@ public class RobotContainer {
           IOConstants.kDriverControllerDeadband, 0.15) {
         @Override
         public double interpolate(double value) {
-          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+          return value * MathUtil.interpolate(0.15, 0.5, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
         }
       };
     } else {
@@ -140,7 +147,7 @@ public class RobotContainer {
           IOConstants.kDriverControllerDeadband, 0.15) {
           @Override
         public double interpolate(double value) {
-          return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+          return value * MathUtil.interpolate(0.15, 0.5, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
         }
       };
     }
@@ -285,6 +292,10 @@ public class RobotContainer {
         () -> driverController.getRightTriggerAxis(),
         SwerveConstants.kMaxVelTele.in(MetersPerSecond), SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond)));
 
+    driverController.leftBumper().whileTrue(new DriveToPose(swerveSubsystem, 
+    	Constants.FieldPosition.kBargeMiddle::getPose,
+		() -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Red).equals(DriverStation.Alliance.Red) ? driverController.getLeftX() : -driverController.getLeftX()));
+
     //Drive to Human Player Station
     // driverController.b().whileTrue();
     // driverController.x().whileTrue();
@@ -370,7 +381,15 @@ public class RobotContainer {
 
     manipulatorController.start().onTrue(grabber.runOnce(() -> pivot.resetPivotAngle(new Rotation2d(3*Math.PI/2))).ignoringDisable(true));
     manipulatorController.back().onTrue(superstructure.LO()); //switch to L1;
-
+    
+    manipulatorController.rightBumper().onTrue(superstructure.bargePlace());
+    manipulatorController.leftBumper().onTrue(new SequentialCommandGroup(
+				pivot.setPivotPositionCommand(PivotPosition.ALGREEF)
+				.alongWith(grabber.runGrabberCommand(GrabberState.INTAKE::getSpeed).withTimeout(2)),
+				grabber.intakeCommand().withTimeout(0.1),
+				pivot.setPivotPositionCommand(PivotPosition.LO)
+			)
+    );
     //reset angles
     // manipulatorController.start().onTrue(new InstantCommand(() -> {
     //   pivot.resetPivotAngle(Rotation2d.kZero);
