@@ -218,8 +218,8 @@ public class RobotContainer {
       FarR = PathPlannerPath.fromPathFile("WaypointToFarR");
       FarC = PathPlannerPath.fromPathFile("WaypointToFarC");
       FarLeftL = PathPlannerPath.fromPathFile("WaypointToFarLeftL");
-      FarLeftR = PathPlannerPath.fromPathFile("WaypointToFarleftR");
-      FarLeftC = PathPlannerPath.fromPathFile("WaypointToFarleftC");
+      FarLeftR = PathPlannerPath.fromPathFile("WaypointToFarLeftR");
+      FarLeftC = PathPlannerPath.fromPathFile("WaypointToFarLeftC");
       FarRightL = PathPlannerPath.fromPathFile("WaypointToFarRightL");
       FarRightR = PathPlannerPath.fromPathFile("WaypointToFarRightR");
       FarRightC = PathPlannerPath.fromPathFile("WaypointToFarRightC");             
@@ -228,8 +228,8 @@ public class RobotContainer {
     }
 
     alignmentCommandFactory = new AlignToReef(swerveSubsystem, superstructure, grabber);
-    nextReef = ReefPoint.kFarLeftL;
-    nextPath = FarLeftL;
+    nextReef = ReefPoint.kNearLeftL;
+    nextPath = NearLeftL;
 
     // commands and stuff
     autoManager = new AutoCommandManager(swerveSubsystem, superstructure, grabber, climber, alignmentCommandFactory);

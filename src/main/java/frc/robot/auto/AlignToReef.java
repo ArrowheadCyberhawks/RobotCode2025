@@ -85,7 +85,7 @@ public class AlignToReef {
      */
     public Command generateCommand(ReefPoint reef, PathPlannerPath path) {
         //Crash-proof
-        if (reef == null || reef.getPose() == null) {
+        if (reef == null || reef.getPose() == null || path == null) {
             return Commands.print("Error: Reef or its pose is null");
         }
 
