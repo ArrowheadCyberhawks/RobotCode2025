@@ -17,21 +17,37 @@ public class LEDCommand extends Command{
 
     public void initialize(){
     }
+/* 
+    public void execute(){
+        setLEDMode(LEDState.OFF, LEDMode.OFF);
+        setLEDMode(LEDState.ALGAE, LEDMode.GREEN);
+        setLEDMode(LEDState.CORAL, LEDMode.WHITE);
+        setLEDMode(LEDState.CLIMB, LEDMode.BLUE);
+        setLEDMode(LEDState.EMAIL, LEDMode.PURPLE);
+        setLEDMode(LEDState.DEFAULT, LEDMode.PINK);
+        setLEDMode(LEDState.ISSUE, LEDMode.STROBE);
+
+
+
+    }
+*/
 
     public void execute(){
         setLEDMode(LEDState.OFF, LEDMode.OFF);
-        setLEDMode(LEDState.IN, LEDMode.VIOLET);
-        setLEDMode(LEDState.OUT, LEDMode.RED);
-        setLEDMode(LEDState.ALIGN, LEDMode.BLUE);
-        setLEDMode(LEDState.READY, LEDMode.GREEN);
-        setLEDMode(LEDState.ERROR, LEDMode.STROBERED);
-        setLEDMode(LEDState.DEF, LEDMode.PINK);
-    }    
+        setLEDMode(LEDState.ALGAE, LEDMode.GREEN);
+        setLEDMode(LEDState.CORAL, LEDMode.WHITE);
+        setLEDMode(LEDState.CLIMB, LEDMode.BLUE);
+        setLEDMode(LEDState.EMAIL, LEDMode.PURPLE);
+        setLEDMode(LEDState.DEFAULT, LEDMode.PINK);
+        setLEDMode(LEDState.ISSUE, LEDMode.STROBE);
 
+
+
+    }
     public boolean isFinished(){
         return false;
     }
-
+        
     public void periodic() {
         //might have to change to a different color idrk
         ledSubsystem.setLEDPWM(0.93);
@@ -48,4 +64,5 @@ public class LEDCommand extends Command{
         }
     }
     
-}
+    }
+    

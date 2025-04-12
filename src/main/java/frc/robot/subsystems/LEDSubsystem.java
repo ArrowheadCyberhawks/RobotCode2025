@@ -12,12 +12,15 @@ public class LEDSubsystem extends SubsystemBase {
 
   public enum LEDState{
     OFF, //black
-    IN, //violet
-    OUT, //red
-    DEF, //pink
-    ALIGN, //blue
-    READY, //green
-    ERROR, //strobe red
+    DEFAULT, //pink
+    CORAL, //white
+    ALGAE, //teal
+    CLIMB, //blue 
+    ISSUE, //strobe red
+    EMAIL, // purple 
+    AUTO, //pink and black strobe 
+    ONREEF, //flashing light blue
+    
   }
 
   //used for controlling lights
@@ -43,11 +46,12 @@ public class LEDSubsystem extends SubsystemBase {
   public enum LEDMode {
     PINK(0.57), //solid hot pink
     GREEN(0.77), //solid green
-    RED(0.61),
+    WHITE(0.93), // white 
     BLUE(0.87), //solid blue
-    STROBERED(-0.11), //strobe red
-    VIOLET(0.91), //violet
+    STROBE(-0.11), //strobe red'
+    PURPLE(0.1),
     OFF(.99); //black
+
     //red: 0.61 green: 0.77 blue: 0.87
 
     public double pwmSignal;

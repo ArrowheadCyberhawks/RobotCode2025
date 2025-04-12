@@ -10,6 +10,7 @@ import lib.frc706.cyberlib.commands.TrackPointCommand;
 import lib.frc706.cyberlib.commands.controller.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.LEDMode;
 import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -19,6 +20,7 @@ import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.IOConstants;
+import frc.robot.constants.Constants.LEDConstants;
 import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
@@ -64,6 +66,7 @@ public class RobotContainer {
 	public static SwerveSubsystem swerveSubsystem;
 	private final Elevator elevator;
 	public final Arm pivot;
+	public final LEDSubsystem LED;
 	private final Grabber grabber;
 	private final Climber climber;
 
@@ -104,6 +107,7 @@ public class RobotContainer {
 		pivot = new Arm();
 		grabber = new Grabber();
 		climber = new Climber();
+		LED = new LED();
 
 		superstructure = new Superstructure(elevator, pivot, grabber);
 
@@ -304,6 +308,8 @@ public class RobotContainer {
 
 		keypadHID.button(21).onTrue(superstructure.setNextSuperStructure(SuperStructureState.INTAKE));
 
+		keypadHID.button(21).onTrue(LEDSubsystem.setLEDMode());
+	
 
 		
 		//MANIPULATOR CONTROLLER

@@ -14,6 +14,8 @@ import frc.robot.commands.*;
 import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
+import frc.robot.commands.LEDCommand;
+
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.math.MathUtil;
@@ -31,7 +33,7 @@ public class Superstructure extends SubsystemBase{
 	public static Elevator elevator;
 	public static Arm pivot;
 	public static Grabber grabber;
-
+	public static LEDSubsystem LED;
 	public static enum SuperStructureState {
 		DEF,
 		LO,
@@ -50,10 +52,12 @@ public class Superstructure extends SubsystemBase{
 	public static SuperStructureState superStructureState = SuperStructureState.INTAKE;
 	public static SuperStructureState nextSuperStructureState = SuperStructureState.L3;
 
-	public Superstructure(Elevator elevator, Arm pivot, Grabber grabber) {
+	public Superstructure(Elevator elevator, Arm pivot, Grabber grabber, LEDSubsystem led) {
 		Superstructure.elevator = elevator;
 		Superstructure.pivot = pivot;
 		Superstructure.grabber = grabber;
+		Superstructure.LED = LED;
+
 	}
 
 	//NOTE: This ONLY WORKS if manual controls don't put it in a dangerous position, so just have height checks for each one seperately
