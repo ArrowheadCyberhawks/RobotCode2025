@@ -22,22 +22,15 @@ import frc.robot.constants.Constants.IOConstants;
 import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
-import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.text.FieldPosition;
-import java.time.Instant;
-
 import org.json.simple.parser.ParseException;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
-import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
@@ -45,16 +38,13 @@ import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.net.WebServer;
-import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -80,11 +70,7 @@ public class RobotContainer {
 	private final Superstructure superstructure;
 	// private final LEDSubsystem ledSubsystem;
 
-	private final LimelightSubsystem limelightSubsystem;
 	private final PhotonCameraWrapper cam0, cam1;
-
-	private ReefPoint nextReef;
-	private PathPlannerPath nextPath;
 	// private final PhotonCameraWrapper cam0, cam1, cam2, cam3, cam4, cam5, cam6;
 
 	private Command teleopCommand;
@@ -98,25 +84,6 @@ public class RobotContainer {
 
   //Automation CommandFactories
   private final AlignToReef alignmentCommandFactory;
-
-  PathPlannerPath NearL;
-  PathPlannerPath NearR;
-  PathPlannerPath NearC;
-  PathPlannerPath NearLeftL;
-  PathPlannerPath NearLeftR;
-  PathPlannerPath NearLeftC;
-  PathPlannerPath NearRightL;
-  PathPlannerPath NearRightR;
-  PathPlannerPath NearRightC;
-  PathPlannerPath FarL;
-  PathPlannerPath FarR;
-  PathPlannerPath FarC;
-  PathPlannerPath FarLeftL;
-  PathPlannerPath FarLeftR;
-  PathPlannerPath FarLeftC;
-  PathPlannerPath FarRightL;
-  PathPlannerPath FarRightR;
-  PathPlannerPath FarRightC;
 
 	/**
 	 * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -208,35 +175,7 @@ public class RobotContainer {
 		// cam0, cam1, cam2, cam3, cam4, cam5, cam6);
 		SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
 
-    // set up limelight
-    limelightSubsystem = new LimelightSubsystem(swerveSubsystem, false, false);
-
-    try {
-      NearL = PathPlannerPath.fromPathFile("WaypointToNearL");
-      NearR = PathPlannerPath.fromPathFile("WaypointToNearR");
-      NearC = PathPlannerPath.fromPathFile("WaypointToNearC");
-      NearLeftL = PathPlannerPath.fromPathFile("WaypointToNearLeftL");
-      NearLeftR = PathPlannerPath.fromPathFile("WaypointToNearRightR");
-      NearLeftC = PathPlannerPath.fromPathFile("WaypointToNearRightC");
-      NearRightL = PathPlannerPath.fromPathFile("WaypointToNearRightL");
-      NearRightR = PathPlannerPath.fromPathFile("WaypointToNearRightR");
-      NearRightC = PathPlannerPath.fromPathFile("WaypointToNearRightC");
-      FarL = PathPlannerPath.fromPathFile("WaypointToFarL");
-      FarR = PathPlannerPath.fromPathFile("WaypointToFarR");
-      FarC = PathPlannerPath.fromPathFile("WaypointToFarC");
-      FarLeftL = PathPlannerPath.fromPathFile("WaypointToFarLeftL");
-      FarLeftR = PathPlannerPath.fromPathFile("WaypointToFarLeftR");
-      FarLeftC = PathPlannerPath.fromPathFile("WaypointToFarLeftC");
-      FarRightL = PathPlannerPath.fromPathFile("WaypointToFarRightL");
-      FarRightR = PathPlannerPath.fromPathFile("WaypointToFarRightR");
-      FarRightC = PathPlannerPath.fromPathFile("WaypointToFarRightC");             
-    } catch (Exception e) {
-      System.out.println(e.getMessage());
-    }
-
     alignmentCommandFactory = new AlignToReef(swerveSubsystem, superstructure, grabber);
-    nextReef = ReefPoint.kNearLeftL;
-    nextPath = NearLeftL;
 
 		// commands and stuff
 		autoManager = new AutoCommandManager(swerveSubsystem, superstructure, grabber, climber, alignmentCommandFactory);
@@ -480,41 +419,6 @@ public class RobotContainer {
 			}
 		)
 	);
-  }
-
-  private void lightboard() {
-    //i just decided to remove the abstraction bc i actually don't know how to translate strings to variable names without doing a whole lot more stuff that might break
-    // Near
-    keypadHID.button(22).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearL).alongWith(new InstantCommand(() -> nextPath = NearL)));
-    keypadHID.button(23).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearR).alongWith(new InstantCommand(() -> nextPath = NearR)));
-    keypadHID.button(22).and(keypadHID.button(23)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearC).alongWith(new InstantCommand(() -> nextPath = NearC)));
-
-    // NearLeft
-    keypadHID.button(13).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearLeftL).alongWith(new InstantCommand(() -> nextPath = NearLeftL)));
-    keypadHID.button(17).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearLeftR).alongWith(new InstantCommand(() -> nextPath = NearLeftR)));
-    keypadHID.button(13).and(keypadHID.button(17)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearLeftC).alongWith(new InstantCommand(() -> nextPath = NearLeftC)));
-
-    // NearRight
-    keypadHID.button(20).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearRightL).alongWith(new InstantCommand(() -> nextPath = NearRightL)));
-    keypadHID.button(16).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearRightR).alongWith(new InstantCommand(() -> nextPath = NearRightR)));
-    keypadHID.button(20).and(keypadHID.button(16)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kNearRightC).alongWith(new InstantCommand(() -> nextPath = NearRightC)));
-
-    // Far
-    keypadHID.button(3).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarL).alongWith(new InstantCommand(() -> nextPath = FarL)));
-    keypadHID.button(2).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarR).alongWith(new InstantCommand(() -> nextPath = FarR)));
-    keypadHID.button(3).and(keypadHID.button(2)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarC).alongWith(new InstantCommand(() -> nextPath = FarC)));
-
-    // FarLeft
-    keypadHID.button(5).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarLeftL).alongWith(new InstantCommand(() -> nextPath = FarLeftL)));
-    keypadHID.button(9).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarLeftR).alongWith(new InstantCommand(() -> nextPath = FarLeftR)));
-    keypadHID.button(5).and(keypadHID.button(9)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarLeftC).alongWith(new InstantCommand(() -> nextPath = FarLeftC)));
-
-    // FarRight
-    keypadHID.button(12).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarRightL).alongWith(new InstantCommand(() -> nextPath = FarRightL)));
-    keypadHID.button(8).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarRightR).alongWith(new InstantCommand(() -> nextPath = FarRightR)));
-    keypadHID.button(12).and(keypadHID.button(8)).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.kFarRightC).alongWith(new InstantCommand(() -> nextPath = FarRightC)));
-
-    //System.out.println("Reef " + nextReef.toString() + "Path " + nextPath.toString());
   }
 
 	public Command getTeleopCommand() {

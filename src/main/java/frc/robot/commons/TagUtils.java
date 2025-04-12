@@ -1,8 +1,6 @@
 package frc.robot.commons;
 
 import static edu.wpi.first.units.Units.Inches;
-import static frc.robot.constants.Constants.*;
-
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFieldLayout.OriginPosition;
 import edu.wpi.first.apriltag.AprilTagFields;

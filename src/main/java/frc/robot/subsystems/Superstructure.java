@@ -1,10 +1,6 @@
 package frc.robot.subsystems;
 
 
-import com.ctre.phoenix.schedulers.SequentialScheduler;
-import com.revrobotics.RelativeEncoder;
-
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
@@ -12,18 +8,10 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import frc.robot.commands.*;
-import frc.robot.constants.Constants;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import static edu.wpi.first.units.Units.*;
-
-import org.littletonrobotics.junction.Logger;
-
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.*;
-import edu.wpi.first.math.util.Units;
-import edu.wpi.first.units.measure.Distance;
 
 
 

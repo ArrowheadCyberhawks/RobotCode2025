@@ -5,35 +5,27 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
-import java.util.function.DoubleSupplier;
-
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.commands.PathfindingCommand;
-import com.pathplanner.lib.path.GoalEndState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.pathfinding.Pathfinding;
 
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import lib.frc706.cyberlib.LocalADStarAK;
 import lib.frc706.cyberlib.commands.ToPointCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.auto.AlignToReef;
-import frc.robot.auto.DriveToPose;
-import frc.robot.commands.SetSuperstructureCommand;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.subsystems.*;
 

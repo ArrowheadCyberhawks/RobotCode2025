@@ -81,16 +81,16 @@ public class AlignToReef {
         }, Set.of());
     }
 
-    // public Command generateCommand(ReefPoint reef) { //Crash-proof
-    //     if (reef == null || reef.getPose() == null) {
-    //         return Commands.print("Error: Reef or its pose is null");
-    //     }
+    public Command generateCommand(ReefPoint reef) { //Crash-proof
+        if (reef == null || reef.getPose() == null) {
+            return Commands.print("Error: Reef or its pose is null");
+        }
 
-    //     return Commands.defer(() -> {
-    //         desiredBranchPublisher.accept(reef.getPose());
-    //         return getPathFromWaypoint(getWaypointFromBranch(reef));
-    //     }, Set.of());
-    // }
+        return Commands.defer(() -> {
+            desiredBranchPublisher.accept(reef.getPose());
+            return getPathFromWaypoint(getWaypointFromBranch(reef));
+        }, Set.of());
+    }
 
     public void setNextState(ReefPoint reefPoint, PathPlannerPath path) {
         nextReef = reefPoint;
