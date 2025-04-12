@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.197918092548837,
-        "y": 2.4901667889127475
+        "x": 3.7187592718672806,
+        "y": 2.964564242826
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.978425212368379,
-        "y": 2.8703396092849283
+        "x": 3.5937592718672806,
+        "y": 2.74805789187989
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "NearRightC"
     },
     {
       "anchor": {
-        "x": 4.999091970586931,
-        "y": 2.859415301127715
+        "x": 3.512397540983606,
+        "y": 2.6404200819672123
       },
       "prevControl": {
-        "x": 5.30494846834702,
-        "y": 2.329656307182163
+        "x": 3.637397540983606,
+        "y": 2.856926432913322
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "FarRightC"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 59.99999999999999
   },
   "reversed": false,
-  "folder": "WaypointToBranch",
+  "folder": "Pluck",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": 59.99999999999999
   },
   "useDefaultConstraints": false
 }

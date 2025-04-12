@@ -56,7 +56,6 @@ public class Grabber extends SubsystemBase {
         grabberMotor2Config = new SparkMaxConfig();
         grabberMotor1Config.smartCurrentLimit(5);
         grabberMotor2Config.smartCurrentLimit(5);
-        grabberMotor1Config.inverted(true);
  
 
         coralSensor = new TimeOfFlight(kCoralSensorPort);

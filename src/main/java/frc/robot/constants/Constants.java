@@ -91,14 +91,14 @@ public final class Constants {
     public static enum ElevatorLevel {
       LO(0.0),
       L1(0.444),
-      L2(0.512), //0.269 
-      L3(0.66), 
-      L4(1.327 ), //1.354
+      L2(0.218), //0.269 
+      L3(0.605), 
+      L4(1.266), //1.354
       HI(maxHeight),
-      HUMAN(0.930),
+      HUMAN(0.907),
       CLEAR(1.1),
       ALG3(0.849),
-      ALG2(0.512);
+      ALG2(0.47);
 
       private final double height;
 
@@ -117,9 +117,9 @@ public final class Constants {
     public static final int kGrabberMotor2Port = 12;
     public static final int kPivotMotorPort = 11;
 
-    public static final int kCoralSensorPort = 13;
-    public static final int kAlgaeSensorPort = 22;
-    public static final int kReefSensorPort = 34;
+    public static final int kCoralSensorPort = 34;
+    public static final int kAlgaeSensorPort = 12;
+    public static final int kReefSensorPort = 22;
 
 
     public static final int kPivotEncoderId = 56;
@@ -135,29 +135,29 @@ public final class Constants {
 
     public static final LoggedNetworkNumber kPivotP = new LoggedNetworkNumber("Grabber/kPivotP", 7);//0.7
     public static final LoggedNetworkNumber kPivotI = new LoggedNetworkNumber("Grabber/kPivotI", 0.0);
-    public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.75);
+    public static final LoggedNetworkNumber kPivotD = new LoggedNetworkNumber("Grabber/kPivotD", 0.0);
     public static final LoggedNetworkNumber kPivotMaxVel = new LoggedNetworkNumber("Grabber/kPivotMaxVel", 3);
     public static final LoggedNetworkNumber kPivotMaxAccel = new LoggedNetworkNumber("Grabber/kPivotMaxAccel", 10);
 
     public static final LoggedNetworkNumber kPivotS = new LoggedNetworkNumber("Grabber/kPivotS", 0.0);
     public static final LoggedNetworkNumber kPivotG = new LoggedNetworkNumber("Grabber/kPivotG", 0.4);
-    public static final LoggedNetworkNumber kPivotV = new LoggedNetworkNumber("Grabber/kPivotV", 0.15);
-    public static final LoggedNetworkNumber kPivotA = new LoggedNetworkNumber("Grabber/kPivotA", 0.04);
+    public static final LoggedNetworkNumber kPivotV = new LoggedNetworkNumber("Grabber/kPivotV", 0.15);//0.15
+    public static final LoggedNetworkNumber kPivotA = new LoggedNetworkNumber("Grabber/kPivotA", 0.04); //0.04
 
     public static final double grabberOffset = Math.PI/2 + 0.42;
     public static enum PivotPosition { //TODO update positions
       //DOWN(Rotation2d.kPi),//-65  was at - 40 
       
       OUT(Rotation2d.fromDegrees(5.0 + grabberOffset)),
-      PLACE(Rotation2d.fromRadians(2.916)),
-      LO(Rotation2d.fromRadians(3.968)),
-      L4(Rotation2d.fromRadians(0.96 + grabberOffset)),
-      HUMAN(Rotation2d.fromRadians(3.902 + grabberOffset)),
+      PLACE(Rotation2d.fromRadians(1.224)),
+      LO(Rotation2d.fromRadians(2.243)),
+      L4(Rotation2d.fromRadians(1.071)),
+      HUMAN(Rotation2d.fromRadians(4.016)),
 
 
-      ALGPICK(Rotation2d.fromRadians(0.622 + grabberOffset)),
-      ALGREEF(Rotation2d.fromRadians(2.65)),
-      HI(Rotation2d.fromRadians(3.67));//70
+      ALGPICK(Rotation2d.fromRadians(0.576)),
+      ALGREEF(Rotation2d.fromRadians(1.120)),
+      HI(Rotation2d.fromRadians(2.253));//70
       
       private final Rotation2d angle;
 
@@ -176,7 +176,7 @@ public final class Constants {
     public static enum GrabberState {
       INTAKE(0.6),
       OUTTAKE_A(-0.90),
-      OUTTAKE_C(-0.50),
+      OUTTAKE_C(-0.375),
       HOLD(0.15),
       STOP(0.0);
 
@@ -331,7 +331,7 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final int LED_PWM = 0; //port of LEDs on robot
+    public static final int LED_PWM = 9; //port of LEDs on robot
   }
 
   public static class CameraConstants {

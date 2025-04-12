@@ -1,12 +1,18 @@
 package frc.robot.auto;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
+
+import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+
+import org.json.simple.parser.ParseException;
+
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
+import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -31,8 +37,8 @@ public class AlignToReef {
     private final SwerveSubsystem swerveSubsystem;
     public static boolean usePathplanner;
     
-    private static ReefPoint nextReef;
-    private static PathPlannerPath nextPath;
+    private ReefPoint nextReef;
+    private PathPlannerPath nextPath;
     // Elevator elevator;
     // Pivot pivot;
     Grabber grabber;
@@ -52,6 +58,8 @@ public class AlignToReef {
         //this.leds = leds;
         this.grabber = grabber;
         this.superstructure = superstructure;
+
+        //TESTING        
         usePathplanner = true;
     }
     
@@ -67,7 +75,16 @@ public class AlignToReef {
      */
     public Command generateCommand() {
         //Crash-proof
+        // try {
+        //     nextPath = PathPlannerPath.fromPathFile("WaypointToFarLeftR");
+        //     nextReef = ReefPoint.kFarLeftR;
+        // } catch (FileVersionException | IOException | ParseException e) {
+        //     e.printStackTrace();
+        // }
         if (nextPath == null) {
+            if (nextReef == null ||nextReef.getPose() == null) {
+                return Commands.print("Error: Reef and Path are null");
+            }
             return Commands.print("Error: Path is null");
         }
         if (nextReef == null || nextReef.getPose() == null) {
@@ -77,6 +94,24 @@ public class AlignToReef {
         return Commands.defer(() -> {
             desiredBranchPublisher.accept(nextReef.getPose());
             return autoScoreCommand(nextReef, nextPath);
+            //return getPathFromWaypoint(getWaypointFromBranch(reef));
+        }, Set.of());
+    }
+
+    public Command generateCommand(ReefPoint reef, PathPlannerPath path) {
+        if (path == null) {
+            if (reef == null ||reef.getPose() == null) {
+                return Commands.print("Error: Reef and Path are null");
+            }
+            return Commands.print("Error: Path is null");
+        }
+        if (reef == null || reef.getPose() == null) {
+            return Commands.print("Error: Reef is null");
+        }
+
+        return Commands.defer(() -> {
+            desiredBranchPublisher.accept(reef.getPose());
+            return autoScoreCommand(reef, path);
             //return getPathFromWaypoint(getWaypointFromBranch(reef));
         }, Set.of());
     }
@@ -93,9 +128,31 @@ public class AlignToReef {
     }
 
     public void setNextState(ReefPoint reefPoint, PathPlannerPath path) {
+        // nextReef = reefPoint;
+        // nextPath = path;
+        // if (nextPath == null) {
+        //     System.out.println("DEBUG in setNextState with nextPath == null");
+        // }
+        // let this crash if anything called setNextState with nulls
+        // System.out.println("DEBUG in setNextState called with "+ reefPoint.name() + " and "+ path.name);
+        
+        try {
+        System.out.println("OLD Reef: " + nextReef.name());
+        } catch (Exception e) {
+            System.out.println("OLD Reef: null");
+        }
+
         nextReef = reefPoint;
-        nextPath = path;
-        System.out.println("Next path set to: " + nextPath.name);
+        //nextReef = ReefPoint.kFarLeftR;
+
+        try {
+            nextPath = PathPlannerPath.fromPathFile("WaypointToFarLeftR");
+        } catch (FileVersionException | IOException | ParseException e) {
+            e.printStackTrace();
+        }
+        System.out.println("CURRENT Reef: " + nextReef.name() + " CURRENT Path: " + nextPath.name);
+
+
     }
 
     private Command getPathFromWaypoint(Pose2d waypoint) {

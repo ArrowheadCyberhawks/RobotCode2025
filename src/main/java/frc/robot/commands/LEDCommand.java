@@ -19,13 +19,13 @@ public class LEDCommand extends Command{
     }
 
     public void execute(){
-        setLEDMode(LEDState.OFF, LEDMode.OFF);
+        setLEDMode(LEDState.OFF, LEDMode.BLACK);
         setLEDMode(LEDState.IN, LEDMode.VIOLET);
         setLEDMode(LEDState.OUT, LEDMode.RED);
         setLEDMode(LEDState.ALIGN, LEDMode.BLUE);
         setLEDMode(LEDState.READY, LEDMode.GREEN);
         setLEDMode(LEDState.ERROR, LEDMode.STROBERED);
-        setLEDMode(LEDState.DEF, LEDMode.PINK);
+        setLEDMode(LEDState.DEF, LEDMode.HOTPINK);
     }    
 
     public boolean isFinished(){
@@ -34,7 +34,7 @@ public class LEDCommand extends Command{
 
     public void periodic() {
         //might have to change to a different color idrk
-        ledSubsystem.setLEDPWM(0.93);
+        //LEDSubsystem.ledState = LEDState.DEF;
     }
 
     /**

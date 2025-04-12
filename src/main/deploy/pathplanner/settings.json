@@ -4,10 +4,11 @@
   "holonomicMode": true,
   "pathFolders": [
     "BranchToAlgae",
+    "BranchToNet",
     "BranchToStation",
     "Center",
     "Left",
-    "BranchToNet",
+    "Pluck",
     "Right",
     "StationToBranch",
     "StationToNet",

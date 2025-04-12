@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.197918092548837,
-        "y": 2.4901667889127475
+        "x": 5.1852060339335875,
+        "y": 4.997515449033143
       },
       "prevControl": null,
       "nextControl": {
-        "x": 4.978425212368379,
-        "y": 2.8703396092849283
+        "x": 5.3102060339335875,
+        "y": 5.214021799979252
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "FarLeftC"
     },
     {
       "anchor": {
-        "x": 4.999091970586931,
-        "y": 2.859415301127715
+        "x": 5.436277502792884,
+        "y": 5.433417864496968
       },
       "prevControl": {
-        "x": 5.30494846834702,
-        "y": 2.329656307182163
+        "x": 5.311277502792884,
+        "y": 5.216911513550858
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "FarRightC"
+      "linkedName": null
     }
   ],
   "rotationTargets": [],
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 0.9,
+    "maxAcceleration": 0.75,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "WaypointToBranch",
+  "folder": "Pluck",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 119.99999999999999
+    "rotation": -119.99999999999999
   },
   "useDefaultConstraints": false
 }

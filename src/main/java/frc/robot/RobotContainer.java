@@ -15,6 +15,7 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.auto.AlignToReef;
 import frc.robot.auto.DriveToPose;
+import frc.robot.commands.LEDCommand;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
 import frc.robot.constants.Constants;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import org.json.simple.parser.ParseException;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.util.FileVersionException;
 
@@ -44,6 +46,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Command.InterruptionBehavior;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.CommandGenericHID;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
@@ -68,7 +72,7 @@ public class RobotContainer {
 	private final Climber climber;
 
 	private final Superstructure superstructure;
-	// private final LEDSubsystem ledSubsystem;
+	private final LEDSubsystem ledSubsystem;
 
 	private final PhotonCameraWrapper cam0, cam1;
 	// private final PhotonCameraWrapper cam0, cam1, cam2, cam3, cam4, cam5, cam6;
@@ -105,7 +109,7 @@ public class RobotContainer {
 
 		superstructure = new Superstructure(elevator, pivot, grabber);
 
-		// ledSubsystem = new LEDSubsystem();
+		ledSubsystem = new LEDSubsystem();
 
 		// Init controllers
 		if (DriverStation.isJoystickConnected(IOConstants.kDriverControllerPortBT)) {
@@ -174,8 +178,8 @@ public class RobotContainer {
 		// PID.PathPlanner.kTranslationPIDConstants, PID.PathPlanner.kThetaPIDConstants,
 		// cam0, cam1, cam2, cam3, cam4, cam5, cam6);
 		SwerveDriveTelemetry.verbosity = TelemetryVerbosity.HIGH;
-
-    alignmentCommandFactory = new AlignToReef(swerveSubsystem, superstructure, grabber);
+		
+		alignmentCommandFactory = new AlignToReef(swerveSubsystem, superstructure, grabber);
 
 		// commands and stuff
 		autoManager = new AutoCommandManager(swerveSubsystem, superstructure, grabber, climber, alignmentCommandFactory);
@@ -196,7 +200,7 @@ public class RobotContainer {
 				.withInterruptBehavior(InterruptionBehavior.kCancelSelf);
 
 		swerveSubsystem.setDefaultCommand(getTeleopCommand());
-		// ledSubsystem.setDefaultCommand(new LEDCommand(ledSubsystem));
+		ledSubsystem.setDefaultCommand(new LEDCommand(ledSubsystem));
 		configureBindings();
 	}
 
@@ -238,11 +242,25 @@ public class RobotContainer {
 				() -> driverController.getRightTriggerAxis(),
 				SwerveConstants.kMaxVelTele.in(MetersPerSecond), SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond)));
 
-		driverController.leftBumper().whileTrue(
-			new DriveToPose(swerveSubsystem, 
-				Constants.FieldPosition.kBargeMiddle::getPose,
-				() -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Red).equals(DriverStation.Alliance.Red) ? driverController.getLeftX() : -driverController.getLeftX()
+		// driverController.leftBumper().whileTrue(
+		// 	new DriveToPose(swerveSubsystem, 
+		// 		Constants.FieldPosition.kBargeMiddle::getPose,
+		// 		() -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Red).equals(DriverStation.Alliance.Red) ? driverController.getLeftX() : -driverController.getLeftX()
+		// 	)
+		// );
+
+		driverController.leftTrigger().and(driverController.rightBumper()).whileTrue(
+			new RunCommand(
+				() -> swerveSubsystem.swerveDrive.drive(
+					new ChassisSpeeds(
+						-driverController.getHID().getLeftTriggerAxis() / 2,
+						0,
+						0
+					)
+				),
+				swerveSubsystem
 			)
+			.finallyDo(swerveSubsystem::stopModules)
 		);
 
 		//Drive to Human Player Station
@@ -329,39 +347,9 @@ public class RobotContainer {
 		manipulatorController.leftTrigger().whileTrue(grabber.run(()->grabber.setGrabberState(GrabberState.INTAKE))).onFalse(grabber.run(()->grabber.setGrabberState(GrabberState.HOLD)));
 		manipulatorController.rightTrigger().whileTrue(grabber.outtakeCommand());
 
-		manipulatorController.start().onTrue(grabber.runOnce(() -> pivot.resetPivotAngle(new Rotation2d(3*Math.PI/2))).ignoringDisable(true));
-		manipulatorController.back().onTrue(superstructure.LO()); //switch to L1;
-		
+		// manipulatorController.start().onTrue(grabber.runOnce(() -> pivot.resetPivotAngle(new Rotation2d(3*Math.PI/2))).ignoringDisable(true));		
 		manipulatorController.rightBumper().onTrue(superstructure.bargePlace());
-		manipulatorController.leftBumper().onTrue(
-			new SequentialCommandGroup(
-				pivot.setPivotPositionCommand(PivotPosition.ALGREEF)
-				.alongWith(
-					grabber.startEnd(
-						() -> grabber.setGrabberState(GrabberState.INTAKE),
-						() -> grabber.setGrabberState(GrabberState.HOLD)
-					)
-					.withTimeout(2)
-				),
-				new ManualPivotCommand(pivot, () -> 0.15)
-					.alongWith(
-						swerveSubsystem.startEnd(
-							() -> swerveSubsystem.swerveDrive.drive(
-								new ChassisSpeeds(
-									MetersPerSecond.of(-0.1),
-									MetersPerSecond.zero(),
-									RadiansPerSecond.zero()
-								)
-							),
-							swerveSubsystem::stopModules
-						)
-					)
-					.withTimeout(2),
-				superstructure.LO()
-			)
-			// .until(() -> grabber.hasAlgae() && pivot.getPivotAngle().getRadians() > PivotPosition.LO.getAngle().getRadians() - 0.1)
-			// .andThen(elevator.setLevelCommand(ElevatorLevel.LO))
-		);
+		manipulatorController.leftBumper().onTrue(superstructure.LO());
 		//reset angles
 		// manipulatorController.start().onTrue(new InstantCommand(() -> {
 		//   pivot.resetPivotAngle(Rotation2d.kZero);
@@ -371,55 +359,26 @@ public class RobotContainer {
 
 	}
 
-  private void poseButtons(Trigger[] triggers, String name) {
-	triggers[0].whileTrue(
-		new InstantCommand(
-			() -> {
-				try {
-					alignmentCommandFactory.setNextState(ReefPoint.valueOf("k" + name + "L"), PathPlannerPath.fromPathFile("WaypointTo" + name + "L"));
-					System.out.println(ReefPoint.valueOf("k" + name + "L").name());
-				} catch (FileVersionException e) {
-					System.out.println("Wrong file version! Message: " + e.getMessage());
-				} catch (IOException e) {
-					System.out.println("The file cannot be read! Message: " + e.getMessage());
-				} catch (ParseException e) {
-					System.out.println("The file cannot be parsed! Message: " + e.getMessage());
-				}
-				
-			}
-		)
-	);
-	triggers[1].whileTrue(
-		new InstantCommand(
-			() -> {
-				try {
-					alignmentCommandFactory.setNextState(ReefPoint.valueOf("k" + name + "R"), PathPlannerPath.fromPathFile("WaypointTo" + name + "R"));
-				} catch (FileVersionException e) {
-					System.out.println("Wrong file version! Message: " + e.getMessage());
-				} catch (IOException e) {
-					System.out.println("The file cannot be read! Message: " + e.getMessage());
-				} catch (ParseException e) {
-					System.out.println("The file cannot be parsed! Message: " + e.getMessage());
-				}
-			}
-		)
-	);
-	triggers[0].and(triggers[1]).whileTrue(
-		new InstantCommand(
-			() -> {
-				try {
-					alignmentCommandFactory.setNextState(ReefPoint.valueOf("k" + name + "C"), PathPlannerPath.fromPathFile("WaypointTo" + name + "C"));
-				} catch (FileVersionException e) {
-					System.out.println("Wrong file version! Message: " + e.getMessage());
-				} catch (IOException e) {
-					System.out.println("The file cannot be read! Message: " + e.getMessage());
-				} catch (ParseException e) {
-					System.out.println("The file cannot be parsed! Message: " + e.getMessage());
-				}
-			}
-		)
-	);
-  }
+	private void poseButtons(Trigger[] triggers, String name) {
+		try {
+			triggers[0].whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "L"), PathPlannerPath.fromPathFile("WaypointTo" + name + "L")));
+			triggers[1].whileTrue(alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "R"), PathPlannerPath.fromPathFile("WaypointTo" + name + "R")));
+			triggers[0].and(triggers[1]).whileTrue(new ParallelCommandGroup(
+					alignmentCommandFactory.generateCommand(ReefPoint.valueOf("k" + name + "C"), PathPlannerPath.fromPathFile("WaypointTo" + name + "C")),
+					new SequentialCommandGroup(
+						grabber.intakeCommand().until(() -> grabber.hasAlgae()),
+						AutoBuilder.followPath(PathPlannerPath.fromPathFile(name + "CPluck"))
+					)
+				)
+			);
+		} catch (FileVersionException e) {
+			System.out.println("Wrong file version! Message: " + e.getMessage());
+		} catch (IOException e) {
+			System.out.println("The file cannot be read! Message: " + e.getMessage());
+		} catch (ParseException e) {
+			System.out.println("The file cannot be parsed! Message: " + e.getMessage());
+		}
+	}
 
 	public Command getTeleopCommand() {
 		return teleopCommand;
@@ -430,6 +389,24 @@ public class RobotContainer {
 
 		SmartDashboard.putString("Auto Selected", autoManager.getAutoManagerSelected().toString());
 		return autoCommand;
+	}
+
+	public Command autoPluck() {
+		return new SequentialCommandGroup(
+				new ParallelCommandGroup(
+					//new ManualPivotCommand(pivot, () -> 0.15),
+					swerveSubsystem.startEnd(
+						() -> swerveSubsystem.swerveDrive.drive(
+							new ChassisSpeeds(
+								MetersPerSecond.of(-0.4),
+								MetersPerSecond.zero(),
+								RadiansPerSecond.zero()
+							)
+						),
+						swerveSubsystem::stopModules
+					)
+				).withTimeout(2),
+				superstructure.LO());
 	}
 
 }
