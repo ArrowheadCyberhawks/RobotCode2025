@@ -28,13 +28,18 @@ import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.text.FieldPosition;
+import java.time.Instant;
 
+import org.json.simple.parser.ParseException;
 import org.photonvision.PhotonPoseEstimator.PoseStrategy;
 
+import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.path.PathPlannerPath;
+import com.pathplanner.lib.util.FileVersionException;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.*;
@@ -77,6 +82,9 @@ public class RobotContainer {
 
 	private final LimelightSubsystem limelightSubsystem;
 	private final PhotonCameraWrapper cam0, cam1;
+
+	private ReefPoint nextReef;
+	private PathPlannerPath nextPath;
 	// private final PhotonCameraWrapper cam0, cam1, cam2, cam3, cam4, cam5, cam6;
 
 	private Command teleopCommand;
@@ -90,8 +98,6 @@ public class RobotContainer {
 
   //Automation CommandFactories
   private final AlignToReef alignmentCommandFactory;
-  private ReefPoint nextReef;
-  private PathPlannerPath nextPath;
 
   PathPlannerPath NearL;
   PathPlannerPath NearR;
@@ -318,45 +324,46 @@ public class RobotContainer {
     driverController.povRight().onTrue(climber.climbInCommand());
 
     //Auto-Positioning
-    driverController.leftTrigger(0.5).whileTrue(alignmentCommandFactory.generateCommand(nextReef, nextPath));
+    driverController.leftTrigger(0.5).whileTrue(alignmentCommandFactory.generateCommand().alongWith(grabber.autoOutakeCommand()));
+	//driverController.leftTrigger().whileTrue(grabber.autoOutakeCommand());
 
     // X-KEYS LIGHTBOARD
-    lightboard();
-    // nearTriggers = new Trigger[] { keypadHID.button(22), keypadHID.button(23) };
-    // nearLeftTriggers = new Trigger[] { keypadHID.button(13), keypadHID.button(17) };
-    // nearRightTriggers = new Trigger[] { keypadHID.button(20), keypadHID.button(16) };
-    // farTriggers = new Trigger[] { keypadHID.button(3), keypadHID.button(2) };
-    // farLeftTriggers = new Trigger[] { keypadHID.button(5), keypadHID.button(9) };
-    // farRightTriggers = new Trigger[] { keypadHID.button(12), keypadHID.button(8) };
+    // lightboard();
+    nearTriggers = new Trigger[] {keypadHID.button(22), keypadHID.button(23)};
+    nearLeftTriggers = new Trigger[] {keypadHID.button(13), keypadHID.button(17)};
+    nearRightTriggers = new Trigger[] {keypadHID.button(20), keypadHID.button(16)};
+    farTriggers = new Trigger[] {keypadHID.button(3), keypadHID.button(2)};
+    farLeftTriggers = new Trigger[] {keypadHID.button(5), keypadHID.button(9)};
+    farRightTriggers = new Trigger[] {keypadHID.button(12), keypadHID.button(8)};
 
     // // Move to Pose
-    // poseButtons(nearTriggers, "Near");
-    // poseButtons(nearLeftTriggers, "NearLeft");
-    // poseButtons(nearRightTriggers, "NearRight");
-    // poseButtons(farTriggers, "Far");
-    // poseButtons(farLeftTriggers, "FarLeft");
-    // poseButtons(farRightTriggers, "FarRight");
+    poseButtons(nearTriggers, "Near");
+    poseButtons(nearLeftTriggers, "NearLeft");
+    poseButtons(nearRightTriggers, "NearRight");
+    poseButtons(farTriggers, "Far");
+    poseButtons(farLeftTriggers, "FarLeft");
+    poseButtons(farRightTriggers, "FarRight");
 
-		//ADD HUMAN PLAYER STATIONS, IN FIELDCONSTANTS :)
+	//ADD HUMAN PLAYER STATIONS, IN FIELDCONSTANTS :)
 
-		keypadHID.button(1).whileTrue(grabber.intakeCommand());
-		keypadHID.button(4).whileTrue(grabber.outtakeCommand());
-		keypadHID.button(2).onTrue(superstructure.LO()); //switch to human intake
+	keypadHID.button(1).whileTrue(grabber.intakeCommand());
+	keypadHID.button(4).whileTrue(grabber.outtakeCommand());
+	keypadHID.button(2).onTrue(superstructure.LO()); //switch to human intake
 
-		keypadHID.button(7).onTrue(superstructure.setNextSuperStructure(SuperStructureState.BARGE));
-		keypadHID.button(11).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG3));
-		keypadHID.button(15).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG2));
-		keypadHID.button(19).onTrue(superstructure.AlgaePickup());
-		keypadHID.button(24).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PICKUP));
-		// TODO: Add algae pickup to superstructure subsystem (button 24)
+	keypadHID.button(7).onTrue(superstructure.setNextSuperStructure(SuperStructureState.BARGE));
+	keypadHID.button(11).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG3));
+	keypadHID.button(15).onTrue(superstructure.setNextSuperStructure(SuperStructureState.ALG2));
+	keypadHID.button(19).onTrue(superstructure.AlgaePickup());
+	keypadHID.button(24).onTrue(superstructure.setNextSuperStructure(SuperStructureState.PICKUP));
+	// TODO: Add algae pickup to superstructure subsystem (button 24)
 
-		keypadHID.button(18).onTrue(superstructure.setNextSuperStructure(SuperStructureState.LO));
-		// keypadHID.button(18).onTrue(setNextSuperStructure(SuperStructureState.L1));
-		keypadHID.button(14).onTrue(superstructure.setNextSuperStructure(SuperStructureState.L2));
-		keypadHID.button(10).onTrue(superstructure.setNextSuperStructure(SuperStructureState.L3));
-		keypadHID.button(6).onTrue(superstructure.setNextSuperStructure(SuperStructureState.L4));
+	keypadHID.button(18).onTrue(superstructure.setNextSuperStructure(SuperStructureState.LO));
+	// keypadHID.button(18).onTrue(setNextSuperStructure(SuperStructureState.L1));
+	keypadHID.button(14).onTrue(superstructure.setNextSuperStructure(SuperStructureState.L2));
+	keypadHID.button(10).onTrue(superstructure.setNextSuperStructure(SuperStructureState.L3));
+	keypadHID.button(6).onTrue(superstructure.setNextSuperStructure(SuperStructureState.L4));
 
-		keypadHID.button(21).onTrue(superstructure.setNextSuperStructure(SuperStructureState.INTAKE));
+	keypadHID.button(21).onTrue(superstructure.setNextSuperStructure(SuperStructureState.INTAKE));
 
 
     //MANIPULATOR CONTROLLER
@@ -426,9 +433,53 @@ public class RobotContainer {
 	}
 
   private void poseButtons(Trigger[] triggers, String name) {
-    triggers[0].whileTrue(new InstantCommand(() -> nextReef = ReefPoint.valueOf("k" + name + "L")));
-    triggers[1].whileTrue(new InstantCommand(() -> nextReef = ReefPoint.valueOf("k" + name + "R")));
-    triggers[0].and(triggers[1]).whileTrue(new InstantCommand(() -> nextReef = ReefPoint.valueOf("k" + name + "C")));
+	triggers[0].whileTrue(
+		new InstantCommand(
+			() -> {
+				try {
+					alignmentCommandFactory.setNextState(ReefPoint.valueOf("k" + name + "L"), PathPlannerPath.fromPathFile("WaypointTo" + name + "L"));
+					System.out.println(ReefPoint.valueOf("k" + name + "L").name());
+				} catch (FileVersionException e) {
+					System.out.println("Wrong file version! Message: " + e.getMessage());
+				} catch (IOException e) {
+					System.out.println("The file cannot be read! Message: " + e.getMessage());
+				} catch (ParseException e) {
+					System.out.println("The file cannot be parsed! Message: " + e.getMessage());
+				}
+				
+			}
+		)
+	);
+	triggers[1].whileTrue(
+		new InstantCommand(
+			() -> {
+				try {
+					alignmentCommandFactory.setNextState(ReefPoint.valueOf("k" + name + "R"), PathPlannerPath.fromPathFile("WaypointTo" + name + "R"));
+				} catch (FileVersionException e) {
+					System.out.println("Wrong file version! Message: " + e.getMessage());
+				} catch (IOException e) {
+					System.out.println("The file cannot be read! Message: " + e.getMessage());
+				} catch (ParseException e) {
+					System.out.println("The file cannot be parsed! Message: " + e.getMessage());
+				}
+			}
+		)
+	);
+	triggers[0].and(triggers[1]).whileTrue(
+		new InstantCommand(
+			() -> {
+				try {
+					alignmentCommandFactory.setNextState(ReefPoint.valueOf("k" + name + "C"), PathPlannerPath.fromPathFile("WaypointTo" + name + "C"));
+				} catch (FileVersionException e) {
+					System.out.println("Wrong file version! Message: " + e.getMessage());
+				} catch (IOException e) {
+					System.out.println("The file cannot be read! Message: " + e.getMessage());
+				} catch (ParseException e) {
+					System.out.println("The file cannot be parsed! Message: " + e.getMessage());
+				}
+			}
+		)
+	);
   }
 
   private void lightboard() {

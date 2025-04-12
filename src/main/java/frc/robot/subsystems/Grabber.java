@@ -20,8 +20,10 @@ import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
 import com.playingwithfusion.TimeOfFlight;
@@ -40,7 +42,7 @@ public class Grabber extends SubsystemBase {
     private final TimeOfFlight coralSensor, algaeSensor, reefSensor;
 
     private final Debouncer algaeDebouncer = new Debouncer(0.1, DebounceType.kBoth);
-    private final Debouncer reefDebouncer = new Debouncer(0.1, DebounceType.kBoth);
+    private final Debouncer reefDebouncer = new Debouncer(0.025, DebounceType.kBoth);
 
 
     private GrabberState grabberState = GrabberState.STOP;
@@ -65,7 +67,7 @@ public class Grabber extends SubsystemBase {
         coralSensor.setRangingMode(RangingMode.Short, 24);
         algaeSensor.setRangingMode(RangingMode.Short, 24);
         reefSensor.setRangingMode(RangingMode.Short, 24);
-
+        // reefSensor.setRangeOfInterest(8, 8, 12, 12);
 
         new Trigger(this::hasCoral).onTrue(stopIntakeCommand());
     }
@@ -76,6 +78,7 @@ public class Grabber extends SubsystemBase {
         setGrabberMotors(grabberState.getSpeed(), grabberState.getSpeed());
         Logger.recordOutput(getName() + "/Has Coral", hasCoral());
         Logger.recordOutput(getName() + "/Has Algae", hasAlgae());
+        Logger.recordOutput(getName() + "/On Reef", onReef());
 
         Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Centimeter));
         Logger.recordOutput(getName() + "/Reef Range", getReefRange().in(Centimeter));
@@ -85,6 +88,7 @@ public class Grabber extends SubsystemBase {
         // if(hasAlgae() || hasCoral()) {
         //     LEDSubsystem.ledState = LEDState.IN;
         // }
+
     }
 
 
@@ -133,7 +137,7 @@ public class Grabber extends SubsystemBase {
 
     public boolean onReef() {
         double reefRange = getReefRange().in(Meters);
-        return reefDebouncer.calculate(reefRange >= 0 && reefRange < 0.12);
+        return reefDebouncer.calculate(reefRange >= 0.45 && reefRange < 0.65);
     }
     
     /**
@@ -222,7 +226,10 @@ public class Grabber extends SubsystemBase {
     public Command outtakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(40);
-        return startEnd(() -> setGrabberState(GrabberState.OUTTAKE), () -> setGrabberState(GrabberState.STOP));
+        if(hasCoral())
+            return startEnd(() -> setGrabberState(GrabberState.OUTTAKE_C), () -> setGrabberState(GrabberState.STOP));
+        else
+            return startEnd(() -> setGrabberState(GrabberState.OUTTAKE_A), () -> setGrabberState(GrabberState.STOP));
     }
 
     public Command stopIntakeCommand() {
@@ -232,5 +239,9 @@ public class Grabber extends SubsystemBase {
 
     public Command getGamePieceCommand() {
         return (hasAlgae()) ? outtakeCommand() : intakeCommand();
+    }
+
+    public Command autoOutakeCommand() {
+        return new WaitUntilCommand(this::onReef).andThen(outtakeCommand());
     }
 }

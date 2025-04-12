@@ -1,19 +1,9 @@
 package frc.robot.auto;
 
 import static edu.wpi.first.units.Units.MetersPerSecond;
-
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import java.util.function.BooleanSupplier;
-
-import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.path.EventMarker;
-import com.pathplanner.lib.path.GoalEndState;
-import com.pathplanner.lib.path.IdealStartingState;
 import com.pathplanner.lib.path.PathConstraints;
 import com.pathplanner.lib.path.PathPlannerPath;
 import com.pathplanner.lib.path.Waypoint;
@@ -22,24 +12,15 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.networktables.StructPublisher;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ConditionalCommand;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.constants.Constants.ElevatorConstants.ElevatorLevel;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
-import frc.robot.constants.Constants.PID.PathPlanner;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.ReefPoint;
-import frc.robot.constants.FieldConstants.Reef;
-import frc.robot.commands.SetSuperstructureCommand;
-import frc.robot.commons.TagUtils;
-import frc.robot.commands.LEDCommand;
-import frc.robot.auto.DriveToPose;
 import frc.robot.subsystems.*;
 import frc.robot.subsystems.Superstructure.*;
 //import lib.frc706.cyberlib.commands.controller.ControllerRumbleCommand;
@@ -48,8 +29,10 @@ import lib.frc706.cyberlib.subsystems.*;
 public class AlignToReef {
 
     private final SwerveSubsystem swerveSubsystem;
-    private final boolean superstructureExists;
     public static boolean usePathplanner;
+    
+    private static ReefPoint nextReef;
+    private static PathPlannerPath nextPath;
     // Elevator elevator;
     // Pivot pivot;
     Grabber grabber;
@@ -69,7 +52,6 @@ public class AlignToReef {
         //this.leds = leds;
         this.grabber = grabber;
         this.superstructure = superstructure;
-        superstructureExists = true;
         usePathplanner = true;
     }
     
@@ -83,45 +65,37 @@ public class AlignToReef {
      * @param reef
      * @return
      */
-    public Command generateCommand(ReefPoint reef, PathPlannerPath path) {
+    public Command generateCommand() {
         //Crash-proof
-        if (reef == null || reef.getPose() == null || path == null) {
-            return Commands.print("Error: Reef or its pose is null");
+        if (nextPath == null) {
+            return Commands.print("Error: Path is null");
+        }
+        if (nextReef == null || nextReef.getPose() == null) {
+            return Commands.print("Error: Reef is null");
         }
 
         return Commands.defer(() -> {
-            desiredBranchPublisher.accept(reef.getPose());
-            return autoScoreCommand(reef, path);
+            desiredBranchPublisher.accept(nextReef.getPose());
+            return autoScoreCommand(nextReef, nextPath);
             //return getPathFromWaypoint(getWaypointFromBranch(reef));
         }, Set.of());
     }
 
-    public Command generateCommand(ReefPoint reef) {
-        //Crash-proof
-        if (reef == null || reef.getPose() == null) {
-            return Commands.print("Error: Reef or its pose is null");
-        }
+    // public Command generateCommand(ReefPoint reef) { //Crash-proof
+    //     if (reef == null || reef.getPose() == null) {
+    //         return Commands.print("Error: Reef or its pose is null");
+    //     }
 
-        return Commands.defer(() -> {
-            desiredBranchPublisher.accept(reef.getPose());
-            return getPathFromWaypoint(getWaypointFromBranch(reef));
-        }, Set.of());
-    }
-    /***
-     * Brings the robot to a desired Pose, automatically scoring the coral
-     * @param pose The desired Pose2d
-     * @return A command that brings the robot to the desired Pose2d using Pathplanner and Odometry
-     */
-    public Command generateCommand(Pose2d pose) {       
-        //Crash-proof
-        if (pose == null || pose == null) {
-            return Commands.print("Error: Reef or its pose is null");
-        }
+    //     return Commands.defer(() -> {
+    //         desiredBranchPublisher.accept(reef.getPose());
+    //         return getPathFromWaypoint(getWaypointFromBranch(reef));
+    //     }, Set.of());
+    // }
 
-        return Commands.defer(() -> {
-            desiredBranchPublisher.accept(pose);
-            return getPathFromWaypoint(pose);
-        }, Set.of());
+    public void setNextState(ReefPoint reefPoint, PathPlannerPath path) {
+        nextReef = reefPoint;
+        nextPath = path;
+        System.out.println("Next path set to: " + nextPath.name);
     }
 
     private Command getPathFromWaypoint(Pose2d waypoint) {
@@ -174,7 +148,7 @@ public class AlignToReef {
     private Command autoScoreCommand(ReefPoint reef, PathPlannerPath path) {
 
         //if close enough it uses PID
-        if (swerveSubsystem.getPose().getTranslation().getDistance(path.getStartingHolonomicPose().get().getTranslation()) < 1.00) {
+        if (swerveSubsystem.getPose().getTranslation().getDistance(path.getStartingHolonomicPose().get().getTranslation()) < 0.255) {
             return autoDrive(reef.getPose()).alongWith(getSuperStructure(reef.getPose()));
         }
 
@@ -226,9 +200,9 @@ public class AlignToReef {
         final double distance;
 
         if (Superstructure.nextSuperStructureState.equals(SuperStructureState.L4)) { //perhaps change to be based off of robot vel
-            distance = 2.5;
+            distance = 1;
         } else { //add more later
-            distance = 1.5;
+            distance = 0.75;
         }
 
         Command structure = 
@@ -245,6 +219,11 @@ public class AlignToReef {
                 );
         
         return structure;
+    }
+
+    public Command autoOuttake() {
+        //if (Centimeters.of(grabber.getReefRange()) <  Meters.of(-1))
+        return new InstantCommand();
     }
 
 }

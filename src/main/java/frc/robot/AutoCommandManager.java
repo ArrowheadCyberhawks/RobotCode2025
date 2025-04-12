@@ -77,7 +77,7 @@ public class AutoCommandManager {
                 .until(grabberSubsystem::hasAlgae))
                 .withTimeout(5)
         );
-        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.runGrabberCommand(GrabberState.OUTTAKE::getSpeed).withTimeout(2.0));
+        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.runGrabberCommand(GrabberState.OUTTAKE_A::getSpeed).withTimeout(2.0));
 
         NamedCommands.registerCommand("HUMAN", superstructure.Intake());
         NamedCommands.registerCommand("DEF", superstructure.LO());

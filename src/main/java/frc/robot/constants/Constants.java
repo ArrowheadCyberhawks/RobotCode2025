@@ -152,7 +152,7 @@ public final class Constants {
       //DOWN(Rotation2d.kPi),//-65  was at - 40 
       
       OUT(Rotation2d.fromDegrees(5.0 + grabberOffset)),
-      PLACE(Rotation2d.fromRadians(1.1 + grabberOffset)),
+      PLACE(Rotation2d.fromRadians(2.916)),
       LO(Rotation2d.fromRadians(3.968)),
       L4(Rotation2d.fromRadians(0.96 + grabberOffset)),
       HUMAN(Rotation2d.fromRadians(3.902 + grabberOffset)),
@@ -178,7 +178,8 @@ public final class Constants {
 
     public static enum GrabberState {
       INTAKE(0.6),
-      OUTTAKE(-0.90),
+      OUTTAKE_A(-0.90),
+      OUTTAKE_C(-0.50),
       HOLD(0.15),
       STOP(0.0);
 
