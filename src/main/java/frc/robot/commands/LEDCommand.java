@@ -20,14 +20,14 @@ public class LEDCommand extends Command{
 
     public void execute(){
         checkState(LEDState.OFF, LEDMode.DARKGRAY);
+        checkState(LEDState.DEFAULT, LEDMode.HOTPINK);
         checkState(LEDState.CORAL, LEDMode.WHITE);
         checkState(LEDState.ALGAE, LEDMode.GREEN);
         checkState(LEDState.EMAIL, LEDMode.ORANGE);
         checkState(LEDState.CLIMB, LEDMode.BLUE);
-        checkState(LEDState.ONREEF, LEDMode.GREEN);
-        checkState(LEDState.ISSUE, LEDMode.RED);
-        checkState(LEDState.DEFAULT, LEDMode.HOTPINK);
-        checkState(LEDState.AUTO, LEDMode.VIOLET);
+        checkState(LEDState.ONREEF, LEDMode.STROBEGOLD);
+        checkState(LEDState.ISSUE, LEDMode.STROBERED);
+        checkState(LEDState.AUTO, LEDMode.HOTPINK);
         checkState(LEDState.ISCLIMBED, LEDMode.GLITTER);
 
 

@@ -46,6 +46,8 @@ public class Grabber extends SubsystemBase {
 
 
     private GrabberState grabberState = GrabberState.STOP;
+
+    boolean isEmail;
     
 
     /**
@@ -81,15 +83,7 @@ public class Grabber extends SubsystemBase {
 
         Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Centimeter));
         Logger.recordOutput(getName() + "/Reef Range", getReefRange().in(Centimeter));
-        if(onReef()){
-        LEDSubsystem.ledState = LEDState.ONREEF;
-
-        }
-        //Controling LEDS
-
-        // if(hasAlgae() || hasCoral()) {
-        //     LEDSubsystem.ledState = LEDState.IN;
-        // }
+        
 
     }
 
@@ -150,6 +144,8 @@ public class Grabber extends SubsystemBase {
     public void setGrabberMotors(double speed1, double speed2) {
         grabberMotor1.set(speed1);
         grabberMotor2.set(speed2);
+        
+        
     }
 
     /**
@@ -162,23 +158,6 @@ public class Grabber extends SubsystemBase {
     
     public void setGrabberState(GrabberState state) {
         grabberState = state;
-        
-        switch (state) {
-            case INTAKE: LEDSubsystem.ledState = LEDState.ALGAE;
-
-        }
-
-        
-        if(hasAlgae()){
-            LEDSubsystem.ledState = LEDState.ALGAE;
-        }
-        else if(hasCoral()){
-            LEDSubsystem.ledState = LEDState.CORAL;
-        }
-        else {
-        LEDSubsystem.ledState = LEDState.ALGAE;
-
-        }
     }
 
     public void setCurrentLimit(int amps) {
@@ -234,7 +213,7 @@ public class Grabber extends SubsystemBase {
     public Command intakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(20);
-        LEDSubsystem.ledState = LEDState.ALGAE;
+      //  LEDSubsystem.ledState = LEDState.ALGAE;
         return startEnd(() -> setGrabberState(GrabberState.INTAKE), () -> setGrabberState(GrabberState.HOLD)).until(this::hasAlgae);
     
     }
@@ -247,7 +226,8 @@ public class Grabber extends SubsystemBase {
     public Command outtakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(40);
-        LEDSubsystem.ledState = LEDState.EMAIL;
+        this.isEmail = true;
+       // LEDSubsystem.ledState = LEDState.EMAIL;
         if(hasCoral()) {
             return startEnd(() -> setGrabberState(GrabberState.OUTTAKE_C), () -> setGrabberState(GrabberState.STOP));
         } else {
@@ -266,5 +246,14 @@ public class Grabber extends SubsystemBase {
 
     public Command autoOutakeCommand() {
         return new WaitUntilCommand(this::onReef).andThen(outtakeCommand());
+    
     }
+
+    public boolean isEmail(){
+        return grabberMotor1.get() < -0.1;
+    }
+
 }
+
+
+

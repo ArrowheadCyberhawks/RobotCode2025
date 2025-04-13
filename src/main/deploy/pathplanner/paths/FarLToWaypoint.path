@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.754009842887627,
-        "y": 3.7613077567447935
+        "x": 5.715355086915006,
+        "y": 3.7132517900133326
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.326733611821628,
-        "y": 3.712378830799984
+        "x": 6.288078855849006,
+        "y": 3.6643228640685233
       },
       "isLocked": false,
       "linkedName": "FarL"
     },
     {
       "anchor": {
-        "x": 6.0396184008833,
-        "y": 3.9097403174291414
+        "x": 6.089042138149486,
+        "y": 3.8880358916930056
       },
       "prevControl": {
-        "x": 6.501889957359498,
-        "y": 3.9443426397555412
+        "x": 6.551313694625684,
+        "y": 3.9226382140194054
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,15 +33,15 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 0.6,
+    "maxVelocity": 1.5,
+    "maxAcceleration": 0.75,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
+    "velocity": 0.5,
     "rotation": 180.0
   },
   "reversed": false,

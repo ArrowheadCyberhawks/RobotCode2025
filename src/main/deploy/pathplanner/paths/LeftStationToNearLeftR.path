@@ -20,7 +20,7 @@
         "y": 5.106737326786492
       },
       "prevControl": {
-        "x": 2.5506746105204425,
+        "x": 2.550674610520443,
         "y": 6.104073299438613
       },
       "nextControl": null,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
-    "maxAcceleration": 0.6,
+    "maxVelocity": 1.5,
+    "maxAcceleration": 0.75,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
@@ -48,7 +48,7 @@
   "folder": "StationToBranch",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": -53.074775138026936
+    "rotation": -55.0
   },
   "useDefaultConstraints": true
 }

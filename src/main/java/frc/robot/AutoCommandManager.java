@@ -5,6 +5,8 @@ import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecond;
 import static edu.wpi.first.units.Units.RadiansPerSecondPerSecond;
 
+import java.util.Set;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 import com.pathplanner.lib.auto.AutoBuilder;
@@ -18,6 +20,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import lib.frc706.cyberlib.LocalADStarAK;
 import lib.frc706.cyberlib.commands.ToPointCommand;
@@ -64,12 +67,15 @@ public class AutoCommandManager {
                                                                                                        // subsystems are
                                                                                                        // made
 
-        NamedCommands.registerCommand("INTAKE",
-                (grabberSubsystem.runGrabberCommand(() -> GrabberState.INTAKE.getSpeed())
-                .until(grabberSubsystem::hasAlgae))
-                .withTimeout(5)
-        );
-        NamedCommands.registerCommand("OUTTAKE", grabberSubsystem.runGrabberCommand(GrabberState.OUTTAKE_A::getSpeed).withTimeout(2.0));
+        // NamedCommands.registerCommand("INTAKE",
+        //         (grabberSubsystem.runGrabberCommand(() -> GrabberState.INTAKE.getSpeed())
+        //         .until(grabberSubsystem::hasAlgae))
+        //         .withTimeout(5)
+        // );
+        NamedCommands.registerCommand("INTAKE", grabberSubsystem.intakeCommand().withTimeout(5).finallyDo(() -> grabberSubsystem.setGrabberState(GrabberState.HOLD)));
+        // NamedCommands.registerCommand("HOLD", grabberSubsystem.runGrabberCommand(() -> GrabberState.HOLD.getSpeed()).withTimeout(2.0));
+        NamedCommands.registerCommand("OUTTAKE_C", grabberSubsystem.startEnd(() -> grabberSubsystem.setGrabberState(GrabberState.OUTTAKE_C), () -> grabberSubsystem.setGrabberState(GrabberState.STOP)).withTimeout(1.0));
+        NamedCommands.registerCommand("OUTTAKE_A", grabberSubsystem.startEnd(() -> grabberSubsystem.setGrabberState(GrabberState.OUTTAKE_A), () -> grabberSubsystem.setGrabberState(GrabberState.STOP)).withTimeout(2.0));
 
         NamedCommands.registerCommand("HUMAN", superstructure.Intake());
         NamedCommands.registerCommand("DEF", superstructure.LO());
@@ -79,7 +85,7 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("L3", superstructure.L3().withTimeout(2));
         NamedCommands.registerCommand("L4", superstructure.L4().withTimeout(2.5));
 
-        NamedCommands.registerCommand("BARGE", superstructure.bargePlace().withTimeout(3));
+        NamedCommands.registerCommand("BARGE", Commands.defer(superstructure::bargePlace, Set.of(superstructure)).withTimeout(3));
         NamedCommands.registerCommand("ALG2", superstructure.Algae2().withTimeout(2));
         NamedCommands.registerCommand("ALG3", superstructure.Algae3().withTimeout(2.25));
 

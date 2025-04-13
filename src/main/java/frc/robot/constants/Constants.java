@@ -15,6 +15,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.measure.AngularAcceleration;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -98,7 +99,7 @@ public final class Constants {
       HUMAN(0.907),
       CLEAR(1.1),
       ALG3(0.849),
-      ALG2(0.47);
+      ALG2(0.368);
 
       private final double height;
 
@@ -202,9 +203,9 @@ public final class Constants {
 
     //TODO Tune to be slower
     public static final LinearVelocity kMaxVelTele = FeetPerSecond.of(19);
-    public static final LinearAcceleration kMaxAccelTele = kMaxVelTele.per(Second).times(10); //idk what this should be
-    public static final AngularVelocity kMaxAngularVelTele = RadiansPerSecond.of(2 * Math.PI); //idk 2 radians per second whatever
-    public static final AngularAcceleration kMaxAngularAccelTele = kMaxAngularVelTele.per(Second).times(5);
+    public static final LinearAcceleration kMaxAccelTele = kMaxVelTele.per(Second).times(10);
+    public static final AngularVelocity kMaxAngularVelTele = RadiansPerSecond.of(3 * Math.PI);
+    public static final AngularAcceleration kMaxAngularAccelTele = kMaxAngularVelTele.per(Second).times(10);
 
     public static final LinearVelocity kMaxVelAuto = MetersPerSecond.of(1);
     public static final LinearAcceleration kMaxAccelAuto = kMaxVelAuto.per(Second).times(5);
@@ -214,20 +215,20 @@ public final class Constants {
 
   public static class PID {
     public static class PathPlanner {
-      public static final double kPTranslation = 5.5; //2.8
-      public static final double kITranslation = 0.2; //0.2
-      public static final double kDTranslation = 0.0; //0.2
+      public static final double kPTranslation = 8; //5.5
+      public static final double kITranslation = 0.3; //0.2
+      public static final double kDTranslation = 0.0; //0.0
 
-      public static final double kPTheta = 5; //2.95
-      public static final double kITheta = 0.1; //0.7
-      public static final double kDTheta = 0.1;
+      public static final double kPTheta = 3.5; //2.95
+      public static final double kITheta = 0.0; //0.7
+      public static final double kDTheta = 0.0;
       
       public static final PIDConstants kTranslationPIDConstants = new PIDConstants(kPTranslation, kITranslation, kDTranslation);
       public static final PIDConstants kThetaPIDConstants = new PIDConstants(kPTheta, kITheta, kDTheta);
     }
 
     public static class Auto {
-      public static final double kPTranslation = 8.45; //6.5
+      public static final double kPTranslation = 8; //6.5
       public static final double kITranslation = 0.3;
       public static final double kDTranslation = 0.01;
 
@@ -240,11 +241,15 @@ public final class Constants {
     }
 
     public static class PointTrack {
-      public static final double kPAutoTurning = 8;
+      public static final double kPAutoTurning = 0; //8
       public static final double kIAutoTurning = 0; 
       public static final double kDAutoTurning = 0;
 
-      public static final PIDController kThetaController = new PIDController(kPAutoTurning, kIAutoTurning, kDAutoTurning);
+      public static final AngularVelocity kMaxAngularVel = RadiansPerSecond.of(0.001 * Math.PI);
+      public static final AngularAcceleration kMaxAngularAccel = kMaxAngularVel.per(Second).times(2);
+
+      public static final ProfiledPIDController kThetaController = new ProfiledPIDController(kPAutoTurning, kIAutoTurning, kDAutoTurning, 
+          new TrapezoidProfile.Constraints(kMaxAngularVel.in(RadiansPerSecond), kMaxAngularAccel.in(RadiansPerSecondPerSecond)));
     }
 
     public static class ToPoint {
@@ -331,20 +336,21 @@ public final class Constants {
   }
 
   public static final class LEDConstants {
-    public static final int LED_PWM = 9; //port of LEDs on robot
+    public static final int ledPort1 = 8;
+    public static final int ledPort2 = 9;
   }
 
   public static class CameraConstants {
     public static class cam0 {
       public static final String name = "cam0";
-      public static final Translation3d translation = new Translation3d(Inches.of(-1.75), Inches.of(-3.1875), Inches.of(5));
-      public static final Rotation3d rotation = new Rotation3d(0, Units.degreesToRadians(-20), 0);
+      public static final Translation3d translation = new Translation3d(Inches.of(-1.75), Inches.of(-3.75), Inches.of(5));
+      public static final Rotation3d rotation = new Rotation3d(0, Units.degreesToRadians(-24), 0);
       public static final Transform3d offset = new Transform3d(translation, rotation);
     }
     public static class cam1 {
       public static final String name = "cam1";
-      public static final Translation3d translation = new Translation3d(Inches.of(-0.75), Inches.of(-12.75), Inches.of(10.25));
-      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(0),Units.degreesToRadians(0), Units.degreesToRadians(-5));
+      public static final Translation3d translation = new Translation3d(Inches.of(-0.75), Inches.of(-12), Inches.of(10));
+      public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(3), Units.degreesToRadians(0));
       public static final Transform3d offset = new Transform3d(translation, rotation);
     }
 

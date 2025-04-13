@@ -23,6 +23,9 @@ public class Climber extends SubsystemBase {
     private final RelativeEncoder climberEncoder;
     private final ProfiledPIDController climbController = new ProfiledPIDController(kClimbP.get(), kClimbI.get(), 0, new Constraints(kClimbMaxVel.get(), kClimbMaxAccel.get()));
 
+
+    boolean isClimbing;
+
     public Climber() {
         climberMotor = new SparkFlex(kClimberMotorPort, MotorType.kBrushless);
         climberEncoder = climberMotor.getEncoder();
@@ -52,6 +55,7 @@ public class Climber extends SubsystemBase {
         climbController.setGoal(position);
     }
 
+
     
     public double getPosition() {
         return climberEncoder.getPosition();
@@ -59,6 +63,7 @@ public class Climber extends SubsystemBase {
     
     public void stop() {
         climberMotor.stopMotor();
+        this.isClimbing = false;
     }
 
     /**
@@ -67,10 +72,13 @@ public class Climber extends SubsystemBase {
      */
     public void setClimberMotor(double speed) {
         climberMotor.set(speed);
+        this.isClimbing = true;
     }
 
+    
+    
+
     public Command runClimbCommand(Supplier<Double> power) {
-        LEDSubsystem.ledState = LEDState.CLIMB;
         return runEnd(() -> setClimberMotor(power.get()), this::stop);
 
     }
@@ -81,5 +89,14 @@ public class Climber extends SubsystemBase {
 
     public Command climbInCommand() {
         return runClimbCommand(() -> 0.8).until(() -> getPosition() > 120);
+    }
+
+
+    public boolean isClimbing(){
+        return this.isClimbing;   
+    }
+
+    public boolean isClimbed() {
+        return getPosition() > 120;
     }
 }

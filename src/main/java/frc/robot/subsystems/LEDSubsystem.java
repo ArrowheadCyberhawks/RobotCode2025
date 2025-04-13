@@ -2,6 +2,7 @@ package frc.robot.subsystems;
 
 import static frc.robot.constants.Constants.LEDConstants.*;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
 
@@ -9,41 +10,65 @@ import frc.robot.subsystems.LEDSubsystem.LEDState;
 
 public class LEDSubsystem extends SubsystemBase {
 
-  private Spark ledPWMController;
+  private final Spark blinkin1, blinkin2;
 
   public enum LEDState{
-    OFF, //black 
-    DEFAULT, //pink
-    CORAL, //white 
-    ALGAE, //teal
-    CLIMB, //blue 
-    ISSUE, //strobe red
-    EMAIL, // purple 
-    AUTO, //pink and black strobe 
-    ONREEF, //flashing light blue
-    ISCLIMBED
+    OFF(LEDMode.DARKGRAY), //black 
+    DEFAULT(LEDMode.HOTPINK), //pink
+    CORAL(LEDMode.WHITE), //white 
+    ALGAE(LEDMode.AQUA), //teal
+    EMAIL(LEDMode.ORANGE), // purple 
+    CLIMB(LEDMode.BLUE), //blue 
+    ONREEF(LEDMode.STROBEGOLD), //flashing light blue
+    ISSUE(LEDMode.STROBERED), //strobe red
+    AUTO(LEDMode.HOTPINK), //pink and black strobe 
+    ISCLIMBED(LEDMode.PARTY);
+
+    LEDMode ledMode;
+
+    private LEDState(LEDMode ledMode) {
+      this.ledMode = ledMode;
+    }
+
+    public LEDMode getLedMode() {
+      return ledMode;
+    }
   }
 
   //used for controlling lights
   public static LEDState ledState = LEDState.DEFAULT;
 
   public LEDSubsystem() {
-    ledPWMController = new Spark(LED_PWM);
+    blinkin1 = new Spark(ledPort1);
+    blinkin2 = new Spark(ledPort2);
+    // blinkin1.addFollower(blinkin2);
     //sets the PWM port it's wired to on the rio
+  }
+
+  @Override
+  public void periodic() {
+    // This method will be called once per scheduler run
+    setLEDMode(ledState.getLedMode());
   }
 
   public void setLEDMode(LEDMode ledMode) {
     // Sets a LED mode
-    ledPWMController.set(ledMode.pwmSignal);
+    blinkin1.set(ledMode.pwmSignal);
+    blinkin2.set(ledMode.pwmSignal);
   }
 
-  public static void setLedState(LEDState state) {
+  public static void setLEDState(LEDState state) {
     ledState = state;
   }
   
   public void setLEDPWM(double PWM) {
     //Sets the PWM signal manually
-    ledPWMController.set(PWM);
+    blinkin1.set(PWM);
+    blinkin2.set(PWM);
+  }
+
+  public Command setLEDStateCommand(LEDState state) {
+    return run(() -> setLEDState(state));//.finallyDo(() -> setLEDState(LEDState.DEFAULT));
   }
 
 

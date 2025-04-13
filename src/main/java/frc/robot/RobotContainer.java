@@ -201,7 +201,19 @@ public class RobotContainer {
 				.withInterruptBehavior(InterruptionBehavior.kCancelSelf);
 
 		swerveSubsystem.setDefaultCommand(getTeleopCommand());
-		ledSubsystem.setDefaultCommand(new LEDCommand(ledSubsystem));
+
+		
+
+		ledSubsystem.setDefaultCommand(ledSubsystem.setLEDStateCommand(LEDState.DEFAULT));
+		new Trigger(grabber::hasAlgae).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ALGAE));
+		new Trigger(grabber::hasCoral).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.CORAL));
+		new Trigger(DriverStation::isAutonomous).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.AUTO));
+		// new Trigger(() -> grabber.onReef() && grabber.hasCoral()).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ONREEF));
+		new Trigger(climber::isClimbing).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.CLIMB));
+		new Trigger(climber::isClimbed).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ISCLIMBED));
+		new Trigger(grabber::isEmail).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.EMAIL));
+
+
 		configureBindings();
 	}
 
