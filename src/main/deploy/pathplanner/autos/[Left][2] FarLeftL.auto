@@ -39,12 +39,6 @@
         {
           "type": "named",
           "data": {
-            "name": "FarLeftL"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
             "name": "OUTTAKE"
           }
         },
@@ -71,7 +65,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "DEF"
+                        "name": "HUMAN"
                       }
                     }
                   ]
@@ -122,12 +116,6 @@
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "NearLeftL"
           }
         },
         {

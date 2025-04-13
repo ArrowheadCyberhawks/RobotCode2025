@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 1.0725,
-        "y": 1.0317499999999995
+        "x": 7.531533594823824,
+        "y": 4.917969066781168
       },
       "prevControl": null,
       "nextControl": {
-        "x": 1.9714603552720606,
-        "y": 2.333389339252668
+        "x": 7.227354452055647,
+        "y": 5.550107020552717
       },
       "isLocked": false,
-      "linkedName": "RightStation"
+      "linkedName": "BargeR"
     },
     {
       "anchor": {
-        "x": 3.223618526467105,
-        "y": 4.1195667024286955
+        "x": 5.1852060339335875,
+        "y": 4.997515449033143
       },
       "prevControl": {
-        "x": 2.3568123243300634,
-        "y": 2.8177329154677713
+        "x": 5.939387894847971,
+        "y": 6.3188469656705095
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": "NearR"
+      "linkedName": "FarLeftC"
     }
   ],
   "rotationTargets": [],
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": -119.99999999999999
   },
   "reversed": false,
-  "folder": "StationToBranch",
+  "folder": "BargeToAlgae",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 54.04133887389291
+    "rotation": 0.0
   },
   "useDefaultConstraints": true
 }

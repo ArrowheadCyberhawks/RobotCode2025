@@ -16,11 +16,12 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 
 public class Climber extends SubsystemBase {
     private final SparkFlex climberMotor;
     private final RelativeEncoder climberEncoder;
-    private final ProfiledPIDController climbController = new ProfiledPIDController(kClimbP.get(), kClimbI.get(), 0, new Constraints(kClimbMaxVel.get(), kClimbMaxAccel.get()));                                                                                                                                                                                                                                                      //fien
+    private final ProfiledPIDController climbController = new ProfiledPIDController(kClimbP.get(), kClimbI.get(), 0, new Constraints(kClimbMaxVel.get(), kClimbMaxAccel.get()));
 
     public Climber() {
         climberMotor = new SparkFlex(kClimberMotorPort, MotorType.kBrushless);
@@ -69,7 +70,9 @@ public class Climber extends SubsystemBase {
     }
 
     public Command runClimbCommand(Supplier<Double> power) {
+        LEDSubsystem.ledState = LEDState.CLIMB;
         return runEnd(() -> setClimberMotor(power.get()), this::stop);
+
     }
 
     public Command climbOutCommand() {

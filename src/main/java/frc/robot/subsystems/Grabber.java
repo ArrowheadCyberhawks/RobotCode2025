@@ -24,6 +24,8 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
+
 import com.playingwithfusion.TimeOfFlight;
 import com.playingwithfusion.TimeOfFlight.RangingMode;
 
@@ -79,7 +81,10 @@ public class Grabber extends SubsystemBase {
 
         Logger.recordOutput(getName() + "/Algae Range", getAlgaeRange().in(Centimeter));
         Logger.recordOutput(getName() + "/Reef Range", getReefRange().in(Centimeter));
+        if(onReef()){
+        LEDSubsystem.ledState = LEDState.ONREEF;
 
+        }
         //Controling LEDS
 
         // if(hasAlgae() || hasCoral()) {
@@ -157,6 +162,23 @@ public class Grabber extends SubsystemBase {
     
     public void setGrabberState(GrabberState state) {
         grabberState = state;
+        
+        switch (state) {
+            case INTAKE: LEDSubsystem.ledState = LEDState.ALGAE;
+
+        }
+
+        
+        if(hasAlgae()){
+            LEDSubsystem.ledState = LEDState.ALGAE;
+        }
+        else if(hasCoral()){
+            LEDSubsystem.ledState = LEDState.CORAL;
+        }
+        else {
+        LEDSubsystem.ledState = LEDState.ALGAE;
+
+        }
     }
 
     public void setCurrentLimit(int amps) {
@@ -212,7 +234,9 @@ public class Grabber extends SubsystemBase {
     public Command intakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(20);
+        LEDSubsystem.ledState = LEDState.ALGAE;
         return startEnd(() -> setGrabberState(GrabberState.INTAKE), () -> setGrabberState(GrabberState.HOLD)).until(this::hasAlgae);
+    
     }
 
     public Command holdCommand() {
@@ -223,10 +247,12 @@ public class Grabber extends SubsystemBase {
     public Command outtakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(40);
-        if(hasCoral())
+        LEDSubsystem.ledState = LEDState.EMAIL;
+        if(hasCoral()) {
             return startEnd(() -> setGrabberState(GrabberState.OUTTAKE_C), () -> setGrabberState(GrabberState.STOP));
-        else
+        } else {
             return startEnd(() -> setGrabberState(GrabberState.OUTTAKE_A), () -> setGrabberState(GrabberState.STOP));
+        }
     }
 
     public Command stopIntakeCommand() {

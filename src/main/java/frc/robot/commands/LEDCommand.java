@@ -19,13 +19,18 @@ public class LEDCommand extends Command{
     }
 
     public void execute(){
-        setLEDMode(LEDState.OFF, LEDMode.BLACK);
-        setLEDMode(LEDState.IN, LEDMode.VIOLET);
-        setLEDMode(LEDState.OUT, LEDMode.RED);
-        setLEDMode(LEDState.ALIGN, LEDMode.BLUE);
-        setLEDMode(LEDState.READY, LEDMode.GREEN);
-        setLEDMode(LEDState.ERROR, LEDMode.STROBERED);
-        setLEDMode(LEDState.DEF, LEDMode.HOTPINK);
+        checkState(LEDState.OFF, LEDMode.DARKGRAY);
+        checkState(LEDState.CORAL, LEDMode.WHITE);
+        checkState(LEDState.ALGAE, LEDMode.GREEN);
+        checkState(LEDState.EMAIL, LEDMode.ORANGE);
+        checkState(LEDState.CLIMB, LEDMode.BLUE);
+        checkState(LEDState.ONREEF, LEDMode.GREEN);
+        checkState(LEDState.ISSUE, LEDMode.RED);
+        checkState(LEDState.DEFAULT, LEDMode.HOTPINK);
+        checkState(LEDState.AUTO, LEDMode.VIOLET);
+        checkState(LEDState.ISCLIMBED, LEDMode.GLITTER);
+
+
     }    
 
     public boolean isFinished(){
@@ -34,7 +39,7 @@ public class LEDCommand extends Command{
 
     public void periodic() {
         //might have to change to a different color idrk
-        //LEDSubsystem.ledState = LEDState.DEF;
+        //LEDSubsystem.ledState = LEDState.DEF; //BROKEN CODE NITIN U BUM
     }
 
     /**
@@ -42,7 +47,7 @@ public class LEDCommand extends Command{
      * @param state The LED State of the robot
      * @param mode The desired LED Mode/Color
      */
-    public void setLEDMode(LEDState state, LEDMode mode) {
+    public void checkState(LEDState state, LEDMode mode) {
         if(LEDSubsystem.ledState == state){
             ledSubsystem.setLEDMode(mode);
         }

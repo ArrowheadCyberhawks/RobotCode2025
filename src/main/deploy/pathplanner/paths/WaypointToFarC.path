@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 6.212111631651574,
-        "y": 3.892166478764723
+        "x": 6.0396184008833,
+        "y": 3.9097403174291414
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.962111631651574,
-        "y": 3.892166478764723
+        "x": 5.7896184008833,
+        "y": 3.9097403174291414
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "FarCWaypoint"
     },
     {
       "anchor": {
-        "x": 5.67482760457779,
-        "y": 3.8808580989530355
+        "x": 5.66524959208542,
+        "y": 3.9097403174291414
       },
       "prevControl": {
-        "x": 5.9242226263888496,
-        "y": 3.8634764104314567
+        "x": 5.9152420683315805,
+        "y": 3.9116798586926698
       },
       "nextControl": null,
       "isLocked": false,
@@ -34,9 +34,9 @@
   "eventMarkers": [],
   "globalConstraints": {
     "maxVelocity": 1.0,
-    "maxAcceleration": 2.0,
-    "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0,
+    "maxAcceleration": 0.6,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },

@@ -28,6 +28,7 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.Superstructure.*;
 //import lib.frc706.cyberlib.commands.controller.ControllerRumbleCommand;
 import lib.frc706.cyberlib.subsystems.*;
@@ -205,6 +206,7 @@ public class AlignToReef {
     private Command autoScoreCommand(ReefPoint reef, PathPlannerPath path) {
 
         //if close enough it uses PID
+        LEDSubsystem.ledState = LEDState.AUTO;
         if (swerveSubsystem.getPose().getTranslation().getDistance(path.getStartingHolonomicPose().get().getTranslation()) < 0.255) {
             return autoDrive(reef.getPose()).alongWith(getSuperStructure(reef.getPose()));
         }

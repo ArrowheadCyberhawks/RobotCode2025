@@ -10,6 +10,7 @@ import lib.frc706.cyberlib.commands.TrackPointCommand;
 import lib.frc706.cyberlib.commands.controller.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
@@ -303,8 +304,8 @@ public class RobotContainer {
 
 	//ADD HUMAN PLAYER STATIONS, IN FIELDCONSTANTS :)
 
-	keypadHID.button(1).whileTrue(grabber.intakeCommand());
-	keypadHID.button(4).whileTrue(grabber.outtakeCommand());
+	//keypadHID.button(1).whileTrue(grabber.intakeCommand());
+	//keypadHID.button(4).whileTrue(grabber.outtakeCommand());
 	keypadHID.button(2).onTrue(superstructure.LO()); //switch to human intake
 
 	keypadHID.button(7).onTrue(superstructure.setNextSuperStructure(SuperStructureState.BARGE));
@@ -321,6 +322,10 @@ public class RobotContainer {
 	keypadHID.button(6).onTrue(superstructure.setNextSuperStructure(SuperStructureState.L4));
 
 	keypadHID.button(21).onTrue(superstructure.setNextSuperStructure(SuperStructureState.INTAKE));
+
+
+	keypadHID.button(1).onTrue(new InstantCommand(() -> LEDSubsystem.ledState = LEDState.ONREEF));
+
 
 
     //MANIPULATOR CONTROLLER
@@ -344,7 +349,7 @@ public class RobotContainer {
 		manipulatorController.pov(180).onTrue(superstructure.Processor());
 
 		//Intake/Outake
-		manipulatorController.leftTrigger().whileTrue(grabber.run(()->grabber.setGrabberState(GrabberState.INTAKE))).onFalse(grabber.run(()->grabber.setGrabberState(GrabberState.HOLD)));
+		manipulatorController.leftTrigger().whileTrue(grabber.run(()->grabber.setGrabberState(GrabberState.INTAKE))).onFalse(grabber.run(() -> grabber.setGrabberState(GrabberState.HOLD)));																																																				//fien 
 		manipulatorController.rightTrigger().whileTrue(grabber.outtakeCommand());
 
 		// manipulatorController.start().onTrue(grabber.runOnce(() -> pivot.resetPivotAngle(new Rotation2d(3*Math.PI/2))).ignoringDisable(true));		
