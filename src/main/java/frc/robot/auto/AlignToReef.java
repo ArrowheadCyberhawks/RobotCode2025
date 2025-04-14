@@ -50,9 +50,9 @@ public class AlignToReef {
     private final double modeVal = 0.5;
 
     //for more flexibility
-    PathConstraints coralPathConstraints = new PathConstraints(1.5, 1, Math.PI, 2*Math.PI);
-    PathConstraints algaePathConstraints = new PathConstraints(1.5, 1, Math.PI, 2*Math.PI);
-    PathConstraints stationPathConstraints = new PathConstraints(1.5, 1, Math.PI, 2*Math.PI);
+    PathConstraints coralPathConstraints = new PathConstraints(3, 3, 2 * Math.PI, Math.PI);
+    PathConstraints algaePathConstraints = new PathConstraints(1.5, 1, 2 * Math.PI, Math.PI);
+    PathConstraints stationPathConstraints = new PathConstraints(1.5, 1, 2 * Math.PI, Math.PI);
 
     public AlignToReef(SwerveSubsystem swerveSubsystem, Superstructure superstructure, Grabber grabber) {
         this.swerveSubsystem = swerveSubsystem;
