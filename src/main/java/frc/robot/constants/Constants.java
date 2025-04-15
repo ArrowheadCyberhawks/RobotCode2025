@@ -94,12 +94,12 @@ public final class Constants {
       L1(0.444),
       L2(0.218), //0.269 
       L3(0.605), 
-      L4(1.266), //1.354
+      L4(1.327), //1.354
       HI(maxHeight),
       HUMAN(0.907),
       CLEAR(1.1),
-      ALG3(0.849),
-      ALG2(0.368);
+      ALG3(0.78),
+      ALG2(0.46);
 
       private final double height;
 
@@ -152,7 +152,7 @@ public final class Constants {
       OUT(Rotation2d.fromDegrees(5.0 + grabberOffset)),
       PLACE(Rotation2d.fromRadians(1.224)),
       LO(Rotation2d.fromRadians(2.243)),
-      L4(Rotation2d.fromRadians(1.071)),
+      L4(Rotation2d.fromRadians(0.97)),
       HUMAN(Rotation2d.fromRadians(4.016)),
 
 
@@ -241,11 +241,11 @@ public final class Constants {
     }
 
     public static class PointTrack {
-      public static final double kPAutoTurning = 0; //8
+      public static final double kPAutoTurning = 7.5; //8
       public static final double kIAutoTurning = 0; 
       public static final double kDAutoTurning = 0;
 
-      public static final AngularVelocity kMaxAngularVel = RadiansPerSecond.of(0.001 * Math.PI);
+      public static final AngularVelocity kMaxAngularVel = RadiansPerSecond.of(0.01 * Math.PI); //DOESN'T WORK ?!?!?!?!?!
       public static final AngularAcceleration kMaxAngularAccel = kMaxAngularVel.per(Second).times(2);
 
       public static final ProfiledPIDController kThetaController = new ProfiledPIDController(kPAutoTurning, kIAutoTurning, kDAutoTurning, 

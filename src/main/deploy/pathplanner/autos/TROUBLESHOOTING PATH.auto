@@ -34,7 +34,7 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "CLIMBOUT"
+                        "name": "CHECK2"
                       }
                     },
                     {
@@ -54,12 +54,6 @@
                       "type": "wait",
                       "data": {
                         "waitTime": 1.0
-                      }
-                    },
-                    {
-                      "type": "named",
-                      "data": {
-                        "name": "L4"
                       }
                     },
                     {

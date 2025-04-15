@@ -44,8 +44,8 @@ public class AutoCommandManager {
             "AutoCommandManager/maxAngularAccel", 4 * Math.PI);
 
     public AutoCommandManager(SwerveSubsystem swerveSubsystem, Superstructure superstructure, Grabber grabberSubsystem,
-            Climber climberSubsystem, AlignToReef reef) {
-        configureNamedCommands(swerveSubsystem, superstructure, grabberSubsystem, climberSubsystem, reef);
+            Climber climberSubsystem) {
+        configureNamedCommands(swerveSubsystem, superstructure, grabberSubsystem, climberSubsystem);
         Pathfinding.setPathfinder(new LocalADStarAK());
         // all pathplanner autos
         autoChooser = AutoBuilder.buildAutoChooser();
@@ -62,7 +62,7 @@ public class AutoCommandManager {
     }
 
     public void configureNamedCommands(SwerveSubsystem swerveSubsystem, Superstructure superstructure,
-            Grabber grabberSubsystem, Climber climberSubsystem, AlignToReef alignmentCommandFactory) { // add more when
+            Grabber grabberSubsystem, Climber climberSubsystem) { // add more when
                                                                                                        // more
                                                                                                        // subsystems are
                                                                                                        // made
@@ -72,6 +72,10 @@ public class AutoCommandManager {
         //         .until(grabberSubsystem::hasAlgae))
         //         .withTimeout(5)
         // );
+        NamedCommands.registerCommand("CHECK", Commands.print("TEST FLAG 1"));
+        NamedCommands.registerCommand("CHECK2", Commands.print("TEST FLAG 2"));
+        NamedCommands.registerCommand("CHECK3", Commands.print("TEST FLAG 3"));
+
         NamedCommands.registerCommand("INTAKE", grabberSubsystem.intakeCommand().withTimeout(5).finallyDo(() -> grabberSubsystem.setGrabberState(GrabberState.HOLD)));
         // NamedCommands.registerCommand("HOLD", grabberSubsystem.runGrabberCommand(() -> GrabberState.HOLD.getSpeed()).withTimeout(2.0));
         NamedCommands.registerCommand("OUTTAKE_C", grabberSubsystem.startEnd(() -> grabberSubsystem.setGrabberState(GrabberState.OUTTAKE_C), () -> grabberSubsystem.setGrabberState(GrabberState.STOP)).withTimeout(1.0));
@@ -89,30 +93,7 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("ALG2", superstructure.Algae2().withTimeout(2));
         NamedCommands.registerCommand("ALG3", superstructure.Algae3().withTimeout(2.25));
 
-        NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.climbOutCommand());
-
-        NamedCommands.registerCommand("FarLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftL).withTimeout(.5));
-        NamedCommands.registerCommand("FarLeftR", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftR).withTimeout(.5));
-        NamedCommands.registerCommand("NearLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftL).withTimeout(.5));
-        NamedCommands.registerCommand("NearLeftR", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftR).withTimeout(.5));
-        NamedCommands.registerCommand("FarR", alignmentCommandFactory.generateCommand(ReefPoint.kFarR).withTimeout(.5));
-        NamedCommands.registerCommand("FarC", alignmentCommandFactory.generateCommand(ReefPoint.kFarC).withTimeout(.5));
-        NamedCommands.registerCommand("FarL", alignmentCommandFactory.generateCommand(ReefPoint.kFarL).withTimeout(.5));
-        NamedCommands.registerCommand("NearR", alignmentCommandFactory.generateCommand(ReefPoint.kNearR).withTimeout(.5));
-        NamedCommands.registerCommand("NearC", alignmentCommandFactory.generateCommand(ReefPoint.kNearC).withTimeout(.5));
-        NamedCommands.registerCommand("NearL", alignmentCommandFactory.generateCommand(ReefPoint.kNearL).withTimeout(.5));
-        NamedCommands.registerCommand("FarRightR", alignmentCommandFactory.generateCommand(ReefPoint.kFarRightR).withTimeout(.5));
-        NamedCommands.registerCommand("FarRightC", alignmentCommandFactory.generateCommand(ReefPoint.kFarRightC).withTimeout(.5));
-        NamedCommands.registerCommand("FarRightL", alignmentCommandFactory.generateCommand(ReefPoint.kFarRightL).withTimeout(.5));
-        NamedCommands.registerCommand("NearRightR", alignmentCommandFactory.generateCommand(ReefPoint.kNearRightR).withTimeout(.5));
-        NamedCommands.registerCommand("NearRightC", alignmentCommandFactory.generateCommand(ReefPoint.kNearRightC).withTimeout(.5));
-        NamedCommands.registerCommand("NearRightL", alignmentCommandFactory.generateCommand(ReefPoint.kNearRightL).withTimeout(.5));
-        NamedCommands.registerCommand("FarLeftR", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftR).withTimeout(.5));
-        NamedCommands.registerCommand("FarLeftC", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftC).withTimeout(.5));
-        NamedCommands.registerCommand("FarLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kFarLeftL).withTimeout(.5));
-        NamedCommands.registerCommand("NearLeftR", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftR).withTimeout(.5));
-        NamedCommands.registerCommand("NearLeftC", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftC).withTimeout(.5));
-        NamedCommands.registerCommand("NearLeftL", alignmentCommandFactory.generateCommand(ReefPoint.kNearLeftL).withTimeout(.5));
+        NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.runClimbCommand(() -> -0.8).withTimeout(0.75));
 
     }
 

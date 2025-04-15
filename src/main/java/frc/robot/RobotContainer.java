@@ -16,7 +16,6 @@ import swervelib.telemetry.SwerveDriveTelemetry;
 import swervelib.telemetry.SwerveDriveTelemetry.TelemetryVerbosity;
 import frc.robot.auto.AlignToReef;
 import frc.robot.auto.DriveToPose;
-import frc.robot.commands.LEDCommand;
 import frc.robot.commands.ManualElevatorCommand;
 import frc.robot.commands.ManualPivotCommand;
 import frc.robot.constants.Constants;
@@ -25,7 +24,6 @@ import frc.robot.constants.Constants.PID;
 import frc.robot.constants.Constants.ReefPoint;
 import frc.robot.constants.Constants.SwerveConstants;
 import frc.robot.constants.Constants.GrabberConstants.GrabberState;
-import frc.robot.constants.Constants.GrabberConstants.PivotPosition;
 import frc.robot.constants.Constants.PID.PointTrack;
 
 import java.io.File;
@@ -183,7 +181,7 @@ public class RobotContainer {
 		alignmentCommandFactory = new AlignToReef(swerveSubsystem, superstructure, grabber);
 
 		// commands and stuff
-		autoManager = new AutoCommandManager(swerveSubsystem, superstructure, grabber, climber, alignmentCommandFactory);
+		autoManager = new AutoCommandManager(swerveSubsystem, superstructure, grabber, climber);
 		// alignmentCommandFactory = new AlignToReef(swerveSubsystem);
 
 		//autoCycleCommandFactory = new AutoCycle(swerveSubsystem, superstructure, grabber);
@@ -202,8 +200,6 @@ public class RobotContainer {
 
 		swerveSubsystem.setDefaultCommand(getTeleopCommand());
 
-		
-
 		ledSubsystem.setDefaultCommand(ledSubsystem.setLEDStateCommand(LEDState.DEFAULT));
 		new Trigger(grabber::hasAlgae).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ALGAE));
 		new Trigger(grabber::hasCoral).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.CORAL));
@@ -212,7 +208,6 @@ public class RobotContainer {
 		new Trigger(climber::isClimbing).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.CLIMB));
 		new Trigger(climber::isClimbed).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ISCLIMBED));
 		new Trigger(grabber::isEmail).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.EMAIL));
-
 
 		configureBindings();
 	}
@@ -255,12 +250,12 @@ public class RobotContainer {
 				() -> driverController.getRightTriggerAxis(),
 				SwerveConstants.kMaxVelTele.in(MetersPerSecond), SwerveConstants.kMaxAngularVelTele.in(RadiansPerSecond)));
 
-		// driverController.leftBumper().whileTrue(
-		// 	new DriveToPose(swerveSubsystem, 
-		// 		Constants.FieldPosition.kBargeMiddle::getPose,
-		// 		() -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Red).equals(DriverStation.Alliance.Red) ? driverController.getLeftX() : -driverController.getLeftX()
-		// 	)
-		// );
+		driverController.leftBumper().whileTrue(
+			new DriveToPose(swerveSubsystem, 
+				Constants.FieldPosition.kBargeMiddle::getPose,
+				() -> DriverStation.getAlliance().orElse(DriverStation.Alliance.Red).equals(DriverStation.Alliance.Red) ? driverController.getLeftX() : -driverController.getLeftX()
+			)
+		);
 
 		driverController.leftTrigger().and(driverController.rightBumper()).whileTrue(
 			new RunCommand(

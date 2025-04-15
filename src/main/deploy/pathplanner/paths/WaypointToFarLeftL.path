@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.62511824970786,
-        "y": 5.342774792875423
+        "x": 5.570432028809183,
+        "y": 5.3369510631319494
       },
       "prevControl": null,
       "nextControl": {
-        "x": 5.482184362681104,
-        "y": 5.095206038421771
+        "x": 5.427498141782427,
+        "y": 5.089382308678298
       },
       "isLocked": false,
       "linkedName": "FarLeftLWaypoint"
     },
     {
       "anchor": {
-        "x": 5.401723064300174,
-        "y": 4.9778847338741965
+        "x": 5.352461056328464,
+        "y": 4.976308181391122
       },
       "prevControl": {
-        "x": 5.553047699597921,
-        "y": 5.2399866906467265
+        "x": 5.503785691626211,
+        "y": 5.238410138163652
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 4.0,
-    "maxAcceleration": 3.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 2.0,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,

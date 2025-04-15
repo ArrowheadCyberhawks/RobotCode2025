@@ -13,7 +13,7 @@ public class LEDSubsystem extends SubsystemBase {
   private final Spark blinkin1, blinkin2;
 
   public enum LEDState{
-    OFF(LEDMode.DARKGRAY), //black 
+    OFF(LEDMode.BLACK), //black 
     DEFAULT(LEDMode.HOTPINK), //pink
     CORAL(LEDMode.WHITE), //white 
     ALGAE(LEDMode.AQUA), //teal
@@ -21,7 +21,7 @@ public class LEDSubsystem extends SubsystemBase {
     CLIMB(LEDMode.BLUE), //blue 
     ONREEF(LEDMode.STROBEGOLD), //flashing light blue
     ISSUE(LEDMode.STROBERED), //strobe red
-    AUTO(LEDMode.HOTPINK), //pink and black strobe 
+    AUTO(LEDMode.STROBE), //pink and black strobe 
     ISCLIMBED(LEDMode.PARTY);
 
     LEDMode ledMode;

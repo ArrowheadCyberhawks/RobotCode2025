@@ -163,7 +163,7 @@ public class Superstructure extends SubsystemBase{
 		return new ParallelCommandGroup(
 			elevator.setLevelCommand(ElevatorLevel.HI),
 			pivot.setPivotPositionCommand(PivotPosition.HI),
-			grabber.outtakeCommand()
+			grabber.runGrabberCommand(GrabberState.OUTTAKE_A::getSpeed)
 				.withTimeout(0.75)
 				.beforeStarting(
 					new WaitUntilCommand(() -> elevator.getHeight().in(Meters) > ElevatorLevel.HI.getHeight() - 0.25)

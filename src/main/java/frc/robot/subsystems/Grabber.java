@@ -18,6 +18,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.filter.Debouncer.DebounceType;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -70,7 +71,7 @@ public class Grabber extends SubsystemBase {
         reefSensor.setRangingMode(RangingMode.Short, 24);
         // reefSensor.setRangeOfInterest(8, 8, 12, 12);
 
-        new Trigger(this::hasCoral).onTrue(stopIntakeCommand());
+        new Trigger(this::hasCoral).and(DriverStation::isTeleop).onTrue(stopIntakeCommand());
     }
 
 

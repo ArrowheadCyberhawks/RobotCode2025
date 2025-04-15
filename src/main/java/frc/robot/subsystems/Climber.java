@@ -84,7 +84,7 @@ public class Climber extends SubsystemBase {
     }
 
     public Command climbOutCommand() {
-        return runClimbCommand(() -> -0.8).until(() -> getPosition() < -100);
+        return runClimbCommand(() -> -0.8).until(() -> getPosition() < -50);
     }
 
     public Command climbInCommand() {

@@ -3,13 +3,13 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 5.726458455345974,
-        "y": 3.7132517900133326
+        "x": 5.734283237760414,
+        "y": 3.6926990871917185
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.299182224279975,
-        "y": 3.6643228640685233
+        "x": 6.307007006694414,
+        "y": 3.643770161246909
       },
       "isLocked": false,
       "linkedName": "FarL"
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.5,
-    "maxAcceleration": 0.75,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 0.5,
     "maxAngularVelocity": 360.0,
     "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
@@ -50,5 +50,5 @@
     "velocity": 0,
     "rotation": 180.0
   },
-  "useDefaultConstraints": true
+  "useDefaultConstraints": false
 }
