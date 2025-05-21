@@ -39,13 +39,7 @@
         {
           "type": "named",
           "data": {
-            "name": "FarLeftL"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "OUTTAKE"
+            "name": "OUTTAKE_C"
           }
         },
         {
@@ -71,19 +65,13 @@
                     {
                       "type": "named",
                       "data": {
-                        "name": "DEF"
+                        "name": "HUMAN"
                       }
                     }
                   ]
                 }
               }
             ]
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 1.0
           }
         },
         {
@@ -127,19 +115,7 @@
         {
           "type": "named",
           "data": {
-            "name": "NearLeftL"
-          }
-        },
-        {
-          "type": "named",
-          "data": {
-            "name": "OUTTAKE"
-          }
-        },
-        {
-          "type": "wait",
-          "data": {
-            "waitTime": 5.0
+            "name": "OUTTAKE_C"
           }
         },
         {

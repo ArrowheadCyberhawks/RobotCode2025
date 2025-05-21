@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.08199972337685,
+        "y": 2.7914141829760126
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.219440459251235,
+        "y": 2.5533598454119226
+      },
+      "isLocked": false,
+      "linkedName": "FarRightC"
+    },
+    {
+      "anchor": {
+        "x": 5.212365433469364,
+        "y": 2.5828741177857046
+      },
+      "prevControl": {
+        "x": 5.050976016862105,
+        "y": 2.8624087871533765
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 4.0,
+    "maxAcceleration": 3.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 119.99999999999999
+  },
+  "reversed": false,
+  "folder": "Pluck",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 119.99999999999999
+  },
+  "useDefaultConstraints": false
+}

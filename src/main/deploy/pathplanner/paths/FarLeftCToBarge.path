@@ -1,0 +1,54 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 5.247116740375478,
+        "y": 5.20030129719995
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 5.688949555364893,
+        "y": 5.907140419947314
+      },
+      "isLocked": false,
+      "linkedName": "FarLeftC"
+    },
+    {
+      "anchor": {
+        "x": 7.577859503634259,
+        "y": 5.747036319178022
+      },
+      "prevControl": {
+        "x": 6.588663700817971,
+        "y": 5.783673200763811
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": "BargeM"
+    }
+  ],
+  "rotationTargets": [],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.5,
+    "maxAcceleration": 0.75,
+    "maxAngularVelocity": 360.0,
+    "maxAngularAcceleration": 180.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "reversed": false,
+  "folder": "BranchToNet",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": -119.99999999999999
+  },
+  "useDefaultConstraints": true
+}

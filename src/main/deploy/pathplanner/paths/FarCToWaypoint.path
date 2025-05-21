@@ -3,29 +3,29 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 14.061577868852458,
-        "y": 2.436629098360655
+        "x": 5.780167976458056,
+        "y": 3.8880358916930056
       },
       "prevControl": null,
       "nextControl": {
-        "x": 15.004481542026133,
-        "y": 1.8922434088339473
+        "x": 6.030167976458056,
+        "y": 3.8880358916930056
       },
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "FarC"
     },
     {
       "anchor": {
-        "x": 16.0,
-        "y": 1.0
+        "x": 6.217790401949863,
+        "y": 3.8880358916930056
       },
       "prevControl": {
-        "x": 15.07694672131148,
-        "y": 1.8132684426229506
+        "x": 5.967790401949863,
+        "y": 3.8880358916930056
       },
       "nextControl": null,
       "isLocked": false,
-      "linkedName": null
+      "linkedName": "FarCWaypoint"
     }
   ],
   "rotationTargets": [],
@@ -33,22 +33,22 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 0.5,
-    "maxAcceleration": 1.0,
+    "maxVelocity": 1.5,
+    "maxAcceleration": 0.75,
     "maxAngularVelocity": 360.0,
-    "maxAngularAcceleration": 360.0,
+    "maxAngularAcceleration": 180.0,
     "nominalVoltage": 12.0,
     "unlimited": false
   },
   "goalEndState": {
-    "velocity": 0,
-    "rotation": -56.8
+    "velocity": 1.0,
+    "rotation": 180.0
   },
   "reversed": false,
   "folder": null,
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 135.0
+    "rotation": 180.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
