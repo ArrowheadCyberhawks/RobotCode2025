@@ -48,7 +48,7 @@ public class Grabber extends SubsystemBase {
 
     private GrabberState grabberState = GrabberState.STOP;
 
-    boolean isEmail;
+    boolean isOutaking;
     
 
     /**
@@ -227,8 +227,6 @@ public class Grabber extends SubsystemBase {
     public Command outtakeCommand() {
         stopGrabberMotors();
         setCurrentLimit(40);
-        this.isEmail = true;
-       // LEDSubsystem.ledState = LEDState.EMAIL;
         if(hasCoral()) {
             return startEnd(() -> setGrabberState(GrabberState.OUTTAKE_C), () -> setGrabberState(GrabberState.STOP));
         } else {
@@ -250,7 +248,7 @@ public class Grabber extends SubsystemBase {
     
     }
 
-    public boolean isEmail(){
+    public boolean isOutaking(){
         return grabberMotor1.get() < -0.1;
     }
 

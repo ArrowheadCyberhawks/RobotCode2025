@@ -93,7 +93,7 @@ public class AutoCommandManager {
         NamedCommands.registerCommand("ALG2", superstructure.Algae2().withTimeout(2));
         NamedCommands.registerCommand("ALG3", superstructure.Algae3().withTimeout(2.25));
 
-        NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.runClimbCommand(() -> -0.8).withTimeout(0.75));
+        NamedCommands.registerCommand("CLIMBOUT", climberSubsystem.runClimbCommand(() -> -0.8).withTimeout(0.90));
 
     }
 

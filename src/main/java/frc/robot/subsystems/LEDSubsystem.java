@@ -17,7 +17,7 @@ public class LEDSubsystem extends SubsystemBase {
     DEFAULT(LEDMode.HOTPINK), //pink
     CORAL(LEDMode.WHITE), //white 
     ALGAE(LEDMode.AQUA), //teal
-    EMAIL(LEDMode.ORANGE), // purple 
+    OUTTAKE(LEDMode.STROBEGOLD), // purple 
     CLIMB(LEDMode.BLUE), //blue 
     ONREEF(LEDMode.STROBEGOLD), //flashing light blue
     ISSUE(LEDMode.STROBERED), //strobe red

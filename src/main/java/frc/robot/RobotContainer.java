@@ -116,7 +116,7 @@ public class RobotContainer {
 					IOConstants.kDriverControllerDeadband, 0.15) {
 				@Override
 				public double interpolate(double value) {
-					return value * MathUtil.interpolate(0.15, 0.5, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+					return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
 				}
 			};
 		} else {
@@ -124,7 +124,7 @@ public class RobotContainer {
 					IOConstants.kDriverControllerDeadband, 0.15) {
 					@Override
 				public double interpolate(double value) {
-					return value * MathUtil.interpolate(0.15, 0.5, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+					return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
 				}
 			};
 		}
@@ -207,7 +207,7 @@ public class RobotContainer {
 		// new Trigger(() -> grabber.onReef() && grabber.hasCoral()).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ONREEF));
 		new Trigger(climber::isClimbing).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.CLIMB));
 		new Trigger(climber::isClimbed).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ISCLIMBED));
-		new Trigger(grabber::isEmail).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.EMAIL));
+		new Trigger(grabber::isOutaking).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.OUTTAKE));
 
 		configureBindings();
 	}
@@ -331,8 +331,8 @@ public class RobotContainer {
 	keypadHID.button(21).onTrue(superstructure.setNextSuperStructure(SuperStructureState.INTAKE));
 
 
-	keypadHID.button(1).onTrue(new InstantCommand(() -> LEDSubsystem.ledState = LEDState.ONREEF));
-
+	keypadHID.button(1).onTrue(grabber.runGrabberCommand(GrabberState.OUTTAKE_C::getSpeed));
+	keypadHID.button(4).onTrue(ledSubsystem.setLEDStateCommand(LEDState.ISCLIMBED));
 
 
     //MANIPULATOR CONTROLLER

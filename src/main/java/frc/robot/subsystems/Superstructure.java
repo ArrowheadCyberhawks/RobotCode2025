@@ -40,7 +40,7 @@ public class Superstructure extends SubsystemBase{
         INTAKE
     }
 
-    public static SuperStructureState superStructureState = SuperStructureState.INTAKE;
+    public static SuperStructureState superStructureState = SuperStructureState.L3;
     public static SuperStructureState nextSuperStructureState = SuperStructureState.L3;
 
     public Superstructure(Elevator elevator, Arm pivot, Grabber grabber) {

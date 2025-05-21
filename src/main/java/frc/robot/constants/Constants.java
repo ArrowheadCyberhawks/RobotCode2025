@@ -175,9 +175,9 @@ public final class Constants {
     }
 
     public static enum GrabberState {
-      INTAKE(0.6),
-      OUTTAKE_A(-0.90),
-      OUTTAKE_C(-0.375),
+      INTAKE(0.8),
+      OUTTAKE_A(-0.93),
+      OUTTAKE_C(-0.40),//-0.375
       HOLD(0.15),
       STOP(0.0);
 
@@ -349,7 +349,7 @@ public final class Constants {
     }
     public static class cam1 {
       public static final String name = "cam1";
-      public static final Translation3d translation = new Translation3d(Inches.of(-0.75), Inches.of(-12), Inches.of(10));
+      public static final Translation3d translation = new Translation3d(Inches.of(-0.75), Inches.of(-12), Inches.of(10)); // if auto breaks -0.75 change to 0
       public static final Rotation3d rotation = new Rotation3d(Units.degreesToRadians(0), Units.degreesToRadians(3), Units.degreesToRadians(0));
       public static final Transform3d offset = new Transform3d(translation, rotation);
     }
