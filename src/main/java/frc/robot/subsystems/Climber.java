@@ -96,7 +96,5 @@ public class Climber extends SubsystemBase {
         return this.isClimbing;   
     }
 
-    public boolean isClimbed() {
-        return getPosition() > 120;
-    }
+    //}
 }

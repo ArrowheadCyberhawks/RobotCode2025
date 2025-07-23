@@ -10,6 +10,7 @@ import lib.frc706.cyberlib.commands.TrackPointCommand;
 import lib.frc706.cyberlib.commands.controller.XboxDriveCommand;
 import lib.frc706.cyberlib.subsystems.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.LEDSubsystem.LEDMode;
 import frc.robot.subsystems.LEDSubsystem.LEDState;
 import frc.robot.subsystems.Superstructure.SuperStructureState;
 import swervelib.telemetry.SwerveDriveTelemetry;
@@ -116,7 +117,7 @@ public class RobotContainer {
 					IOConstants.kDriverControllerDeadband, 0.15) {
 				@Override
 				public double interpolate(double value) {
-					return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+					return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.4999);
 				}
 			};
 		} else {
@@ -124,7 +125,7 @@ public class RobotContainer {
 					IOConstants.kDriverControllerDeadband, 0.15) {
 					@Override
 				public double interpolate(double value) {
-					return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.7);
+					return value * MathUtil.interpolate(0.15, 1, getRightTriggerAxis() - elevator.getHeight().in(Meters) / 1.4999);
 				}
 			};
 		}
@@ -206,7 +207,6 @@ public class RobotContainer {
 		new Trigger(DriverStation::isAutonomous).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.AUTO));
 		// new Trigger(() -> grabber.onReef() && grabber.hasCoral()).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ONREEF));
 		new Trigger(climber::isClimbing).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.CLIMB));
-		new Trigger(climber::isClimbed).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.ISCLIMBED));
 		new Trigger(grabber::isOutaking).whileTrue(ledSubsystem.setLEDStateCommand(LEDState.OUTTAKE));
 
 		configureBindings();
@@ -332,7 +332,10 @@ public class RobotContainer {
 
 
 	keypadHID.button(1).onTrue(grabber.runGrabberCommand(GrabberState.OUTTAKE_C::getSpeed));
-	keypadHID.button(4).onTrue(ledSubsystem.setLEDStateCommand(LEDState.ISCLIMBED));
+	keypadHID.button(4).onTrue(ledSubsystem.setLEDStateCommand(LEDState.ONREEF));
+
+	
+
 
 
     //MANIPULATOR CONTROLLER

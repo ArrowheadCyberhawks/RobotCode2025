@@ -19,10 +19,11 @@ public class LEDSubsystem extends SubsystemBase {
     ALGAE(LEDMode.AQUA), //teal
     OUTTAKE(LEDMode.STROBEGOLD), // purple 
     CLIMB(LEDMode.BLUE), //blue 
-    ONREEF(LEDMode.STROBEGOLD), //flashing light blue
+    ONREEF(LEDMode.COLORWAVESRAINBOW), //flashing light blue
+    ISCLIMBED(LEDMode.PARTY),
     ISSUE(LEDMode.STROBERED), //strobe red
-    AUTO(LEDMode.STROBE), //pink and black strobe 
-    ISCLIMBED(LEDMode.PARTY);
+    WHYTHEFUCKISNTTHISWORKING(LEDMode.RAINBOW),
+    AUTO(LEDMode.STROBE); //pink and black strobe 
 
     LEDMode ledMode;
 
